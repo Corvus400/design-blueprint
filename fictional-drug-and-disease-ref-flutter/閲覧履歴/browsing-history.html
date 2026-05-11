@@ -2598,7 +2598,13 @@
                   </div>
                   <div class="scroll">
                     <div class="hlist">
-                      <div class="hrow" data-row-type="drug" data-row-state="normal" aria-label="薬品の閲覧履歴">
+                      <div
+                        class="hrow"
+                        data-id="drug_AML012"
+                        data-row-type="drug"
+                        data-row-state="normal"
+                        aria-label="薬品の閲覧履歴"
+                      >
                         <div class="row-img">
                           <svg
                             class="drug-img-icon"
@@ -2666,7 +2672,13 @@
                           </div>
                         </div>
                       </div>
-                      <div class="hrow" data-row-type="disease" data-row-state="normal" aria-label="疾患の閲覧履歴">
+                      <div
+                        class="hrow"
+                        data-id="disease_HTN001"
+                        data-row-type="disease"
+                        data-row-state="normal"
+                        aria-label="疾患の閲覧履歴"
+                      >
                         <div class="row-body">
                           <div class="row-badges">
                             <span class="badge chronicity">慢性</span>
@@ -9489,7 +9501,32 @@
                   : no image, badges → name/time → kana → meta.
                 </li>
                 <li>Meta always includes ATC + revisedAt for drug rows, and ICD-10 + revisedAt for disease rows.</li>
+                <li>
+                  <code>id</code>
+                  naming: drug rows use
+                  <code>drug_&lt;DBID&gt;</code>
+                  and disease rows use
+                  <code>disease_&lt;DBID&gt;</code>
+                  .
+                  <code>data-row-type</code>
+                  is a derived UI attribute; the primary discriminator is the
+                  <code>id</code>
+                  prefix. The inverse
+                  <code>idx_browsing_id_prefix_date</code>
+                  (
+                  <code>substr(id, 1, 5)</code>
+                  ) accelerates type-tab filtering and corresponds to
+                  <code>specification/.../08_閲覧履歴DBスキーマ定義.md:18</code>
+                  .
+                </li>
                 <li>Tap → /drug/:id or /disease/:id (online fetch).</li>
+                <li>
+                  Tap failure: the destination detail screen shows the error, and the browsing-history screen remains
+                  unchanged (閲覧履歴画面側は状態不変). A screen-level error frame (UIState
+                  <code>.error(AppError)</code>
+                  ) is not used on this screen because history is read from LocalDB and name-resolution failure is
+                  absorbed by the §H-6 row-level err state.
+                </li>
                 <li>Left-swipe ≥ 48 dp → reveal red delete (§H-5).</li>
               </ul>
             </div>
@@ -10227,6 +10264,74 @@
               .
             </li>
           </ul>
+          <h3 style="font-size: 14px; margin: 28px 0 10px">Intentionally omitted frame combinations</h3>
+          <table class="matrix">
+            <thead>
+              <tr>
+                <th>State</th>
+                <th>Omitted device × theme</th>
+                <th>Rationale</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Loading</td>
+                <td>iPhone Landscape L/D</td>
+                <td>
+                  Landscape loading is derived from portrait Loading plus landscape Normal; no decoration differs.
+                </td>
+              </tr>
+              <tr>
+                <td>Loading</td>
+                <td>iPad Split L/D</td>
+                <td>Split-view loading disables interaction, and the right-pane skeleton is identical.</td>
+              </tr>
+              <tr>
+                <td>Name fetch fail</td>
+                <td>iPhone Landscape L/D</td>
+                <td>Row-level err presentation is invariant across device and theme.</td>
+              </tr>
+              <tr>
+                <td>Name fetch fail</td>
+                <td>iPad Portrait/Landscape/Split L/D</td>
+                <td>
+                  The iPhone Compact pair already defines the row-err pattern; tablet panes only reflow the same rows.
+                </td>
+              </tr>
+              <tr>
+                <td>Bulk Delete</td>
+                <td>iPhone Compact/Landscape/Split</td>
+                <td>The confirm UI is modal, so device-specific frame variance is not required.</td>
+              </tr>
+              <tr>
+                <td>Bulk Delete</td>
+                <td>iPad Portrait Dark</td>
+                <td>The light frame verifies modal layout; dark colors derive from existing color tokens.</td>
+              </tr>
+              <tr>
+                <td>Bulk Delete</td>
+                <td>iPad Landscape</td>
+                <td>Landscape uses the same modal layout as portrait.</td>
+              </tr>
+              <tr>
+                <td>Swipe</td>
+                <td>iPhone Compact Dark</td>
+                <td>The light frame verifies the swipe reveal; dark colors derive from existing color tokens.</td>
+              </tr>
+              <tr>
+                <td>Swipe</td>
+                <td>iPhone Landscape L/D</td>
+                <td>Geometry is identical to portrait swipe, including the translateX -72px reveal.</td>
+              </tr>
+              <tr>
+                <td>Swipe</td>
+                <td>iPad Split Dark</td>
+                <td>
+                  The light split-view frame verifies split swipe behavior; dark colors derive from existing tokens.
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </section>
 
         <!-- ====================================================================

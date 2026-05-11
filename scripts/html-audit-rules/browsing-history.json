@@ -82,6 +82,16 @@
       "min": 1
     },
     {
+      "selector": ".hrow[data-id^=\"drug_\"]",
+      "min": 1,
+      "message": "History row examples must include at least one drug_ data-id marker."
+    },
+    {
+      "selector": ".hrow[data-id^=\"disease_\"]",
+      "min": 1,
+      "message": "History row examples must include at least one disease_ data-id marker."
+    },
+    {
       "selector": ".frame.f-iphone-compact .scroll > .empty-wrap",
       "min": 1,
       "message": "Phone empty state must be inside the scrollable content area, not replacing fixed tabs."
