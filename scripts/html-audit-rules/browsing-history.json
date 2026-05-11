@@ -38,6 +38,26 @@
     {
       "selector": ".frame.f-iphone-landscape > .device > .scroll > .tabbar",
       "message": "iPhone landscape tabs must stay fixed outside the scroll area."
+    },
+    {
+      "selector": ".frame.f-ipad-portrait > .device > .scroll .tabbar",
+      "message": "iPad portrait tabs must stay fixed in the left pane, outside the scroll area."
+    },
+    {
+      "selector": ".frame.f-ipad-landscape > .device > .scroll .tabbar",
+      "message": "iPad landscape tabs must stay fixed in the left pane, outside the scroll area."
+    },
+    {
+      "selector": ".frame.f-tablet-splitview > .device > .scroll .tabbar",
+      "message": "Split-view tabs must stay fixed in the left pane, outside the scroll area."
+    },
+    {
+      "selector": ".frame[data-frame-label=\"iPad Split 50:50 × Light × Empty\"]",
+      "message": "Split-view Empty is redundant with iPad Empty and must not be retained as a light-only extra frame."
+    },
+    {
+      "selector": ".hrow .row-retry",
+      "message": "Row-level retry buttons are forbidden; use the screen-level Retry FAB instead."
     }
   ],
   "forbiddenText": [
@@ -48,7 +68,8 @@
     "API failure",
     "再試行",
     "pane-right-list",
-    "row-level retry"
+    "row-level retry",
+    "repeat(auto-fit, minmax(720px, max-content))"
   ],
   "requiredSelectors": [
     {
@@ -74,6 +95,36 @@
       "selector": ".frame.f-ipad-landscape .pane:not(.pane-left) > .empty-wrap",
       "min": 1,
       "message": "iPad landscape empty state must render in the right/content pane."
+    },
+    {
+      "selector": ".frame.f-iphone-landscape > .device > .body-pane2 > .pane-left .tabbar",
+      "min": 1,
+      "message": "iPhone landscape frames must use the two-pane fixed-tab layout."
+    },
+    {
+      "selector": ".frame.f-ipad-portrait > .device > .body-pane2 > .pane-left .tabbar",
+      "min": 1,
+      "message": "iPad portrait frames must use the two-pane fixed-tab layout."
+    },
+    {
+      "selector": ".frame.f-ipad-landscape > .device > .body-pane2 > .pane-left .tabbar",
+      "min": 1,
+      "message": "iPad landscape frames must use the two-pane fixed-tab layout."
+    },
+    {
+      "selector": ".frame.f-tablet-splitview > .device > .body-pane2 > .pane-left .tabbar",
+      "min": 1,
+      "message": "Split-view frames must use the two-pane fixed-tab layout."
+    },
+    {
+      "selector": ".frame[data-frame-label=\"iPad Landscape × Dark × Loading\"]",
+      "min": 1,
+      "message": "iPad landscape loading state must include a dark-mode frame."
+    },
+    {
+      "selector": ".frame[data-frame-label=\"iPhone Compact × Dark × Loading\"]",
+      "min": 1,
+      "message": "iPhone compact loading state must include a dark-mode frame."
     }
   ],
   "forbiddenDescendants": [
