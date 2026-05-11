@@ -1,0 +1,2 @@
+node scripts/lint-hook.mjs --all || exit 1
+node scripts/vrt-hook.mjs --all
