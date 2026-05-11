@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Sample Design</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --brand: #1f3a93;
+        --text: #111111;
+        --bg: #f6f7fb;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: -apple-system, Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+      header {
+        padding: 48px 24px 24px;
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 32px;
+        color: var(--brand);
+      }
+      p {
+        margin: 0 0 24px;
+        max-width: 720px;
+        line-height: 1.6;
+      }
+      .actions {
+        padding: 0 24px 48px;
+      }
+      button {
+        background: var(--brand);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      footer {
+        padding: 16px 24px;
+        color: #555;
+        font-size: 14px;
+        border-top: 1px solid #ddd;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Sample Design</h1>
+      <p>
+        This is the canonical sample used to verify the VRT pipeline. The page is intentionally tiny so that any pixel
+        diff has a clear root cause.
+      </p>
+    </header>
+    <section class="actions">
+      <button type="button">Primary Action</button>
+    </section>
+    <footer>design-blueprint &middot; sample</footer>
+  </body>
+</html>

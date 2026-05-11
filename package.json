@@ -1,0 +1,27 @@
+{
+  "name": "design-blueprint",
+  "version": "0.1.0",
+  "description": "HTML design repository with pre-commit/pre-push VRT and AI visual review",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "lint": "node scripts/lint-hook.mjs --all",
+    "lint:fix": "prettier --write \"**/*.html\" \"!**/snapshots/**\" \"!.vrt-output/**\" \"!node_modules/**\"",
+    "vrt": "node scripts/vrt-hook.mjs --all",
+    "vrt:approve": "node scripts/vrt-approve.mjs",
+    "vrt:report": "node scripts/vrt-report.mjs"
+  },
+  "devDependencies": {
+    "htmlhint": "^1.1.4",
+    "husky": "^9.1.6",
+    "pixelmatch": "^6.0.0",
+    "playwright": "^1.49.0",
+    "pngjs": "^7.0.0",
+    "prettier": "^3.3.3",
+    "sharp": "^0.33.5"
+  }
+}

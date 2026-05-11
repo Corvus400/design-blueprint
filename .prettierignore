@@ -1,0 +1,5 @@
+node_modules/
+.vrt-output/
+*/snapshots/
+*.png
+package-lock.json

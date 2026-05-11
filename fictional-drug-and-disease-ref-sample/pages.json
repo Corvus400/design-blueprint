@@ -1,0 +1,15 @@
+{
+  "pages": [
+    {
+      "name": "index",
+      "file": "index.html",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    }
+  ]
+}
