@@ -4,7 +4,9 @@
   "tocSections": {
     "tocSelector": "aside.toc a[href^=\"#sec-\"]",
     "sectionSelector": "main section.block[id^=\"sec-\"]",
-    "requiredAnchors": ["sec-09-5"]
+    "requiredAnchors": [
+      "sec-09-5"
+    ]
   },
   "forbiddenSelectors": [
     {
@@ -135,6 +137,16 @@
       "selector": ".frame[data-frame-label=\"iPhone Compact × Dark × Loading\"]",
       "min": 1,
       "message": "iPhone compact loading state must include a dark-mode frame."
+    },
+    {
+      "selector": ".frame.f-iphone-compact.large-text[data-frame-label=\"iPhone Compact × Light × LargeText\"]",
+      "min": 1,
+      "message": "Dynamic Type 200% evidence must include an iPhone Compact light LargeText frame."
+    },
+    {
+      "selector": ".frame.f-iphone-compact.large-text.dark[data-frame-label=\"iPhone Compact × Dark × LargeText\"]",
+      "min": 1,
+      "message": "Dynamic Type 200% evidence must include an iPhone Compact dark LargeText frame."
     }
   ],
   "forbiddenDescendants": [
@@ -166,7 +178,20 @@
     },
     {
       "name": "history row brand structure",
-      "selectors": [".frame[data-frame-label] .hrow", ".frame[data-frame-label] .hrow .row-body .row-head .row-brand"]
+      "selectors": [
+        ".frame[data-frame-label] .hrow",
+        ".frame[data-frame-label] .hrow .row-body .row-head .row-brand"
+      ]
+    }
+  ],
+  "selectorCounts": [
+    {
+      "selector": ".frame[data-frame-label]",
+      "equals": 35
+    },
+    {
+      "selector": ".frame.large-text[data-frame-label]",
+      "equals": 2
     }
   ]
 }
