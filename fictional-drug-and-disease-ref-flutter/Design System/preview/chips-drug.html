@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 16px;
+        background: var(--surface);
+      }
+      .wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 5px;
+      }
+      .chip {
+        padding: 2px 7px;
+        border-radius: 5px;
+        font: 700 11px/1.5 var(--font-jp);
+        white-space: nowrap;
+      }
+      .h {
+        font: var(--t-label-s);
+        color: var(--fg-muted);
+        margin: 2px 0 6px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .sec {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 10px;
+      }
+      .ssot {
+        font: 600 10px/1 var(--font-jp);
+        color: var(--muted-2);
+        margin-left: 6px;
+        letter-spacing: 0.04em;
+      }
+    </style>
+    <title>Chips Drug — Preview</title>
+  </head>
+  <body>
+    <div class="sec">
+      <div class="h">
+        Regulatory class · 規制区分
+        <span class="ssot">SSOT 11</span>
+      </div>
+      <div class="wrap">
+        <span class="chip" style="background: rgba(214, 42, 42, 0.05); color: #d62a2a">毒薬</span>
+        <span class="chip" style="background: rgba(180, 83, 9, 0.05); color: #b45309">劇薬</span>
+        <span class="chip" style="background: rgba(75, 85, 99, 0.05); color: #4b5563">普通薬</span>
+        <span class="chip" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed">向精神薬第1種</span>
+        <span class="chip" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed">向精神薬第2種</span>
+        <span class="chip" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed">向精神薬第3種</span>
+        <span class="chip" style="background: rgba(147, 51, 234, 0.05); color: #9333ea">麻薬</span>
+        <span class="chip" style="background: rgba(234, 88, 12, 0.05); color: #ea580c">覚醒剤原料</span>
+        <span class="chip" style="background: rgba(15, 118, 110, 0.05); color: #0f766e">生物由来製品</span>
+        <span class="chip" style="background: rgba(14, 116, 144, 0.05); color: #0e7490">特定生物由来製品</span>
+        <span class="chip" style="background: rgba(10, 111, 232, 0.05); color: #0a6fe8">処方箋医薬品</span>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="h">
+        Route of administration · 投与経路
+        <span class="ssot">SSOT 8</span>
+      </div>
+      <div class="wrap">
+        <span class="chip" style="background: rgba(29, 78, 216, 0.05); color: #1d4ed8">内服</span>
+        <span class="chip" style="background: rgba(14, 116, 144, 0.05); color: #0e7490">外用</span>
+        <span class="chip" style="background: rgba(185, 28, 28, 0.05); color: #b91c1c">注射</span>
+        <span class="chip" style="background: rgba(8, 145, 178, 0.05); color: #0891b2">吸入</span>
+        <span class="chip" style="background: rgba(161, 98, 7, 0.05); color: #a16207">坐剤</span>
+        <span class="chip" style="background: rgba(109, 40, 217, 0.05); color: #6d28d9">点眼</span>
+        <span class="chip" style="background: rgba(21, 128, 61, 0.05); color: #15803d">点鼻</span>
+        <span class="chip" style="background: rgba(190, 24, 93, 0.05); color: #be185d">貼付</span>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="h">
+        Dosage form · 剤形
+        <span class="ssot">SSOT 13</span>
+      </div>
+      <div class="wrap">
+        <span class="chip" style="background: rgba(29, 78, 216, 0.05); color: #1d4ed8">錠剤</span>
+        <span class="chip" style="background: rgba(124, 58, 237, 0.05); color: #7c3aed">カプセル</span>
+        <span class="chip" style="background: rgba(161, 98, 7, 0.05); color: #a16207">散剤</span>
+        <span class="chip" style="background: rgba(202, 138, 4, 0.05); color: #ca8a04">顆粒</span>
+        <span class="chip" style="background: rgba(8, 145, 178, 0.05); color: #0891b2">液剤</span>
+        <span class="chip" style="background: rgba(185, 28, 28, 0.05); color: #b91c1c">注射剤</span>
+        <span class="chip" style="background: rgba(21, 128, 61, 0.05); color: #15803d">軟膏</span>
+        <span class="chip" style="background: rgba(15, 118, 110, 0.05); color: #0f766e">クリーム</span>
+        <span class="chip" style="background: rgba(190, 24, 93, 0.05); color: #be185d">貼付剤</span>
+        <span class="chip" style="background: rgba(55, 48, 163, 0.05); color: #3730a3">点眼液</span>
+        <span class="chip" style="background: rgba(154, 52, 18, 0.05); color: #9a3412">坐剤</span>
+        <span class="chip" style="background: rgba(14, 116, 144, 0.05); color: #0e7490">吸入剤</span>
+        <span class="chip" style="background: rgba(109, 40, 217, 0.05); color: #6d28d9">点鼻液</span>
+      </div>
+    </div>
+  </body>
+</html>

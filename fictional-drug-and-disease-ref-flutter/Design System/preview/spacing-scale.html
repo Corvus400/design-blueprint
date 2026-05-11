@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 16px;
+        background: var(--surface);
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 6px 0;
+        border-bottom: 0.5px solid var(--hairline);
+      }
+      .row:last-child {
+        border-bottom: none;
+      }
+      .tok {
+        font: var(--t-mono-s);
+        color: var(--fg-muted);
+        flex: 0 0 80px;
+      }
+      .val {
+        font: var(--t-mono-s);
+        color: var(--fg-muted);
+        flex: 0 0 56px;
+      }
+      .demo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .box {
+        background: var(--primary-soft);
+        border: 0.5px solid var(--primary-ring);
+      }
+      .b1 {
+        width: 4px;
+      }
+      .b2 {
+        width: 8px;
+      }
+      .b3 {
+        width: 12px;
+      }
+      .b4 {
+        width: 16px;
+      }
+      .b5 {
+        width: 20px;
+      }
+      .b6 {
+        width: 24px;
+      }
+      .b8 {
+        width: 32px;
+      }
+      .b10 {
+        width: 40px;
+      }
+      .h {
+        height: 18px;
+      }
+    </style>
+    <title>Spacing Scale — Preview</title>
+  </head>
+  <body>
+    <div class="row">
+      <div class="tok">--s-1</div>
+      <div class="val">4 px</div>
+      <div class="demo"><div class="box b1 h"></div></div>
+    </div>
+    <div class="row">
+      <div class="tok">--s-2</div>
+      <div class="val">8 px</div>
+      <div class="demo"><div class="box b2 h"></div></div>
+    </div>
+    <div class="row">
+      <div class="tok">--s-3</div>
+      <div class="val">12 px</div>
+      <div class="demo"><div class="box b3 h"></div></div>
+    </div>
+    <div class="row">
+      <div class="tok">--s-4</div>
+      <div class="val">16 px</div>
+      <div class="demo"><div class="box b4 h"></div></div>
+    </div>
+    <div class="row">
+      <div class="tok">--s-5</div>
+      <div class="val">20 px</div>
+      <div class="demo"><div class="box b5 h"></div></div>
+    </div>
+    <div class="row">
+      <div class="tok">--s-6</div>
+      <div class="val">24 px</div>
+      <div class="demo"><div class="box b6 h"></div></div>
+    </div>
+    <div class="row">
+      <div class="tok">--s-8</div>
+      <div class="val">32 px</div>
+      <div class="demo"><div class="box b8 h"></div></div>
+    </div>
+    <div class="row">
+      <div class="tok">--s-10</div>
+      <div class="val">40 px</div>
+      <div class="demo"><div class="box b10 h"></div></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,4542 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>医薬品・疾患リファレンス — Design System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --page-bg: #f4f5f7;
+        --page-fg: #15181d;
+        --page-muted: #5c6370;
+        --page-rule: #d8dce3;
+        --page-card: #ffffff;
+        --page-accent: #0a66c2;
+        --page-warn: #b3261e;
+        --page-ok: #1f7a3a;
+        --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+        --jp: "Noto Sans JP", system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic UI", sans-serif;
+
+        /* Round6 — light */
+        --r6-bg: #f2f2f7;
+        --r6-surface: #ffffff;
+        --r6-surface3: #efeff4;
+        --r6-ink: #1a1c1e;
+        --r6-ink2: #3f4347;
+        --r6-muted: #6c7177;
+        --r6-hairline: rgba(60, 60, 67, 0.13);
+        --r6-primary: #007aff;
+        --r6-search-bg: #ebebef;
+        --r6-dangerCont: #ffeded;
+        --r6-danger: #d62a2a;
+        --r6-dxTint: rgba(122, 79, 204, 0.1);
+        --r6-dxInk: #7a4fcc;
+        --r6-rxTint: rgba(0, 122, 255, 0.1);
+        --r6-rxInk: #0a6fe8;
+
+        /* Round6 — dark */
+        --r6d-bg: #101317;
+        --r6d-surface: #181b20;
+        --r6d-surface3: #272b32;
+        --r6d-ink: #e5e7ec;
+        --r6d-ink2: #c2c6cd;
+        --r6d-muted: #9ca1aa;
+        --r6d-hairline: rgba(255, 255, 255, 0.1);
+        --r6d-primary: #9ecaff;
+        --r6d-search-bg: #272b32;
+        --r6d-dangerCont: #5c1612;
+        --r6d-danger: #ffb4ab;
+        --r6d-dxTint: rgba(213, 186, 255, 0.16);
+        --r6d-dxInk: #d5baff;
+        --r6d-rxTint: rgba(158, 202, 255, 0.16);
+        --r6d-rxInk: #9ecaff;
+
+        /* Detail (M3) — light */
+        --d-primary: #1f5bb5;
+        --d-on-primary: #ffffff;
+        --d-secondary: #525e78;
+        --d-tertiary: #705574;
+        --d-error: #b3261e;
+        --d-on-error: #ffffff;
+        --d-error-container: #f9dedc;
+        --d-on-error-container: #410e0b;
+        --d-surface: #fbfbfe;
+        --d-on-surface: #1a1b20;
+        --d-on-surface-variant: #44464e;
+        --d-surface-c-lowest: #ffffff;
+        --d-surface-c-low: #f4f4f8;
+        --d-surface-c: #edeef3;
+        --d-surface-c-high: #e7e8ee;
+        --d-surface-c-highest: #e1e2e8;
+        --d-outline: #75777f;
+        --d-outline-variant: #c5c6cd;
+        --d-primary-container: #d8e2ff;
+        --d-on-primary-container: #001a41;
+
+        /* Detail (M3) — dark */
+        --dd-primary: #aec6ff;
+        --dd-on-primary: #002e69;
+        --dd-surface: #121318;
+        --dd-on-surface: #e3e2e9;
+        --dd-on-surface-variant: #c5c6cd;
+        --dd-surface-c-lowest: #0d0e13;
+        --dd-surface-c-low: #1a1b20;
+        --dd-surface-c: #1e1f25;
+        --dd-surface-c-high: #292a30;
+        --dd-surface-c-highest: #33343a;
+        --dd-outline: #8e9099;
+        --dd-outline-variant: #44464e;
+        --dd-primary-container: #003494;
+        --dd-on-primary-container: #d8e2ff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--jp);
+        background: var(--page-bg);
+        color: var(--page-fg);
+        font-size: 14px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      .shell {
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr);
+        max-width: 1840px;
+        margin: 0 auto;
+      }
+      .toc {
+        position: sticky;
+        top: 0;
+        align-self: start;
+        height: 100vh;
+        overflow: auto;
+        padding: 28px 18px 28px 24px;
+        border-right: 1px solid var(--page-rule);
+        background: #fff;
+      }
+      .toc h1 {
+        font-size: 13px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--page-muted);
+        margin: 0 0 14px;
+        font-weight: 700;
+      }
+      .toc ol {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        counter-reset: toc;
+      }
+      .toc ol li {
+        counter-increment: toc;
+        margin: 0;
+      }
+      .toc ol li a {
+        display: block;
+        padding: 6px 8px;
+        border-radius: 6px;
+        color: var(--page-fg);
+        text-decoration: none;
+        font-size: 13px;
+      }
+      .toc ol li a::before {
+        content: counter(toc, lower-alpha) ".  ";
+        color: var(--page-muted);
+        font-family: var(--mono);
+      }
+      .toc ol li a:hover {
+        background: #eef1f5;
+      }
+      .toc .meta {
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px dashed var(--page-rule);
+        font-size: 11px;
+        color: var(--page-muted);
+        line-height: 1.6;
+      }
+      main {
+        padding: 36px 40px 80px;
+        min-width: 0;
+      }
+      section.block {
+        margin: 0 0 56px;
+        scroll-margin-top: 12px;
+      }
+      h2.section-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 0 4px;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+      h2.section-title .tag {
+        font: 600 11px/1.2 var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #fff;
+        background: var(--page-fg);
+        padding: 3px 6px;
+        border-radius: 4px;
+      }
+      .section-sub {
+        color: var(--page-muted);
+        font-size: 13px;
+        margin: 0 0 22px;
+        max-width: 880px;
+      }
+      .card {
+        background: var(--page-card);
+        border: 1px solid var(--page-rule);
+        border-radius: 12px;
+        padding: 20px;
+      }
+      .card + .card {
+        margin-top: 14px;
+      }
+      .kbd,
+      code {
+        font-family: var(--mono);
+        font-size: 0.92em;
+        background: #eef1f5;
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+
+      /* Cover */
+      .cover {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%);
+        color: #fff;
+        border-radius: 16px;
+        padding: 32px 36px;
+      }
+      .cover .eyebrow {
+        font: 600 11px/1 var(--mono);
+        letter-spacing: 0.16em;
+        color: #9db2d9;
+        text-transform: uppercase;
+      }
+      .cover h1 {
+        font-size: 34px;
+        font-weight: 700;
+        margin: 10px 0 6px;
+      }
+      .cover .lede {
+        color: #cbd5e1;
+        max-width: 780px;
+        font-size: 14.5px;
+        margin: 0 0 18px;
+      }
+      .cover .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-top: 18px;
+      }
+      .cover .grid .lbl {
+        font: 600 10px/1 var(--mono);
+        color: #94a3b8;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .cover .grid .val {
+        font-size: 14px;
+        color: #fff;
+        font-weight: 500;
+      }
+      .cover .disc {
+        margin-top: 22px;
+        padding: 12px 14px;
+        background: rgba(255, 180, 171, 0.1);
+        border: 0.5px solid rgba(255, 180, 171, 0.35);
+        border-radius: 8px;
+        color: #ffb4ab;
+        font: 700 11.5px/1.5 var(--jp);
+        letter-spacing: 0.04em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .cover .disc .dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #ffb4ab;
+        flex: 0 0 auto;
+      }
+
+      /* Token swatches */
+      .token-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+      .token-grid.three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .token-pair {
+        border: 1px solid var(--page-rule);
+        border-radius: 12px;
+        background: #fff;
+        overflow: hidden;
+      }
+      .token-pair header {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--page-rule);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+      .token-pair header h3 {
+        margin: 0;
+        font-size: 13px;
+        font-family: var(--mono);
+        font-weight: 600;
+      }
+      .token-pair header .role {
+        font-size: 11px;
+        color: var(--page-muted);
+      }
+      .token-pair .pair-body {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      .swatch {
+        padding: 14px;
+      }
+      .swatch.light {
+        background: #f8fafc;
+      }
+      .swatch.dark {
+        background: #0b1220;
+      }
+      .swatch .chip {
+        height: 56px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 600;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+      .swatch .meta {
+        display: flex;
+        justify-content: space-between;
+        font: 11px var(--mono);
+        margin-top: 8px;
+        gap: 8px;
+      }
+      .swatch.light .meta {
+        color: #475569;
+      }
+      .swatch.dark .meta {
+        color: #94a3b8;
+      }
+      .swatch .pass {
+        color: var(--page-ok);
+        font-weight: 700;
+      }
+      .swatch.dark .pass {
+        color: #5bd392;
+      }
+      .swatch .ratio {
+        font: 600 11px var(--mono);
+      }
+      .swatch.dark .ratio {
+        color: #cbd5e1;
+      }
+
+      /* Tables */
+      table.spec {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12.5px;
+      }
+      table.spec th,
+      table.spec td {
+        padding: 8px 10px;
+        text-align: left;
+        border-bottom: 1px solid var(--page-rule);
+        vertical-align: top;
+      }
+      table.spec th {
+        font: 600 11px/1.2 var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--page-muted);
+        background: #f7f8fa;
+      }
+      table.spec td code {
+        font-size: 11.5px;
+      }
+      table.spec .sw {
+        display: inline-block;
+        width: 11px;
+        height: 11px;
+        border-radius: 3px;
+        vertical-align: -2px;
+        margin-right: 6px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+      }
+
+      /* Numbered list */
+      ol.contract {
+        counter-reset: c;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+      }
+      ol.contract li {
+        counter-increment: c;
+        display: grid;
+        grid-template-columns: 36px 1fr;
+        gap: 12px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--page-rule);
+      }
+      ol.contract li:last-child {
+        border-bottom: none;
+      }
+      ol.contract li::before {
+        content: counter(c);
+        font: 700 14px/30px var(--mono);
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        background: #15181d;
+        color: #fff;
+        border-radius: 6px;
+      }
+      ol.contract li h4 {
+        margin: 0 0 4px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+      ol.contract li p {
+        margin: 0;
+        color: var(--page-muted);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      /* Definition list / KV */
+      dl.kv {
+        display: grid;
+        grid-template-columns: 160px 1fr;
+        gap: 8px 16px;
+        margin: 0;
+        font-size: 13px;
+      }
+      dl.kv dt {
+        font-weight: 700;
+        color: var(--page-fg);
+      }
+      dl.kv dd {
+        margin: 0;
+        color: var(--page-muted);
+      }
+
+      /* Type specimen */
+      .type-spec {
+        display: grid;
+        grid-template-columns: 160px 1fr 160px;
+        gap: 12px 18px;
+        align-items: baseline;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--page-rule);
+      }
+      .type-spec:last-child {
+        border-bottom: none;
+      }
+      .type-spec .lbl {
+        font: 600 11px/1.4 var(--mono);
+        color: var(--page-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .type-spec .spec {
+        font: 500 11px/1.4 var(--mono);
+        color: var(--page-muted);
+        text-align: right;
+      }
+      .type-spec .demo {
+        color: var(--page-fg);
+      }
+
+      /* Spacing scale */
+      .spacing-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--page-rule);
+      }
+      .spacing-row:last-child {
+        border: none;
+      }
+      .spacing-row .name {
+        width: 80px;
+        font: 600 12px var(--mono);
+        color: var(--page-fg);
+      }
+      .spacing-row .px {
+        width: 60px;
+        font: 500 11px var(--mono);
+        color: var(--page-muted);
+      }
+      .spacing-row .bar {
+        height: 18px;
+        background: #0a66c2;
+        border-radius: 3px;
+      }
+
+      /* Radii row */
+      .radii-row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+      }
+      .radii-row .ri {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        font: 500 11px var(--mono);
+        color: var(--page-muted);
+      }
+      .radii-row .ri .sq {
+        width: 60px;
+        height: 60px;
+        background: #0a66c2;
+      }
+      .radii-row .ri .nm {
+        font-weight: 600;
+        color: var(--page-fg);
+      }
+
+      /* Ribbon live */
+      .ribbon-stage {
+        position: relative;
+        height: 80px;
+        border-radius: 8px;
+        border: 1px solid var(--page-rule);
+        overflow: hidden;
+      }
+      .ribbon-stage.light {
+        background: #f2f2f7;
+      }
+      .ribbon-stage.dark {
+        background: #181b20;
+      }
+      .disclaimer-ribbon {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 26px;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 0 12px;
+        user-select: none;
+        pointer-events: none;
+        font: 700 11px/1 var(--jp);
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+        background: #1a1c1e;
+      }
+      .disclaimer-ribbon.d {
+        background: #0d0e13;
+      }
+      .disclaimer-ribbon .accent {
+        color: #ffb4ab;
+      }
+      .disclaimer-ribbon .dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #ffb4ab;
+        flex: 0 0 auto;
+      }
+
+      /* Chip render */
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 7px;
+        border-radius: 5px;
+        font: 700 11px/1.5 var(--jp);
+        white-space: nowrap;
+      }
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .chip-set {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 8px 14px;
+        align-items: start;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--page-rule);
+      }
+      .chip-set:last-child {
+        border: none;
+      }
+      .chip-set .axis {
+        font: 600 12px var(--mono);
+        color: var(--page-fg);
+        padding-top: 3px;
+      }
+      .chip-set .axis small {
+        display: block;
+        color: var(--page-muted);
+        font-size: 10.5px;
+        font-weight: 500;
+        margin-top: 2px;
+      }
+      .chip-bg-l {
+        background: #fff;
+        border: 0.5px solid var(--r6-hairline);
+        border-radius: 10px;
+        padding: 10px 12px;
+      }
+      .chip-bg-d {
+        background: #181b20;
+        border: 0.5px solid var(--r6d-hairline);
+        border-radius: 10px;
+        padding: 10px 12px;
+        color: #e5e7ec;
+      }
+      .theme-pair {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      /* Component preview frames */
+      .cf {
+        background: #fbfbfe;
+        border-radius: 10px;
+        border: 0.5px solid var(--r6-hairline);
+        overflow: hidden;
+      }
+      .cf.d {
+        background: #121318;
+        border: 0.5px solid var(--r6d-hairline);
+        color: #e3e2e9;
+      }
+      .cf-h {
+        padding: 8px 12px;
+        font: 600 10.5px var(--mono);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--page-muted);
+        background: #f4f4f8;
+        border-bottom: 0.5px solid var(--r6-hairline);
+      }
+      .cf.d .cf-h {
+        background: #1a1b20;
+        color: #c5c6cd;
+        border-bottom: 0.5px solid var(--r6d-hairline);
+      }
+      .cf-b {
+        padding: 14px;
+      }
+
+      /* Phone frame inline preview */
+      .phone {
+        width: 390px;
+        background: #0f172a;
+        border-radius: 30px;
+        padding: 8px;
+        position: relative;
+        flex: 0 0 auto;
+      }
+      .phone.d {
+        background: #1e293b;
+      }
+      .phone .device {
+        background: #fbfbfe;
+        border-radius: 24px;
+        overflow: hidden;
+        height: 580px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .phone.d .device {
+        background: #121318;
+        color: #e3e2e9;
+      }
+      .phone .status {
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 22px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #1a1b20;
+        background: #fbfbfe;
+      }
+      .phone.d .status {
+        background: #121318;
+        color: #e3e2e9;
+      }
+
+      /* Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border: none;
+        font: 700 14px/1 var(--jp);
+        cursor: pointer;
+        padding: 0 18px;
+        height: 44px;
+        border-radius: 22px;
+      }
+      .btn-primary {
+        background: #1f5bb5;
+        color: #fff;
+      }
+      .btn-secondary {
+        background: #edeef3;
+        color: #1a1b20;
+      }
+      .btn-outline {
+        background: #fff;
+        color: #1a1b20;
+        border: 1px solid #c5c6cd;
+      }
+      .btn-r10 {
+        border-radius: 10px;
+        height: 40px;
+        padding: 0 16px;
+      }
+      .btn-r10.btn-primary {
+        background: #007aff;
+      }
+
+      /* Buttons in dark */
+      .theme-d .btn-primary {
+        background: #aec6ff;
+        color: #002e69;
+      }
+      .theme-d .btn-secondary {
+        background: #1e1f25;
+        color: #e3e2e9;
+      }
+      .theme-d .btn-outline {
+        background: transparent;
+        color: #e3e2e9;
+        border: 1px solid #44464e;
+      }
+
+      /* Seg control */
+      .seg {
+        display: flex;
+        background: #efeff4;
+        border-radius: 9px;
+        padding: 2px;
+        font: 600 14px var(--jp);
+      }
+      .seg .s {
+        flex: 1;
+        text-align: center;
+        padding: 7px 12px;
+        border-radius: 7px;
+        color: #3f4347;
+        cursor: default;
+      }
+      .seg .s.on {
+        background: #fff;
+        color: #1a1c1e;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+      }
+      .theme-d .seg {
+        background: #272b32;
+      }
+      .theme-d .seg .s {
+        color: #c2c6cd;
+      }
+      .theme-d .seg .s.on {
+        background: #181b20;
+        color: #e5e7ec;
+      }
+
+      /* Drug/disease cards */
+      .dcard {
+        background: #fff;
+        border: 0.5px solid var(--r6-hairline);
+        border-radius: 10px;
+        padding: 12px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .dcard.d {
+        background: #181b20;
+        border-color: var(--r6d-hairline);
+        color: #e5e7ec;
+      }
+      .dcard .img {
+        width: 56px;
+        height: 84px;
+        border-radius: 8px;
+        background: #efeff4;
+        border: 0.5px solid var(--r6-hairline);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 auto;
+        color: #8e9298;
+      }
+      .dcard.d .img {
+        background: #272b32;
+        border-color: var(--r6d-hairline);
+        color: #9ca1aa;
+      }
+      .dcard .col {
+        min-width: 0;
+        flex: 1;
+      }
+      .dcard .brand {
+        font: 700 14px/1.3 var(--jp);
+        color: #1a1c1e;
+        margin-top: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .dcard.d .brand {
+        color: #e5e7ec;
+      }
+      .dcard .gen {
+        font: 400 12px/1.3 var(--jp);
+        color: #44464e;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .dcard.d .gen {
+        color: #c5c6cd;
+      }
+      .dcard .meta {
+        margin-top: 5px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 12px;
+        font: 500 11px/1.4 var(--jp);
+        color: #44464e;
+      }
+      .dcard.d .meta {
+        color: #c5c6cd;
+      }
+
+      /* Bottom nav */
+      .bnav {
+        display: flex;
+        height: 64px;
+        background: #fff;
+        border-top: 0.5px solid var(--r6-hairline);
+        font: 600 11px var(--jp);
+      }
+      .bnav.d {
+        background: #0d0e13;
+        border-color: var(--r6d-hairline);
+        color: #c5c6cd;
+      }
+      .bnav .b {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: #44464e;
+        padding-top: 8px;
+      }
+      .bnav.d .b {
+        color: #c5c6cd;
+      }
+      .bnav .b .ic {
+        width: 56px;
+        height: 30px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .bnav .b.on .ic {
+        background: rgba(0, 122, 255, 0.12);
+      }
+      .bnav .b.on {
+        color: #1a1c1e;
+      }
+      .bnav.d .b.on {
+        color: #e5e7ec;
+      }
+      .bnav.d .b.on .ic {
+        background: rgba(158, 202, 255, 0.18);
+      }
+
+      /* FAB */
+      .fab-stage {
+        position: relative;
+        height: 120px;
+        background: #f2f2f7;
+        border-radius: 8px;
+      }
+      .fab-stage.d {
+        background: #1a1b20;
+      }
+      .fab {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        background: #1f5bb5;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 16px rgba(31, 91, 181, 0.32);
+        border: none;
+      }
+      .fab .badge {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        height: 22px;
+        min-width: 24px;
+        padding: 0 7px;
+        border-radius: 11px;
+        background: #b3261e;
+        color: #fff;
+        font: 700 11px/22px var(--jp);
+        text-align: center;
+        box-shadow: 0 0 0 2px #f2f2f7;
+      }
+      .fab-stage.d .fab .badge {
+        box-shadow: 0 0 0 2px #1a1b20;
+      }
+
+      /* Sheet */
+      .sheet {
+        background: #fff;
+        border-radius: 20px 20px 0 0;
+        padding: 0 0 16px;
+        box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.18);
+        overflow: hidden;
+      }
+      .sheet.d {
+        background: #1a1b20;
+        color: #e5e7ec;
+      }
+      .sheet .handle {
+        display: flex;
+        justify-content: center;
+        padding: 8px 0 4px;
+      }
+      .sheet .handle i {
+        width: 40px;
+        height: 4px;
+        background: #c5c6cd;
+        border-radius: 2px;
+        display: block;
+      }
+      .sheet.d .handle i {
+        background: #44464e;
+      }
+      .sheet .title {
+        padding: 8px 16px 12px;
+        text-align: center;
+        font: 700 16px/1.2 var(--jp);
+        border-bottom: 0.5px solid var(--r6-hairline);
+      }
+      .sheet.d .title {
+        border-bottom: 0.5px solid var(--r6d-hairline);
+      }
+      .sheet .opt {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        border-bottom: 0.5px solid rgba(60, 60, 67, 0.1);
+        font: 500 14px var(--jp);
+      }
+      .sheet .opt.on {
+        font-weight: 700;
+        color: #1f5bb5;
+      }
+      .sheet.d .opt.on {
+        color: #aec6ff;
+      }
+
+      /* Snackbar */
+      .snack {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        background: #1a1b20;
+        color: #fff;
+        font: 500 13.5px var(--jp);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+      }
+      .snack a {
+        color: #aec6ff;
+        font-weight: 700;
+        text-decoration: none;
+        letter-spacing: 0.04em;
+      }
+
+      /* List row */
+      .lrow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        background: #fff;
+        border-top: 0.5px solid var(--r6-hairline);
+      }
+      .lrow:first-child {
+        border-top: none;
+      }
+      .lrow.d {
+        background: #181b20;
+        border-top-color: var(--r6d-hairline);
+        color: #e5e7ec;
+      }
+      .lrow .lead {
+        width: 36px;
+        height: 36px;
+        border-radius: 18px;
+        background: #efeff4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #44464e;
+        flex: 0 0 auto;
+      }
+      .lrow.d .lead {
+        background: #272b32;
+        color: #c5c6cd;
+      }
+      .lrow .title {
+        font: 600 14px/1.3 var(--jp);
+      }
+      .lrow .sub {
+        font: 400 12px/1.3 var(--jp);
+        color: #44464e;
+      }
+      .lrow.d .sub {
+        color: #c5c6cd;
+      }
+      .lrow .trail {
+        margin-left: auto;
+        color: #8e9298;
+      }
+
+      /* Material Symbols utility */
+      .msym {
+        font-family: "Material Symbols Outlined";
+        font-weight: normal;
+        font-style: normal;
+        font-size: 18px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        -moz-osx-font-smoothing: grayscale;
+        font-feature-settings: "liga";
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .msym.fill {
+        font-variation-settings:
+          "FILL" 1,
+          "wght" 500,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+
+      /* Filter axes */
+      .axis-block {
+        padding: 14px 0;
+        border-bottom: 1px solid var(--page-rule);
+      }
+      .axis-block:last-child {
+        border: none;
+      }
+      .axis-block .ah {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .axis-block .ah h4 {
+        margin: 0;
+        font: 700 13px var(--jp);
+      }
+      .axis-block .ah .id {
+        font: 500 11px var(--mono);
+        color: var(--page-muted);
+      }
+      .fchip {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 12px;
+        border-radius: 14px;
+        background: #f4f4f8;
+        border: 0.5px solid #c5c6cd;
+        font: 500 12px var(--jp);
+        color: #1a1b20;
+        margin: 3px 4px 3px 0;
+      }
+
+      /* Do/Don't */
+      .dd-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      .dd {
+        border: 1px solid var(--page-rule);
+        border-radius: 10px;
+        padding: 14px;
+        background: #fff;
+      }
+      .dd .h {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font: 700 13px var(--jp);
+        margin-bottom: 8px;
+      }
+      .dd .h.ok {
+        color: #1f7a3a;
+      }
+      .dd .h.no {
+        color: #b3261e;
+      }
+      .dd .h .pill {
+        font: 700 10px var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: #fff;
+      }
+      .dd .h.ok .pill {
+        background: #1f7a3a;
+      }
+      .dd .h.no .pill {
+        background: #b3261e;
+      }
+      .dd p {
+        margin: 0;
+        color: var(--page-muted);
+        font-size: 12.5px;
+        line-height: 1.55;
+      }
+      .dd .example {
+        margin-top: 10px;
+        padding: 12px;
+        background: #f4f5f7;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 60px;
+        font: 600 12px var(--jp);
+        color: #15181d;
+      }
+      .dd .example.bad-grad {
+        background: linear-gradient(135deg, #d8e2ff 0%, #f2daff 50%, #ffd8e0 100%);
+        color: #b3261e;
+      }
+      .dd .example.bad-emoji {
+        font-size: 22px;
+        color: #15181d;
+      }
+      .dd .example.bad-glow {
+        background: #181b20;
+        color: #fff;
+        text-shadow:
+          0 0 8px #007aff,
+          0 0 16px #007aff;
+      }
+      .dd .example.bad-inner {
+        background: #fff;
+        box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.15);
+        color: #15181d;
+      }
+      .dd .example.good-flat {
+        background: #fff;
+        border: 0.5px solid var(--r6-hairline);
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      }
+      .dd .example.good-icon {
+        background: #fff;
+        border: 0.5px solid var(--r6-hairline);
+        color: #1f5bb5;
+        gap: 8px;
+      }
+
+      /* Sources table specifically */
+      .sources-table td:first-child {
+        font-weight: 600;
+        white-space: nowrap;
+        width: 18%;
+      }
+      .sources-table td:nth-child(2) {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: #1a1b20;
+      }
+
+      /* Misc */
+      .lead {
+        font-size: 14px;
+        color: var(--page-fg);
+        max-width: 880px;
+      }
+      .lead + .lead {
+        margin-top: 8px;
+      }
+      .pillbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .pillbar .pill {
+        padding: 3px 8px;
+        border-radius: 4px;
+        font: 600 11px var(--mono);
+        background: #eef1f5;
+        color: var(--page-fg);
+      }
+      .note {
+        padding: 12px 14px;
+        border-radius: 8px;
+        background: #fff8e6;
+        border: 1px solid #f2d69e;
+        color: #7b5a12;
+        font-size: 12.5px;
+        line-height: 1.55;
+      }
+      .note.info {
+        background: #eef4fb;
+        border-color: #bdd3ec;
+        color: #1f4a82;
+      }
+
+      footer.page {
+        margin-top: 40px;
+        padding: 18px 0;
+        border-top: 1px solid var(--page-rule);
+        font-size: 12px;
+        color: var(--page-muted);
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      @media (max-width: 980px) {
+        .shell {
+          grid-template-columns: 1fr;
+        }
+        .toc {
+          position: static;
+          height: auto;
+          border-right: none;
+          border-bottom: 1px solid var(--page-rule);
+        }
+        main {
+          padding: 24px 18px 60px;
+        }
+        .token-grid,
+        .token-grid.three,
+        .dd-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <nav class="toc">
+        <h1>Design System v1.0</h1>
+        <ol>
+          <li><a href="#cover">Cover</a></li>
+          <li><a href="#contract">Hard contract</a></li>
+          <li><a href="#sources">Sources</a></li>
+          <li><a href="#fundamentals">Content fundamentals</a></li>
+          <li><a href="#foundations">Visual foundations</a></li>
+          <li><a href="#tokens">Color tokens</a></li>
+          <li><a href="#typography">Typography</a></li>
+          <li><a href="#ribbon">Disclaimer ribbon</a></li>
+          <li><a href="#components">UI kit / components</a></li>
+          <li><a href="#axes">Filter axes labels</a></li>
+          <li><a href="#previews">Preview cards</a></li>
+          <li><a href="#dodont">Do / Don&rsquo;t</a></li>
+          <li><a href="#implementation">Implementation guidance</a></li>
+        </ol>
+        <div class="meta">
+          Single-file consolidation of the multi-file design system at
+          <code>fictional-drug-and-disease-ref-flutter</code>
+          . Locale ja-JP only; Flutter / Material 3 on phone 390 dp and tablet 834×1194 dp. The always-on Disclaimer
+          ribbon is the load-bearing UX contract.
+        </div>
+      </nav>
+      <main>
+        <!-- =================== A. COVER =================== -->
+        <section class="block" id="cover">
+          <div class="cover">
+            <div class="eyebrow">a · System cover</div>
+            <h1>医薬品・疾患リファレンス — Design System</h1>
+            <p class="lede">
+              Japanese-language drug &amp; disease reference for healthcare-professional UX exploration. Flutter /
+              Material 3 on iOS + Android. This document is the single-file consolidation of every token, contract, and
+              component preview shipped in
+              <code>fictional-drug-and-disease-ref-flutter/</code>
+              .
+            </p>
+            <div class="grid">
+              <div>
+                <div class="lbl">Locale</div>
+                <div class="val">ja-JP only · 半角数字</div>
+              </div>
+              <div>
+                <div class="lbl">Surfaces</div>
+                <div class="val">Phone 390 dp · Tablet 834×1194 dp two-pane</div>
+              </div>
+              <div>
+                <div class="lbl">Color systems</div>
+                <div class="val">
+                  Round6
+                  <code style="color: #9db2d9">#007AFF</code>
+                  · M3 Detail
+                  <code style="color: #9db2d9">#1F5BB5</code>
+                </div>
+              </div>
+              <div>
+                <div class="lbl">Status</div>
+                <div class="val">Portfolio / fictional · not for medical use</div>
+              </div>
+            </div>
+            <div class="disc">
+              <span class="dot"></span>
+              <span>
+                · FICTIONAL DATA - NOT FOR MEDICAL USE ·
+                <span style="color: #fff">架空データ・医療判断には使用不可</span>
+                ·
+              </span>
+              <span class="dot"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================== B. HARD CONTRACT =================== -->
+        <section class="block" id="contract">
+          <h2 class="section-title">
+            <span class="tag">B</span>
+            Hard contract
+          </h2>
+          <p class="section-sub">
+            Read before doing anything. Five non-negotiable rules that bound the entire design surface. Lifted verbatim
+            from
+            <code>SKILL.md</code>
+            .
+          </p>
+          <div class="card">
+            <ol class="contract">
+              <li>
+                <div>
+                  <h4>Locale is ja-JP only</h4>
+                  <p>
+                    Never retranslate Japanese chip labels — copy them verbatim from
+                    <code>Components.jsx</code>
+                    (
+                    <code>DRUG_FILTER_AXES</code>
+                    ,
+                    <code>DISEASE_FILTER_AXES</code>
+                    ) or
+                    <code>lib/l10n/app_ja.arb</code>
+                    . Mixed Japanese + Latin identifiers (ATC, YJ, ICD-10) are allowed. Numerals are half-width.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h4>Disclaimer ribbon is always-on</h4>
+                  <p>
+                    Any view with medical content must render
+                    <code>&lt;Disclaimer/&gt;</code>
+                    at the shell layer above the bottom safe-area inset. Never shorten or remove the ribbon copy. Bind
+                    text to l10n key
+                    <code>detailDisclaimer</code>
+                    .
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h4>Two color systems, one app</h4>
+                  <p>
+                    Round6 (
+                    <code>#007AFF</code>
+                    ) for shell / bottom-nav / segmented control / FAB tints / primary actions. Material 3
+                    <em>Detail</em>
+                    (
+                    <code>#1F5BB5</code>
+                    ) for content-dense detail surfaces. Don&rsquo;t mix.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h4>No emoji, no gradients, no full-bleed photography, no inner shadows, no glow</h4>
+                  <p>
+                    Material Symbols Outlined only; FILL=1 for selected. Imagery is restricted to cool placeholder
+                    gradients (
+                    <code>#D8E2FF</code>
+                    ↘
+                    <code>#F2DAFF</code>
+                    ) inside drug-card image rectangles — never as page backgrounds.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h4>Domain-flavored examples are not prescriptions</h4>
+                  <p>
+                    The seed says: do NOT design new search/detail/list screens by default. Compose from primitives
+                    instead. Mock data is not clinical guidance.
+                  </p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <!-- =================== C. SOURCES =================== -->
+        <section class="block" id="sources">
+          <h2 class="section-title">
+            <span class="tag">C</span>
+            Sources read for this system
+          </h2>
+          <p class="section-sub">
+            Where every token, label, and rule in this document is derived from.
+            <code>lib/l10n/app_ja.arb</code>
+            is the verified mirror of the mock-server Kotlin KDoc and is enforced by
+            <code>test/l10n/drug_filter_alignment_test.dart</code>
+            .
+          </p>
+          <div class="card">
+            <table class="spec sources-table">
+              <thead>
+                <tr>
+                  <th>Kind</th>
+                  <th>Path / handle</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Flutter app</td>
+                  <td>fictional-drug-and-disease-ref-flutter/ (mounted)</td>
+                  <td>l10n + theme are SSOT</td>
+                </tr>
+                <tr>
+                  <td>Flutter l10n</td>
+                  <td>lib/l10n/app_ja.arb</td>
+                  <td>visible Japanese text</td>
+                </tr>
+                <tr>
+                  <td>Flutter theme</td>
+                  <td>lib/theme/app_palette.dart, lib/theme/detail_color_extension.dart</td>
+                  <td>light/dark tokens and chip foreground colors</td>
+                </tr>
+                <tr>
+                  <td>Flutter typed models</td>
+                  <td>
+                    lib/domain/drug/drug.dart, lib/domain/drug/drug_nested.dart, lib/domain/disease/disease.dart,
+                    lib/domain/disease/disease_nested.dart
+                  </td>
+                  <td>DTO and nested fixture shape</td>
+                </tr>
+                <tr>
+                  <td>Mock server</td>
+                  <td>fictional-drug-and-disease-ref-mock-server/ (mounted)</td>
+                  <td>Kotlin KDoc enums; OpenAPI</td>
+                </tr>
+                <tr>
+                  <td>Repos</td>
+                  <td>
+                    Corvus400/fictional-drug-and-disease-ref-flutter,
+                    Corvus400/fictional-drug-and-disease-ref-mock-server
+                  </td>
+                  <td>GitHub mirrors</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- =================== D. CONTENT FUNDAMENTALS =================== -->
+        <section class="block" id="fundamentals">
+          <h2 class="section-title">
+            <span class="tag">D</span>
+            Content fundamentals
+          </h2>
+          <p class="section-sub">
+            Rules for written content: locale, tone, casing, numerals, emoji policy, and the disclaimer copy bound to
+            <code>detailDisclaimer</code>
+            .
+          </p>
+
+          <div class="card">
+            <dl class="kv">
+              <dt>Locale</dt>
+              <dd>
+                ja-JP only. Mixed Japanese + Latin code identifiers (
+                <code>ATC</code>
+                ,
+                <code>YJ</code>
+                ,
+                <code>ICD-10</code>
+                ). Numerals are half-width.
+              </dd>
+
+              <dt>Tone</dt>
+              <dd>
+                Clinical, terse, third-person. No
+                <code>「あなた」「君」「お客様」</code>
+                . Section headers are one or two kanji compounds — 概要 / 用法・用量 / 禁忌 / 相互作用 / 副作用 /
+                薬物動態 / 関連.
+              </dd>
+
+              <dt>Casing &amp; punctuation</dt>
+              <dd>
+                Full-width Japanese punctuation (
+                <code>、 。 ・</code>
+                ) inside narrative text. Half-width inside code identifiers and meta lines (
+                <code>ATC: C08CA01</code>
+                ,
+                <code>改訂 2024-08-12</code>
+                ). Ratios use
+                <code>:</code>
+                (e.g.
+                <code>1:8</code>
+                ).
+              </dd>
+
+              <dt>Numerals</dt>
+              <dd>
+                Half-width Arabic only. Use
+                <code>mg</code>
+                ,
+                <code>mL</code>
+                ,
+                <code>μg</code>
+                ; never
+                <code>㎎</code>
+                ,
+                <code>㎖</code>
+                . Time of day in 24-hour
+                <code>09:00–17:00</code>
+                . Dates ISO-style
+                <code>2024-08-12</code>
+                .
+              </dd>
+
+              <dt>Emoji policy</dt>
+              <dd>Never. Material Symbols Outlined only; FILL=1 for selected. We do not draw glyphs by hand.</dd>
+
+              <dt>Disclaimer copy</dt>
+              <dd>
+                Bound to l10n key
+                <code>detailDisclaimer</code>
+                :
+                <code style="font-family: var(--mono); font-size: 11px">
+                  · FICTIONAL DATA - NOT FOR MEDICAL USE · 架空データ・医療判断には使用不可 ·
+                </code>
+                . Do not shorten, marquee, or truncate. Any
+                <code>disclaimer</code>
+                field from the API is for logging / audit only — never display it.
+              </dd>
+
+              <dt>Brand wordmark</dt>
+              <dd>NotoSansJP 700 / 22 px. No logo, no illustration, no consumer-facing branding.</dd>
+            </dl>
+          </div>
+        </section>
+
+        <!-- =================== E. VISUAL FOUNDATIONS =================== -->
+        <section class="block" id="foundations">
+          <h2 class="section-title">
+            <span class="tag">E</span>
+            Visual foundations
+          </h2>
+          <p class="section-sub">
+            Color systems, accessibility floor, backgrounds, cards, borders, shadows, radii, the spacing scale, and the
+            type scale. Every token referenced here is defined in
+            <code>colors_and_type.css</code>
+            .
+          </p>
+
+          <div class="card">
+            <h3 style="margin: 0 0 8px; font-size: 14px; font-weight: 700">Two color systems</h3>
+            <p class="lead" style="margin: 0 0 12px">
+              Round6 is seeded from
+              <code>#007AFF</code>
+              and applies to bottom-nav, segmented control, FAB tints, and primary action button tints. Material 3
+              <em>Detail</em>
+              (
+              <code>DetailColorExtension</code>
+              ) is seeded from
+              <code>#1F5BB5</code>
+              and provides higher-saturation accents for content-dense surfaces.
+            </p>
+            <div class="token-grid">
+              <div class="token-pair">
+                <header>
+                  <h3>Round6</h3>
+                  <span class="role">shell · nav · search · FAB tint</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #007aff; color: #fff">#007AFF</div>
+                    <div class="meta">
+                      <span>--primary (light)</span>
+                      <span class="ratio">4.66:1</span>
+                    </div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #9ecaff; color: #003258">#9ECAFF</div>
+                    <div class="meta">
+                      <span>--primary (dark)</span>
+                      <span class="ratio">10.7:1</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>Material 3 Detail</h3>
+                  <span class="role">content-dense detail surfaces</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #1f5bb5; color: #fff">#1F5BB5</div>
+                    <div class="meta">
+                      <span>--d-primary (light)</span>
+                      <span class="ratio">5.92:1</span>
+                    </div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #aec6ff; color: #002e69">#AEC6FF</div>
+                    <div class="meta">
+                      <span>--d-primary (dark)</span>
+                      <span class="ratio">9.83:1</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 8px; font-size: 14px; font-weight: 700">Accessibility floor</h3>
+            <p class="lead" style="margin: 0">
+              WCAG AA 4.5:1 minimum in both light and dark themes. Exceptions: outline / surface borders (4.0:1 light)
+              are AA-Large only — they must not carry body-text foregrounds. Documented inline in
+              <code>colors_and_type.css</code>
+              .
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 10px; font-size: 14px; font-weight: 700">Backgrounds</h3>
+            <p class="lead" style="margin: 0 0 12px">
+              Solid pale neutrals. No gradients, no full-bleed photography, no patterns.
+            </p>
+            <div class="token-grid three">
+              <div class="token-pair">
+                <header>
+                  <h3>--bg</h3>
+                  <span class="role">shell</span>
+                </header>
+                <div class="swatch light">
+                  <div class="chip" style="background: #f2f2f7">#F2F2F7</div>
+                  <div class="meta"><span>Round6 light</span></div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-surface</h3>
+                  <span class="role">detail</span>
+                </header>
+                <div class="swatch light">
+                  <div class="chip" style="background: #fbfbfe">#FBFBFE</div>
+                  <div class="meta"><span>M3 detail light</span></div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--bg / dark</h3>
+                  <span class="role">shell</span>
+                </header>
+                <div class="swatch dark">
+                  <div class="chip" style="background: #101317; color: #fff">#101317</div>
+                  <div class="meta"><span>Round6 dark</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 10px; font-size: 14px; font-weight: 700">Cards, borders, shadows</h3>
+            <dl class="kv">
+              <dt>Card</dt>
+              <dd>
+                White /
+                <code>--d-surface-c-lowest</code>
+                . Radius 10.
+                <code>0.5px</code>
+                hairline border
+                <code>rgba(60,60,67,.13)</code>
+                . One elevation:
+                <code>0 1px 2px rgba(15,23,42,.04)</code>
+                .
+              </dd>
+              <dt>Hairline</dt>
+              <dd>
+                iOS-style 0.5 px separator. Light
+                <code>rgba(60,60,67,.13)</code>
+                ; dark
+                <code>rgba(255,255,255,.10)</code>
+                .
+              </dd>
+              <dt>Shadows</dt>
+              <dd>Three only — card, footer (negative-y soft), bottom sheet. No inner shadows. No glow.</dd>
+            </dl>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 10px; font-size: 14px; font-weight: 700">Corner radii</h3>
+            <div class="radii-row">
+              <div class="ri">
+                <div class="sq" style="border-radius: 4px"></div>
+                <div class="nm">--r-xs</div>
+                <div>4 · chip</div>
+              </div>
+              <div class="ri">
+                <div class="sq" style="border-radius: 8px"></div>
+                <div class="nm">--r-s</div>
+                <div>8 · image / badge bg</div>
+              </div>
+              <div class="ri">
+                <div class="sq" style="border-radius: 10px"></div>
+                <div class="nm">--r-m</div>
+                <div>10 · card</div>
+              </div>
+              <div class="ri">
+                <div class="sq" style="border-radius: 12px"></div>
+                <div class="nm">--r-l</div>
+                <div>12 · sheet card</div>
+              </div>
+              <div class="ri">
+                <div class="sq" style="border-radius: 18px"></div>
+                <div class="nm">--r-xl</div>
+                <div>18 · device inner / FAB</div>
+              </div>
+              <div class="ri">
+                <div class="sq" style="border-radius: 22px"></div>
+                <div class="nm">--r-2xl</div>
+                <div>22 · M3 button pill</div>
+              </div>
+              <div class="ri">
+                <div class="sq" style="border-radius: 9999px; width: 90px"></div>
+                <div class="nm">--r-pill</div>
+                <div>pill</div>
+              </div>
+            </div>
+            <p class="lead" style="margin: 14px 0 0; color: var(--page-muted); font-size: 12.5px">
+              Sheet top edge uses radius 20 (handle area only); FAB is 18; chip 5 in compact contexts.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 10px; font-size: 14px; font-weight: 700">Spacing scale</h3>
+            <div class="spacing-row">
+              <div class="name">--s-1</div>
+              <div class="px">4 px</div>
+              <div class="bar" style="width: 4px"></div>
+            </div>
+            <div class="spacing-row">
+              <div class="name">--s-2</div>
+              <div class="px">8 px</div>
+              <div class="bar" style="width: 8px"></div>
+            </div>
+            <div class="spacing-row">
+              <div class="name">--s-3</div>
+              <div class="px">12 px</div>
+              <div class="bar" style="width: 12px"></div>
+            </div>
+            <div class="spacing-row">
+              <div class="name">--s-4</div>
+              <div class="px">16 px</div>
+              <div class="bar" style="width: 16px"></div>
+            </div>
+            <div class="spacing-row">
+              <div class="name">--s-5</div>
+              <div class="px">20 px</div>
+              <div class="bar" style="width: 20px"></div>
+            </div>
+            <div class="spacing-row">
+              <div class="name">--s-6</div>
+              <div class="px">24 px</div>
+              <div class="bar" style="width: 24px"></div>
+            </div>
+            <div class="spacing-row">
+              <div class="name">--s-8</div>
+              <div class="px">32 px</div>
+              <div class="bar" style="width: 32px"></div>
+            </div>
+            <div class="spacing-row">
+              <div class="name">--s-10</div>
+              <div class="px">40 px</div>
+              <div class="bar" style="width: 40px"></div>
+            </div>
+            <p class="lead" style="margin: 14px 0 0; color: var(--page-muted); font-size: 12.5px">
+              Phone gutter
+              <strong>16</strong>
+              . Tablet gutter
+              <strong>28</strong>
+              . Hit targets
+              <strong>≥ 44 px</strong>
+              .
+            </p>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 10px; font-size: 14px; font-weight: 700">Motion</h3>
+            <dl class="kv">
+              <dt>Standard easing</dt>
+              <dd>
+                <code>cubic-bezier(.2, 0, 0, 1)</code>
+                (M3 standard).
+              </dd>
+              <dt>Durations</dt>
+              <dd>120 / 200 / 320 ms.</dd>
+              <dt>Bottom sheet</dt>
+              <dd>
+                iOS-style emphasized
+                <code>cubic-bezier(.32,.72,0,1)</code>
+                over 260 ms.
+              </dd>
+              <dt>Press</dt>
+              <dd>Opacity drop to 0.85. No hover (mobile-only).</dd>
+              <dt>Scrim</dt>
+              <dd>32 % alpha. Never frosted-glass blur.</dd>
+            </dl>
+          </div>
+        </section>
+        <!-- /sections-d-e -->
+        <!-- =================== F. COLOR TOKENS =================== -->
+        <section class="block" id="tokens">
+          <h2 class="section-title">
+            <span class="tag">F</span>
+            Color tokens
+          </h2>
+          <p class="section-sub">
+            Every CSS custom property from
+            <code>colors_and_type.css</code>
+            rendered as a paired light/dark swatch. Left half = light theme; right half = dark theme. Hex / rgba shown
+            beneath each chip.
+          </p>
+
+          <div class="card">
+            <h3 style="margin: 0 0 12px; font-size: 14px; font-weight: 700">
+              Round6 — AppPalette (shell, nav, search, FAB tint)
+            </h3>
+            <div class="token-grid">
+              <!-- repeated pairs -->
+              <div class="token-pair">
+                <header>
+                  <h3>--bg</h3>
+                  <span class="role">shell</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #f2f2f7; color: #1a1c1e">Bg</div>
+                    <div class="meta"><span>#F2F2F7</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #101317; color: #e5e7ec">Bg</div>
+                    <div class="meta"><span>#101317</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--surface</h3>
+                  <span class="role">card / list bg</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #ffffff; color: #1a1c1e">Surface</div>
+                    <div class="meta"><span>#FFFFFF</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #181b20; color: #e5e7ec">Surface</div>
+                    <div class="meta"><span>#181B20</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--surface-2</h3>
+                  <span class="role">sunken</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #f7f7fa; color: #1a1c1e">Surface 2</div>
+                    <div class="meta"><span>#F7F7FA</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #1f2329; color: #e5e7ec">Surface 2</div>
+                    <div class="meta"><span>#1F2329</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--surface-3</h3>
+                  <span class="role">field / input</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #efeff4; color: #1a1c1e">Surface 3</div>
+                    <div class="meta"><span>#EFEFF4</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #272b32; color: #e5e7ec">Surface 3</div>
+                    <div class="meta"><span>#272B32</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--surface-4</h3>
+                  <span class="role">hover / press</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #e5e5ea; color: #1a1c1e">Surface 4</div>
+                    <div class="meta"><span>#E5E5EA</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #31353d; color: #e5e7ec">Surface 4</div>
+                    <div class="meta"><span>#31353D</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--ink</h3>
+                  <span class="role">primary text</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #1a1c1e; color: #fff">Aa 概要</div>
+                    <div class="meta">
+                      <span>#1A1C1E</span>
+                      <span class="pass">AAA</span>
+                    </div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #e5e7ec; color: #101317">Aa 概要</div>
+                    <div class="meta">
+                      <span>#E5E7EC</span>
+                      <span class="pass">AAA</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--ink-2</h3>
+                  <span class="role">secondary text</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #3f4347; color: #fff">Aa 用法</div>
+                    <div class="meta">
+                      <span>#3F4347</span>
+                      <span class="pass">AA</span>
+                    </div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #c2c6cd; color: #101317">Aa 用法</div>
+                    <div class="meta">
+                      <span>#C2C6CD</span>
+                      <span class="pass">AAA</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--muted</h3>
+                  <span class="role">meta text</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #6c7177; color: #fff">Aa 改訂</div>
+                    <div class="meta">
+                      <span>#6C7177</span>
+                      <span class="pass">AA</span>
+                    </div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #9ca1aa; color: #101317">Aa 改訂</div>
+                    <div class="meta">
+                      <span>#9CA1AA</span>
+                      <span class="pass">AA</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--primary</h3>
+                  <span class="role">action</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #007aff; color: #fff">Primary</div>
+                    <div class="meta">
+                      <span>#007AFF</span>
+                      <span class="pass">AA</span>
+                    </div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #9ecaff; color: #003258">Primary</div>
+                    <div class="meta">
+                      <span>#9ECAFF</span>
+                      <span class="pass">AAA</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--primary-soft</h3>
+                  <span class="role">tint</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: rgba(0, 122, 255, 0.1); color: #0a6fe8">Tint</div>
+                    <div class="meta"><span>rgba(0,122,255,.10)</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: rgba(158, 202, 255, 0.14); color: #9ecaff">Tint</div>
+                    <div class="meta"><span>rgba(158,202,255,.14)</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--danger</h3>
+                  <span class="role">禁忌</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #d62a2a; color: #fff">禁忌</div>
+                    <div class="meta">
+                      <span>#D62A2A</span>
+                      <span class="pass">AA</span>
+                    </div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #ffb4ab; color: #5c1612">禁忌</div>
+                    <div class="meta">
+                      <span>#FFB4AB</span>
+                      <span class="pass">AAA</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--danger-cont</h3>
+                  <span class="role">禁忌 container</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #ffeded; color: #5c1612">container</div>
+                    <div class="meta"><span>#FFEDED</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #5c1612; color: #ffb4ab">container</div>
+                    <div class="meta"><span>#5C1612</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--search-field-bg</h3>
+                  <span class="role">search</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #ebebef; color: #1a1c1e">検索</div>
+                    <div class="meta"><span>#EBEBEF</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #272b32; color: #e5e7ec">検索</div>
+                    <div class="meta"><span>#272B32</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--rx-tint / --rx-ink</h3>
+                  <span class="role">drug chip</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: rgba(0, 122, 255, 0.1); color: #0a6fe8">Rx</div>
+                    <div class="meta"><span>rgba(0,122,255,.10) · #0A6FE8</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: rgba(158, 202, 255, 0.16); color: #9ecaff">Rx</div>
+                    <div class="meta"><span>rgba(158,202,255,.16) · #9ECAFF</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--dx-tint / --dx-ink</h3>
+                  <span class="role">disease chip</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: rgba(122, 79, 204, 0.1); color: #7a4fcc">Dx</div>
+                    <div class="meta"><span>rgba(122,79,204,.10) · #7A4FCC</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: rgba(213, 186, 255, 0.16); color: #d5baff">Dx</div>
+                    <div class="meta"><span>rgba(213,186,255,.16) · #D5BAFF</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--hairline</h3>
+                  <span class="role">separator</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div
+                      class="chip"
+                      style="
+                        background: #fff;
+                        color: #1a1c1e;
+                        box-shadow:
+                          inset 0 -0.5px 0 rgba(60, 60, 67, 0.13),
+                          inset 0 0.5px 0 rgba(60, 60, 67, 0.13);
+                      "
+                    >
+                      ───────
+                    </div>
+                    <div class="meta"><span>rgba(60,60,67,.13)</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div
+                      class="chip"
+                      style="
+                        background: #181b20;
+                        color: #e5e7ec;
+                        box-shadow:
+                          inset 0 -0.5px 0 rgba(255, 255, 255, 0.1),
+                          inset 0 0.5px 0 rgba(255, 255, 255, 0.1);
+                      "
+                    >
+                      ───────
+                    </div>
+                    <div class="meta"><span>rgba(255,255,255,.10)</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 12px; font-size: 14px; font-weight: 700">
+              Material 3 Detail — DetailColorExtension (content-dense surfaces)
+            </h3>
+            <div class="token-grid">
+              <div class="token-pair">
+                <header>
+                  <h3>--d-primary</h3>
+                  <span class="role">action</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #1f5bb5; color: #fff">Primary</div>
+                    <div class="meta">
+                      <span>#1F5BB5</span>
+                      <span class="pass">AA</span>
+                    </div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #aec6ff; color: #002e69">Primary</div>
+                    <div class="meta">
+                      <span>#AEC6FF</span>
+                      <span class="pass">AAA</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-secondary</h3>
+                  <span class="role">accent</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #525e78; color: #fff">Secondary</div>
+                    <div class="meta"><span>#525E78</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #bbc6e4; color: #253048">Secondary</div>
+                    <div class="meta"><span>#BBC6E4</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-tertiary</h3>
+                  <span class="role">accent</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #705574; color: #fff">Tertiary</div>
+                    <div class="meta"><span>#705574</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #debcdf; color: #3f2843">Tertiary</div>
+                    <div class="meta"><span>#DEBCDF</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-error</h3>
+                  <span class="role">error</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #b3261e; color: #fff">Error</div>
+                    <div class="meta"><span>#B3261E</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #f2b8b5; color: #601410">Error</div>
+                    <div class="meta"><span>#F2B8B5</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-error-container</h3>
+                  <span class="role">禁忌 container</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #f9dedc; color: #410e0b">container</div>
+                    <div class="meta"><span>#F9DEDC</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #8c1d18; color: #f9dedc">container</div>
+                    <div class="meta"><span>#8C1D18</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-surface</h3>
+                  <span class="role">detail bg</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #fbfbfe; color: #1a1b20">Surface</div>
+                    <div class="meta"><span>#FBFBFE</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #121318; color: #e3e2e9">Surface</div>
+                    <div class="meta"><span>#121318</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-surface-c-lowest</h3>
+                  <span class="role">card</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #ffffff; color: #1a1b20">C-lowest</div>
+                    <div class="meta"><span>#FFFFFF</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #0d0e13; color: #e3e2e9">C-lowest</div>
+                    <div class="meta"><span>#0D0E13</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-surface-c-low</h3>
+                  <span class="role">sunken card</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #f4f4f8; color: #1a1b20">C-low</div>
+                    <div class="meta"><span>#F4F4F8</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #1a1b20; color: #e3e2e9">C-low</div>
+                    <div class="meta"><span>#1A1B20</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-surface-c</h3>
+                  <span class="role">chip off-state</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #edeef3; color: #1a1b20">C-default</div>
+                    <div class="meta"><span>#EDEEF3</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #1e1f25; color: #e3e2e9">C-default</div>
+                    <div class="meta"><span>#1E1F25</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-surface-c-high</h3>
+                  <span class="role">raised</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #e7e8ee; color: #1a1b20">C-high</div>
+                    <div class="meta"><span>#E7E8EE</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #292a30; color: #e3e2e9">C-high</div>
+                    <div class="meta"><span>#292A30</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-surface-c-highest</h3>
+                  <span class="role">sheet base</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #e1e2e8; color: #1a1b20">C-highest</div>
+                    <div class="meta"><span>#E1E2E8</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #33343a; color: #e3e2e9">C-highest</div>
+                    <div class="meta"><span>#33343A</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-on-surface</h3>
+                  <span class="role">body</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #1a1b20; color: #fff">本文</div>
+                    <div class="meta">
+                      <span>#1A1B20</span>
+                      <span class="pass">AAA</span>
+                    </div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #e3e2e9; color: #121318">本文</div>
+                    <div class="meta">
+                      <span>#E3E2E9</span>
+                      <span class="pass">AAA</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-on-surface-variant</h3>
+                  <span class="role">meta</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #44464e; color: #fff">改訂</div>
+                    <div class="meta">
+                      <span>#44464E</span>
+                      <span class="pass">AA</span>
+                    </div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #c5c6cd; color: #121318">改訂</div>
+                    <div class="meta">
+                      <span>#C5C6CD</span>
+                      <span class="pass">AAA</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-outline</h3>
+                  <span class="role">AA-Large only · 4.0:1</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #fff; color: #1a1b20; border: 1px solid #75777f">outline</div>
+                    <div class="meta"><span>#75777F</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #121318; color: #e3e2e9; border: 1px solid #8e9099">
+                      outline
+                    </div>
+                    <div class="meta"><span>#8E9099</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-outline-variant</h3>
+                  <span class="role">hairline</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #fff; color: #1a1b20; border: 1px solid #c5c6cd">variant</div>
+                    <div class="meta"><span>#C5C6CD</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #121318; color: #e3e2e9; border: 1px solid #44464e">
+                      variant
+                    </div>
+                    <div class="meta"><span>#44464E</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-primary-container</h3>
+                  <span class="role">F2 footer-active</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #d8e2ff; color: #001a41">container</div>
+                    <div class="meta"><span>#D8E2FF</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #003494; color: #d8e2ff">container</div>
+                    <div class="meta"><span>#003494</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-tertiary-container</h3>
+                  <span class="role">soft accent</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div class="chip" style="background: #fbd8ff; color: #280a2d">container</div>
+                    <div class="meta"><span>#FBD8FF</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div class="chip" style="background: #573c5b; color: #fbd8ff">container</div>
+                    <div class="meta"><span>#FBD8FF</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="token-pair">
+                <header>
+                  <h3>--d-shadow</h3>
+                  <span class="role">elevation tint</span>
+                </header>
+                <div class="pair-body">
+                  <div class="swatch light">
+                    <div
+                      class="chip"
+                      style="background: #fbfbfe; color: #1a1b20; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08)"
+                    >
+                      shadow
+                    </div>
+                    <div class="meta"><span>rgba(15,23,42,.08)</span></div>
+                  </div>
+                  <div class="swatch dark">
+                    <div
+                      class="chip"
+                      style="background: #121318; color: #e3e2e9; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5)"
+                    >
+                      shadow
+                    </div>
+                    <div class="meta"><span>rgba(0,0,0,.50)</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 10px; font-size: 14px; font-weight: 700">Elevation tokens</h3>
+            <dl class="kv">
+              <dt>--elev-card</dt>
+              <dd><code>0 1px 2px rgba(15,23,42,.04), 0 0 0 0.5px var(--hairline)</code></dd>
+              <dt>--elev-footer</dt>
+              <dd><code>0 -4px 12px rgba(15,23,42,.08)</code></dd>
+              <dt>--elev-sheet</dt>
+              <dd><code>0 12px 32px rgba(15,23,42,.18)</code></dd>
+            </dl>
+          </div>
+        </section>
+
+        <!-- =================== G. TYPOGRAPHY =================== -->
+        <section class="block" id="typography">
+          <h2 class="section-title">
+            <span class="tag">G</span>
+            Typography
+          </h2>
+          <p class="section-sub">
+            NotoSansJP exclusively (bundled as
+            <code>fonts/NotoSansJP-Regular.otf</code>
+            /
+            <code>NotoSansJP-Bold.otf</code>
+            in source; served here from Google Fonts). JetBrains Mono for code identifiers. Other weights (300, 500,
+            900) are not provided — fall back to the OS Japanese stack defined in
+            <code>--font-jp</code>
+            .
+          </p>
+
+          <div class="card">
+            <div class="type-spec">
+              <div class="lbl">--t-display-l</div>
+              <div class="demo" style="font: 700 34px/1.18 var(--jp)">医薬品リファレンス</div>
+              <div class="spec">700 · 34 / 1.18</div>
+            </div>
+            <div class="type-spec">
+              <div class="lbl">--t-display-m</div>
+              <div class="demo" style="font: 700 28px/1.2 var(--jp)">概要 — Search</div>
+              <div class="spec">700 · 28 / 1.20 · phone</div>
+            </div>
+            <div class="type-spec">
+              <div class="lbl">--t-display-s</div>
+              <div class="demo" style="font: 700 22px/1.22 var(--jp)">薬剤検索</div>
+              <div class="spec">700 · 22 / 1.22 · tablet</div>
+            </div>
+            <div class="type-spec">
+              <div class="lbl">--t-title-l</div>
+              <div class="demo" style="font: 700 20px/1.25 var(--jp)">アムロジピン錠 5mg</div>
+              <div class="spec">700 · 20 / 1.25 · brand</div>
+            </div>
+            <div class="type-spec">
+              <div class="lbl">--t-title-m</div>
+              <div class="demo" style="font: 700 16px/1.3 var(--jp)">用法・用量</div>
+              <div class="spec">700 · 16 / 1.30 · card</div>
+            </div>
+            <div class="type-spec">
+              <div class="lbl">--t-title-s</div>
+              <div class="demo" style="font: 700 14px/1.35 var(--jp)">タブラベル / チップ</div>
+              <div class="spec">700 · 14 / 1.35</div>
+            </div>
+            <div class="type-spec">
+              <div class="lbl">--t-body-l</div>
+              <div class="demo" style="font: 400 15px/1.55 var(--jp)">用量は患者の状態に応じて適宜増減する。</div>
+              <div class="spec">400 · 15 / 1.55</div>
+            </div>
+            <div class="type-spec">
+              <div class="lbl">--t-body-m</div>
+              <div class="demo" style="font: 400 14px/1.55 var(--jp)">
+                通常、成人にはアムロジピンとして1日1回 2.5–5mg を経口投与する。
+              </div>
+              <div class="spec">400 · 14 / 1.55 · default body</div>
+            </div>
+            <div class="type-spec">
+              <div class="lbl">--t-body-s</div>
+              <div class="demo" style="font: 400 13px/1.5 var(--jp)">あむろじぴん / 二次的テキスト</div>
+              <div class="spec">400 · 13 / 1.50</div>
+            </div>
+            <div class="type-spec">
+              <div class="lbl">--t-label-m</div>
+              <div class="demo" style="font: 500 12px/1.4 var(--jp); color: #44464e">
+                改訂 2024-08-12 · ATC: C08CA01
+              </div>
+              <div class="spec">500 · 12 / 1.40 · meta</div>
+            </div>
+            <div class="type-spec">
+              <div class="lbl">--t-label-s</div>
+              <div class="demo" style="font: 600 11px/1.35 var(--jp); letter-spacing: 0.04em">処方箋医薬品 / 内服</div>
+              <div class="spec">600 · 11 / 1.35 · chip</div>
+            </div>
+            <div class="type-spec">
+              <div class="lbl">--t-mono-s</div>
+              <div class="demo" style="font: 400 11px/1.4 var(--mono)">ATC: C08CA01 · YJ: 2171022F1095</div>
+              <div class="spec">400 · 11 / 1.40 · JetBrains Mono</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 8px; font-size: 14px; font-weight: 700">Font stack</h3>
+            <dl class="kv">
+              <dt>--font-jp</dt>
+              <dd>
+                <code>
+                  "NotoSansJP", system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic",
+                  Meiryo, sans-serif
+                </code>
+              </dd>
+              <dt>--font-mono</dt>
+              <dd><code>"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace</code></dd>
+            </dl>
+            <p class="lead" style="margin: 10px 0 0; color: var(--page-muted); font-size: 12.5px">
+              In production, embed bundled OTF; this spec document uses Google Fonts CDN to stay single-file. JetBrains
+              Mono is referenced for
+              <code>--font-mono</code>
+              but not bundled — install via Google Fonts in production or accept the OS monospace fallback.
+            </p>
+          </div>
+        </section>
+
+        <!-- =================== H. DISCLAIMER RIBBON =================== -->
+        <section class="block" id="ribbon">
+          <h2 class="section-title">
+            <span class="tag">H</span>
+            Disclaimer ribbon
+          </h2>
+          <p class="section-sub">
+            The highest-priority UX requirement in this system. Always-mounted overlay at the shell layer, above the
+            bottom safe-area inset, non-interactive (pointer-events:none). Bound to l10n key
+            <code>detailDisclaimer</code>
+            .
+          </p>
+
+          <div class="card">
+            <h3 style="margin: 0 0 10px; font-size: 14px; font-weight: 700">Live render — light &amp; dark</h3>
+            <div class="theme-pair">
+              <div>
+                <div class="ribbon-stage light">
+                  <div class="disclaimer-ribbon">
+                    <span class="dot"></span>
+                    <span>FICTIONAL DATA - NOT FOR MEDICAL USE</span>
+                    <span class="dot"></span>
+                    <span class="accent">架空データ・医療判断には使用不可</span>
+                    <span class="dot"></span>
+                  </div>
+                </div>
+                <div style="margin-top: 8px; font: 500 11px var(--mono); color: var(--page-muted)">
+                  light · bg #1A1C1E · fg #FFFFFF · accent #FFB4AB
+                </div>
+              </div>
+              <div>
+                <div class="ribbon-stage dark">
+                  <div class="disclaimer-ribbon d">
+                    <span class="dot"></span>
+                    <span>FICTIONAL DATA - NOT FOR MEDICAL USE</span>
+                    <span class="dot"></span>
+                    <span class="accent">架空データ・医療判断には使用不可</span>
+                    <span class="dot"></span>
+                  </div>
+                </div>
+                <div style="margin-top: 8px; font: 500 11px var(--mono); color: var(--page-muted)">
+                  dark · bg #0D0E13 · fg #FFFFFF · accent #FFB4AB
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <ol class="contract">
+              <li>
+                <div>
+                  <h4>Placement</h4>
+                  <p>
+                    Rendered at the app shell layer so it sits on every view, directly above the bottom safe-area inset
+                    (above any bottom-navigation when present). Must not scroll. Modal routes may cover it; ribbon
+                    resumes visibility on dismiss.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h4>Height</h4>
+                  <p>24–28 dp (we ship 26 dp). Non-tappable.</p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h4>Colors</h4>
+                  <p>
+                    Light: bg
+                    <code>#1A1C1E</code>
+                    / fg
+                    <code>#FFFFFF</code>
+                    / accent
+                    <code>#FFB4AB</code>
+                    . Dark: bg
+                    <code>#0D0E13</code>
+                    / fg
+                    <code>#FFFFFF</code>
+                    / accent
+                    <code>#FFB4AB</code>
+                    .
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h4>Text</h4>
+                  <p>
+                    Single line
+                    <code>· FICTIONAL DATA - NOT FOR MEDICAL USE · 架空データ・医療判断には使用不可 ·</code>
+                    in NotoSansJP 700 / 11 px / letter-spacing 0.04em. The system no longer ships a short form — keep
+                    the full l10n copy visible. Do not marquee or truncate.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h4>Accessibility</h4>
+                  <p>
+                    Announce as
+                    <code>label: "免責: 架空データ・医療判断には使用しないでください"</code>
+                    ,
+                    <code>liveRegion: false</code>
+                    .
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h4>Source of truth</h4>
+                  <p>
+                    Bind visible text to l10n key
+                    <code>detailDisclaimer</code>
+                    . Any
+                    <code>disclaimer</code>
+                    field returned by API endpoints is for logging / audit only — never display it.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h4>Rule</h4>
+                  <p>
+                    Implement as an always-mounted overlay at the shell layer, not as a per-screen widget.
+                    Non-interactive (input-blocking). Single text node styled with NotoSansJP 700 / 11 / 0.04em.
+                  </p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 8px; font-size: 14px; font-weight: 700">
+              Layer offsets —
+              <code>data-layer</code>
+            </h3>
+            <table class="spec">
+              <thead>
+                <tr>
+                  <th>data-layer</th>
+                  <th>Bottom offset</th>
+                  <th>Context</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>above-bottom-nav</code></td>
+                  <td>80 px</td>
+                  <td>List shells with bottom navigation</td>
+                </tr>
+                <tr>
+                  <td><code>above-detail-footer</code></td>
+                  <td>64 px</td>
+                  <td>Detail views with action footer</td>
+                </tr>
+                <tr>
+                  <td><code>bottom-safe-area</code></td>
+                  <td>0 px</td>
+                  <td>Standalone screens</td>
+                </tr>
+                <tr>
+                  <td><code>above-modal</code></td>
+                  <td>0 px</td>
+                  <td>Re-anchor after modal dismiss</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <!-- =================== I. UI KIT / COMPONENTS =================== -->
+        <section class="block" id="components">
+          <h2 class="section-title">
+            <span class="tag">I</span>
+            UI kit / components
+          </h2>
+          <p class="section-sub">
+            Static HTML previews of the components defined in
+            <code>ui_kits/flutter_app/Components.jsx</code>
+            . Each block shows light and dark together. Props are summarized beside the render.
+          </p>
+
+          <!-- Chips -->
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 700">Chips — filter axes</h3>
+            <p class="lead" style="margin: 0 0 12px; color: var(--page-muted); font-size: 12.5px">
+              Two visual families.
+              <strong>Rx</strong>
+              for drug-domain chips uses
+              <code>--rx-tint</code>
+              /
+              <code>--rx-ink</code>
+              ;
+              <strong>Dx</strong>
+              for disease-domain uses
+              <code>--dx-tint</code>
+              /
+              <code>--dx-ink</code>
+              . Radius 5. Font 700 / 11 px. Padding 2×7.
+            </p>
+            <div class="theme-pair">
+              <div class="chip-bg-l">
+                <div class="chip-row">
+                  <span class="chip" style="background: rgba(0, 122, 255, 0.1); color: #0a6fe8">処方箋医薬品</span>
+                  <span class="chip" style="background: rgba(0, 122, 255, 0.1); color: #0a6fe8">内服</span>
+                  <span class="chip" style="background: rgba(0, 122, 255, 0.1); color: #0a6fe8">錠剤</span>
+                  <span class="chip" style="background: rgba(122, 79, 204, 0.1); color: #7a4fcc">IX 循環器系</span>
+                  <span class="chip" style="background: rgba(122, 79, 204, 0.1); color: #7a4fcc">慢性</span>
+                  <span class="chip" style="background: #ffeded; color: #5c1612">禁忌</span>
+                </div>
+              </div>
+              <div class="chip-bg-d">
+                <div class="chip-row">
+                  <span class="chip" style="background: rgba(158, 202, 255, 0.16); color: #9ecaff">処方箋医薬品</span>
+                  <span class="chip" style="background: rgba(158, 202, 255, 0.16); color: #9ecaff">内服</span>
+                  <span class="chip" style="background: rgba(158, 202, 255, 0.16); color: #9ecaff">錠剤</span>
+                  <span class="chip" style="background: rgba(213, 186, 255, 0.16); color: #d5baff">IX 循環器系</span>
+                  <span class="chip" style="background: rgba(213, 186, 255, 0.16); color: #d5baff">慢性</span>
+                  <span class="chip" style="background: #5c1612; color: #ffb4ab">禁忌</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 700">Buttons</h3>
+            <p class="lead" style="margin: 0 0 12px; color: var(--page-muted); font-size: 12.5px">
+              <strong>Primary (M3 pill)</strong>
+              — radius 22, height 44, Detail primary
+              <code>#1F5BB5</code>
+              / dark
+              <code>#AEC6FF</code>
+              .
+              <strong>Round6 action</strong>
+              — radius 10, height 40, Round6 primary
+              <code>#007AFF</code>
+              .
+              <strong>Secondary</strong>
+              —
+              <code>--d-surface-c</code>
+              .
+              <strong>Outline</strong>
+              — 1 px
+              <code>--d-outline-variant</code>
+              . Press opacity 0.85.
+            </p>
+            <div class="theme-pair">
+              <div class="chip-bg-l">
+                <div style="display: flex; flex-wrap: wrap; gap: 10px">
+                  <button class="btn btn-primary">処方詳細を見る</button>
+                  <button class="btn btn-r10 btn-primary">検索</button>
+                  <button class="btn btn-secondary">キャンセル</button>
+                  <button class="btn btn-outline">フィルタ</button>
+                </div>
+              </div>
+              <div class="chip-bg-d theme-d">
+                <div style="display: flex; flex-wrap: wrap; gap: 10px">
+                  <button class="btn btn-primary">処方詳細を見る</button>
+                  <button class="btn btn-r10 btn-primary" style="background: #9ecaff; color: #003258">検索</button>
+                  <button class="btn btn-secondary">キャンセル</button>
+                  <button class="btn btn-outline">フィルタ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Segmented control -->
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 700">Segmented control</h3>
+            <p class="lead" style="margin: 0 0 12px; color: var(--page-muted); font-size: 12.5px">
+              iOS-style segmented control on Round6 surfaces. Track
+              <code>--surface-3</code>
+              ; thumb
+              <code>--surface</code>
+              with one card shadow. Used for the drug / disease toggle at the top of search.
+            </p>
+            <div class="theme-pair">
+              <div class="chip-bg-l">
+                <div class="seg" style="max-width: 360px; margin: 0 auto">
+                  <div class="s on">医薬品</div>
+                  <div class="s">疾患</div>
+                </div>
+              </div>
+              <div class="chip-bg-d theme-d">
+                <div class="seg" style="max-width: 360px; margin: 0 auto">
+                  <div class="s on">医薬品</div>
+                  <div class="s">疾患</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cards -->
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 700">DrugCard &amp; DiseaseCard</h3>
+            <p class="lead" style="margin: 0 0 12px; color: var(--page-muted); font-size: 12.5px">
+              DrugCard has a 56×84 image rectangle (radius 8, cool placeholder gradient
+              <code>#D8E2FF → #F2DAFF</code>
+              ). DiseaseCard has no image. Both use radius 10, hairline border, single card elevation. Brand name 700 /
+              14; generic 400 / 12; meta 500 / 11.
+            </p>
+            <div class="theme-pair">
+              <div class="chip-bg-l">
+                <div class="dcard">
+                  <div class="img" style="background: linear-gradient(135deg, #d8e2ff, #f2daff)"></div>
+                  <div class="col">
+                    <div class="brand">アムロジピン錠 5mg</div>
+                    <div class="gen">あむろじぴん</div>
+                    <div class="meta">
+                      <span>処方箋医薬品</span>
+                      <span>内服</span>
+                      <span>錠剤</span>
+                    </div>
+                    <div class="meta" style="font-family: var(--mono); font-size: 10.5px; margin-top: 2px">
+                      <span>ATC: C08CA01</span>
+                      <span>改訂 2024-08-12</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="dcard" style="margin-top: 8px">
+                  <div class="col" style="display: flex; align-items: flex-start">
+                    <div style="flex: 1">
+                      <div class="brand">本態性高血圧症</div>
+                      <div class="gen">ほんたいせいこうけつあつしょう</div>
+                      <div class="meta">
+                        <span>IX 循環器系</span>
+                        <span>慢性</span>
+                      </div>
+                      <div class="meta" style="font-family: var(--mono); font-size: 10.5px; margin-top: 2px">
+                        <span>ICD-10: I10</span>
+                        <span>改訂 2024-09-01</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="chip-bg-d theme-d">
+                <div class="dcard d">
+                  <div class="img" style="background: linear-gradient(135deg, #3b4a78, #5a4070)"></div>
+                  <div class="col">
+                    <div class="brand">アムロジピン錠 5mg</div>
+                    <div class="gen">あむろじぴん</div>
+                    <div class="meta">
+                      <span>処方箋医薬品</span>
+                      <span>内服</span>
+                      <span>錠剤</span>
+                    </div>
+                    <div class="meta" style="font-family: var(--mono); font-size: 10.5px; margin-top: 2px">
+                      <span>ATC: C08CA01</span>
+                      <span>改訂 2024-08-12</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="dcard d" style="margin-top: 8px">
+                  <div class="col">
+                    <div class="brand">本態性高血圧症</div>
+                    <div class="gen">ほんたいせいこうけつあつしょう</div>
+                    <div class="meta">
+                      <span>IX 循環器系</span>
+                      <span>慢性</span>
+                    </div>
+                    <div class="meta" style="font-family: var(--mono); font-size: 10.5px; margin-top: 2px">
+                      <span>ICD-10: I10</span>
+                      <span>改訂 2024-09-01</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- List rows -->
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 700">List rows</h3>
+            <p class="lead" style="margin: 0 0 12px; color: var(--page-muted); font-size: 12.5px">
+              Generic ListRow with leading icon (36 px circle), title 600 / 14, sub 400 / 12, trailing chevron. Hit
+              target 44 px minimum. Hairline separator between rows; no separator at the top.
+            </p>
+            <div class="theme-pair">
+              <div class="chip-bg-l" style="padding: 0; overflow: hidden">
+                <div class="lrow">
+                  <div class="lead"><span class="msym">tune</span></div>
+                  <div>
+                    <div class="title">フィルタ</div>
+                    <div class="sub">処方箋医薬品 · 内服 · 錠剤</div>
+                  </div>
+                  <div class="trail"><span class="msym">chevron_right</span></div>
+                </div>
+                <div class="lrow">
+                  <div class="lead"><span class="msym">sort</span></div>
+                  <div>
+                    <div class="title">並べ替え</div>
+                    <div class="sub">改訂日（新しい順）</div>
+                  </div>
+                  <div class="trail"><span class="msym">chevron_right</span></div>
+                </div>
+                <div class="lrow">
+                  <div class="lead"><span class="msym">bookmark</span></div>
+                  <div>
+                    <div class="title">保存済み</div>
+                    <div class="sub">12 件</div>
+                  </div>
+                  <div class="trail"><span class="msym">chevron_right</span></div>
+                </div>
+              </div>
+              <div class="chip-bg-d theme-d" style="padding: 0; overflow: hidden">
+                <div class="lrow d">
+                  <div class="lead"><span class="msym">tune</span></div>
+                  <div>
+                    <div class="title">フィルタ</div>
+                    <div class="sub">処方箋医薬品 · 内服 · 錠剤</div>
+                  </div>
+                  <div class="trail"><span class="msym">chevron_right</span></div>
+                </div>
+                <div class="lrow d">
+                  <div class="lead"><span class="msym">sort</span></div>
+                  <div>
+                    <div class="title">並べ替え</div>
+                    <div class="sub">改訂日（新しい順）</div>
+                  </div>
+                  <div class="trail"><span class="msym">chevron_right</span></div>
+                </div>
+                <div class="lrow d">
+                  <div class="lead"><span class="msym">bookmark</span></div>
+                  <div>
+                    <div class="title">保存済み</div>
+                    <div class="sub">12 件</div>
+                  </div>
+                  <div class="trail"><span class="msym">chevron_right</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom nav -->
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 700">Bottom navigation</h3>
+            <p class="lead" style="margin: 0 0 12px; color: var(--page-muted); font-size: 12.5px">
+              Round6 (
+              <code>#007AFF</code>
+              ) — bottom-nav uses
+              <code>selectedIcon</code>
+              (filled, FILL=1) vs
+              <code>icon</code>
+              (outlined, FILL=0). The 56×30 selection pill behind the active icon is
+              <code>rgba(0,122,255,.12)</code>
+              . Label 600 / 11 px.
+            </p>
+            <div class="theme-pair">
+              <div class="chip-bg-l" style="padding: 0">
+                <div class="bnav">
+                  <div class="b on">
+                    <div class="ic"><span class="msym fill" style="color: #007aff">search</span></div>
+                    検索
+                  </div>
+                  <div class="b">
+                    <div class="ic"><span class="msym">bookmark</span></div>
+                    保存
+                  </div>
+                  <div class="b">
+                    <div class="ic"><span class="msym">history</span></div>
+                    履歴
+                  </div>
+                  <div class="b">
+                    <div class="ic"><span class="msym">settings</span></div>
+                    設定
+                  </div>
+                </div>
+              </div>
+              <div class="chip-bg-d" style="padding: 0">
+                <div class="bnav d">
+                  <div class="b on">
+                    <div class="ic"><span class="msym fill" style="color: #9ecaff">search</span></div>
+                    検索
+                  </div>
+                  <div class="b">
+                    <div class="ic"><span class="msym">bookmark</span></div>
+                    保存
+                  </div>
+                  <div class="b">
+                    <div class="ic"><span class="msym">history</span></div>
+                    履歴
+                  </div>
+                  <div class="b">
+                    <div class="ic"><span class="msym">settings</span></div>
+                    設定
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FAB -->
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 700">Floating Action Button</h3>
+            <p class="lead" style="margin: 0 0 12px; color: var(--page-muted); font-size: 12.5px">
+              56×56 square, radius 18, Detail primary
+              <code>#1F5BB5</code>
+              tint, soft shadow. Optional badge for unread count uses
+              <code>--d-error</code>
+              with a 2 px outer-ring against the page background.
+            </p>
+            <div class="theme-pair">
+              <div class="fab-stage">
+                <button class="fab" aria-label="新規">
+                  <span class="msym fill" style="color: #fff; font-size: 24px">edit</span>
+                  <span class="badge">3</span>
+                </button>
+              </div>
+              <div class="fab-stage d">
+                <button class="fab" style="background: #aec6ff; color: #002e69" aria-label="新規">
+                  <span class="msym fill" style="color: #002e69; font-size: 24px">edit</span>
+                  <span class="badge">3</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sheet -->
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 700">Bottom sheet</h3>
+            <p class="lead" style="margin: 0 0 12px; color: var(--page-muted); font-size: 12.5px">
+              Top radius 20. Handle 40×4. Emphasized easing
+              <code>cubic-bezier(.32,.72,0,1)</code>
+              over 260 ms. Scrim 32 % alpha — never frosted-glass blur. Selected row uses
+              <code>--d-primary</code>
+              700 weight; no checkmark glyph.
+            </p>
+            <div class="theme-pair">
+              <div class="chip-bg-l" style="padding: 0; background: #f2f2f7">
+                <div class="sheet">
+                  <div class="handle"><i></i></div>
+                  <div class="title">並べ替え</div>
+                  <div class="opt on">改訂日（新しい順）</div>
+                  <div class="opt">かな（昇順）</div>
+                  <div class="opt">ATC コード</div>
+                  <div class="opt">薬効分類名</div>
+                </div>
+              </div>
+              <div class="chip-bg-d" style="padding: 0; background: #0d0e13">
+                <div class="sheet d">
+                  <div class="handle"><i></i></div>
+                  <div class="title">並べ替え</div>
+                  <div class="opt on">改訂日（新しい順）</div>
+                  <div class="opt">かな（昇順）</div>
+                  <div class="opt">ATC コード</div>
+                  <div class="opt">薬効分類名</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Snackbar -->
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 700">Snackbar</h3>
+            <p class="lead" style="margin: 0 0 12px; color: var(--page-muted); font-size: 12.5px">
+              Single-line message with optional action. bg
+              <code>--d-on-surface</code>
+              ; action color
+              <code>--d-primary</code>
+              (light
+              <code>#1F5BB5</code>
+              / dark
+              <code>#AEC6FF</code>
+              ). Display 4 s default; persist until dismissed if undoable.
+            </p>
+            <div class="theme-pair">
+              <div class="chip-bg-l">
+                <div class="snack">
+                  <span>保存済みに追加しました</span>
+                  <a href="#">取り消す</a>
+                </div>
+              </div>
+              <div class="chip-bg-d">
+                <div class="snack" style="background: #e3e2e9; color: #1a1b20">
+                  <span>保存済みに追加しました</span>
+                  <a href="#" style="color: #1f5bb5">取り消す</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Iconography -->
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 700">Iconography</h3>
+            <p class="lead" style="margin: 0 0 12px; color: var(--page-muted); font-size: 12.5px">
+              Material Symbols Outlined only. FILL=0 for unselected; FILL=1 for selected. No SVG icon set ships. No
+              emoji.
+            </p>
+            <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center; padding: 6px 0">
+              <span class="msym" style="font-size: 24px">search</span>
+              <span class="msym fill" style="font-size: 24px; color: #1f5bb5">search</span>
+              <span class="msym" style="font-size: 24px">bookmark</span>
+              <span class="msym fill" style="font-size: 24px; color: #1f5bb5">bookmark</span>
+              <span class="msym" style="font-size: 24px">tune</span>
+              <span class="msym" style="font-size: 24px">sort</span>
+              <span class="msym" style="font-size: 24px">chevron_right</span>
+              <span class="msym" style="font-size: 24px">close</span>
+              <span class="msym" style="font-size: 24px">edit</span>
+              <span class="msym" style="font-size: 24px">info</span>
+              <span class="msym" style="font-size: 24px">warning</span>
+              <span class="msym" style="font-size: 24px; color: #b3261e">block</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================== J. FILTER AXES LABELS =================== -->
+        <section class="block" id="axes">
+          <h2 class="section-title">
+            <span class="tag">J</span>
+            Filter axes labels
+          </h2>
+          <p class="section-sub">
+            Verbatim reproductions of
+            <code>DRUG_FILTER_AXES</code>
+            and
+            <code>DISEASE_FILTER_AXES</code>
+            from
+            <code>Components.jsx</code>
+            . Japanese labels must match
+            <code>lib/l10n/app_ja.arb</code>
+            .
+            <strong>Do not retranslate.</strong>
+          </p>
+
+          <div class="card">
+            <h3 style="margin: 0 0 12px; font-size: 14px; font-weight: 700">DRUG_FILTER_AXES</h3>
+            <div class="axis-block">
+              <div class="ah">
+                <h4>規制区分 RegulatoryClass</h4>
+                <span class="id">11 values</span>
+              </div>
+              <div>
+                <span class="fchip">毒薬</span>
+                <span class="fchip">劇薬</span>
+                <span class="fchip">処方箋医薬品</span>
+                <span class="fchip">普通薬</span>
+                <span class="fchip">向精神薬第1種</span>
+                <span class="fchip">向精神薬第2種</span>
+                <span class="fchip">向精神薬第3種</span>
+                <span class="fchip">麻薬</span>
+                <span class="fchip">覚醒剤原料</span>
+                <span class="fchip">生物由来製品</span>
+                <span class="fchip">特定生物由来製品</span>
+              </div>
+            </div>
+            <div class="axis-block">
+              <div class="ah">
+                <h4>剤形 DosageForm</h4>
+                <span class="id">13 values</span>
+              </div>
+              <div>
+                <span class="fchip">錠剤</span>
+                <span class="fchip">カプセル</span>
+                <span class="fchip">散剤</span>
+                <span class="fchip">顆粒</span>
+                <span class="fchip">液剤</span>
+                <span class="fchip">注射剤</span>
+                <span class="fchip">軟膏</span>
+                <span class="fchip">クリーム</span>
+                <span class="fchip">貼付剤</span>
+                <span class="fchip">点眼液</span>
+                <span class="fchip">坐剤</span>
+                <span class="fchip">吸入剤</span>
+                <span class="fchip">点鼻液</span>
+              </div>
+            </div>
+            <div class="axis-block">
+              <div class="ah">
+                <h4>投与経路 RouteOfAdministration</h4>
+                <span class="id">8 values</span>
+              </div>
+              <div>
+                <span class="fchip">内服</span>
+                <span class="fchip">外用</span>
+                <span class="fchip">注射</span>
+                <span class="fchip">吸入</span>
+                <span class="fchip">坐剤</span>
+                <span class="fchip">点眼</span>
+                <span class="fchip">点鼻</span>
+                <span class="fchip">貼付</span>
+              </div>
+            </div>
+            <div class="axis-block">
+              <div class="ah">
+                <h4>患者背景 PrecautionPopulationCategory</h4>
+                <span class="id">8 values</span>
+              </div>
+              <div>
+                <span class="fchip">合併症</span>
+                <span class="fchip">腎機能障害</span>
+                <span class="fchip">肝機能障害</span>
+                <span class="fchip">生殖能有する患者</span>
+                <span class="fchip">妊婦</span>
+                <span class="fchip">授乳婦</span>
+                <span class="fchip">小児等</span>
+                <span class="fchip">高齢者</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 12px; font-size: 14px; font-weight: 700">DISEASE_FILTER_AXES</h3>
+            <div class="axis-block">
+              <div class="ah">
+                <h4>慢性度 Chronicity</h4>
+                <span class="id">4 values</span>
+              </div>
+              <div>
+                <span class="fchip">急性</span>
+                <span class="fchip">亜急性</span>
+                <span class="fchip">慢性</span>
+                <span class="fchip">再発性</span>
+              </div>
+            </div>
+            <div class="axis-block">
+              <div class="ah">
+                <h4>発症パターン OnsetPattern</h4>
+                <span class="id">5 values</span>
+              </div>
+              <div>
+                <span class="fchip">急性発症</span>
+                <span class="fchip">亜急性発症</span>
+                <span class="fchip">慢性経過</span>
+                <span class="fchip">間欠性</span>
+                <span class="fchip">再発性</span>
+              </div>
+            </div>
+            <div class="axis-block">
+              <div class="ah">
+                <h4>検査区分 ExamCategory</h4>
+                <span class="id">5 values</span>
+              </div>
+              <div>
+                <span class="fchip">血液検査</span>
+                <span class="fchip">画像検査</span>
+                <span class="fchip">生理検査</span>
+                <span class="fchip">病理検査</span>
+                <span class="fchip">問診</span>
+              </div>
+            </div>
+            <div class="axis-block">
+              <div class="ah">
+                <h4>診療科 MedicalDepartment</h4>
+                <span class="id">16 values</span>
+              </div>
+              <div>
+                <span class="fchip">内科</span>
+                <span class="fchip">循環器内科</span>
+                <span class="fchip">消化器内科</span>
+                <span class="fchip">内分泌代謝科</span>
+                <span class="fchip">神経内科</span>
+                <span class="fchip">精神科</span>
+                <span class="fchip">外科</span>
+                <span class="fchip">整形外科</span>
+                <span class="fchip">皮膚科</span>
+                <span class="fchip">眼科</span>
+                <span class="fchip">耳鼻咽喉科</span>
+                <span class="fchip">泌尿器科</span>
+                <span class="fchip">婦人科</span>
+                <span class="fchip">小児科</span>
+                <span class="fchip">救急科</span>
+                <span class="fchip">感染症科</span>
+              </div>
+            </div>
+            <div class="axis-block">
+              <div class="ah">
+                <h4>ICD-10 章 Icd10Chapter (long → short)</h4>
+                <span class="id">22 values</span>
+              </div>
+              <table class="spec">
+                <thead>
+                  <tr>
+                    <th style="width: 50%">Long (SSOT, app_ja.arb)</th>
+                    <th>Short (design-system-owned)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>I 感染症および寄生虫症</td>
+                    <td><span class="fchip">I 感染症</span></td>
+                  </tr>
+                  <tr>
+                    <td>II 新生物</td>
+                    <td><span class="fchip">II 新生物</span></td>
+                  </tr>
+                  <tr>
+                    <td>III 血液および造血器の疾患ならびに免疫機構の障害</td>
+                    <td><span class="fchip">III 血液・免疫</span></td>
+                  </tr>
+                  <tr>
+                    <td>IV 内分泌、栄養および代謝疾患</td>
+                    <td><span class="fchip">IV 内分泌・代謝</span></td>
+                  </tr>
+                  <tr>
+                    <td>V 精神および行動の障害</td>
+                    <td><span class="fchip">V 精神・行動</span></td>
+                  </tr>
+                  <tr>
+                    <td>VI 神経系の疾患</td>
+                    <td><span class="fchip">VI 神経系</span></td>
+                  </tr>
+                  <tr>
+                    <td>VII 眼および付属器の疾患</td>
+                    <td><span class="fchip">VII 眼</span></td>
+                  </tr>
+                  <tr>
+                    <td>VIII 耳および乳様突起の疾患</td>
+                    <td><span class="fchip">VIII 耳</span></td>
+                  </tr>
+                  <tr>
+                    <td>IX 循環器系の疾患</td>
+                    <td><span class="fchip">IX 循環器系</span></td>
+                  </tr>
+                  <tr>
+                    <td>X 呼吸器系の疾患</td>
+                    <td><span class="fchip">X 呼吸器系</span></td>
+                  </tr>
+                  <tr>
+                    <td>XI 消化器系の疾患</td>
+                    <td><span class="fchip">XI 消化器系</span></td>
+                  </tr>
+                  <tr>
+                    <td>XII 皮膚および皮下組織の疾患</td>
+                    <td><span class="fchip">XII 皮膚</span></td>
+                  </tr>
+                  <tr>
+                    <td>XIII 筋骨格系および結合組織の疾患</td>
+                    <td><span class="fchip">XIII 筋骨格系</span></td>
+                  </tr>
+                  <tr>
+                    <td>XIV 腎尿路生殖器系の疾患</td>
+                    <td><span class="fchip">XIV 腎尿路</span></td>
+                  </tr>
+                  <tr>
+                    <td>XV 妊娠、分娩および産褥</td>
+                    <td><span class="fchip">XV 妊娠・分娩</span></td>
+                  </tr>
+                  <tr>
+                    <td>XVI 周産期に発生した病態</td>
+                    <td><span class="fchip">XVI 周産期</span></td>
+                  </tr>
+                  <tr>
+                    <td>XVII 先天奇形、変形および染色体異常</td>
+                    <td><span class="fchip">XVII 先天奇形</span></td>
+                  </tr>
+                  <tr>
+                    <td>XVIII 症状、徴候および異常臨床所見・異常検査所見で他に分類されないもの</td>
+                    <td><span class="fchip">XVIII 症状</span></td>
+                  </tr>
+                  <tr>
+                    <td>XIX 損傷、中毒およびその他の外因の影響</td>
+                    <td><span class="fchip">XIX 損傷・中毒</span></td>
+                  </tr>
+                  <tr>
+                    <td>XX 傷病および死亡の外因</td>
+                    <td><span class="fchip">XX 外因</span></td>
+                  </tr>
+                  <tr>
+                    <td>XXI 健康状態に影響を及ぼす要因および保健サービスの利用</td>
+                    <td><span class="fchip">XXI 保健</span></td>
+                  </tr>
+                  <tr>
+                    <td>XXII 特殊目的用コード</td>
+                    <td><span class="fchip">XXII 特殊目的</span></td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="lead" style="margin: 10px 0 0; color: var(--page-muted); font-size: 12px">
+                <strong>Long form</strong>
+                — filter sheets, meta lines, any list item with ≥ 2 lines.
+                <strong>Short form</strong>
+                — compact chip contexts (≤ 1 line, ≤ 80 dp wide). Render long form via
+                <code>aria-label</code>
+                /
+                <code>Tooltip</code>
+                so the abbreviation is recoverable to assistive tech.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================== K. PREVIEW CARDS =================== -->
+        <section class="block" id="previews">
+          <h2 class="section-title">
+            <span class="tag">K</span>
+            Preview cards
+          </h2>
+          <p class="section-sub">
+            Inlined reproductions of the cards that live under
+            <code>preview/</code>
+            in the source. Each preview is ~700 px wide and renders as HTML/CSS — no
+            <code>&lt;img&gt;</code>
+            references.
+          </p>
+
+          <div class="card" style="max-width: 760px">
+            <h3 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; font-family: var(--mono)">
+              preview/colors-app-light.html
+            </h3>
+            <div class="cf">
+              <div class="cf-h">Round6 — light</div>
+              <div class="cf-b">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px">
+                  <div
+                    style="
+                      height: 54px;
+                      border-radius: 8px;
+                      background: #f2f2f7;
+                      border: 0.5px solid var(--r6-hairline);
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 6px;
+                      font: 600 10px var(--mono);
+                    "
+                  >
+                    --bg
+                    <br />
+                    #F2F2F7
+                  </div>
+                  <div
+                    style="
+                      height: 54px;
+                      border-radius: 8px;
+                      background: #ffffff;
+                      border: 0.5px solid var(--r6-hairline);
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 6px;
+                      font: 600 10px var(--mono);
+                    "
+                  >
+                    surface
+                    <br />
+                    #FFFFFF
+                  </div>
+                  <div
+                    style="
+                      height: 54px;
+                      border-radius: 8px;
+                      background: #efeff4;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 6px;
+                      font: 600 10px var(--mono);
+                    "
+                  >
+                    surface-3
+                    <br />
+                    #EFEFF4
+                  </div>
+                  <div
+                    style="
+                      height: 54px;
+                      border-radius: 8px;
+                      background: #007aff;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 6px;
+                      font: 700 10px var(--mono);
+                      color: #fff;
+                    "
+                  >
+                    primary
+                    <br />
+                    #007AFF
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="max-width: 760px">
+            <h3 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; font-family: var(--mono)">
+              preview/colors-app-dark.html
+            </h3>
+            <div class="cf d">
+              <div class="cf-h">Round6 — dark</div>
+              <div class="cf-b">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px">
+                  <div
+                    style="
+                      height: 54px;
+                      border-radius: 8px;
+                      background: #101317;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 6px;
+                      font: 600 10px var(--mono);
+                      color: #e5e7ec;
+                    "
+                  >
+                    --bg
+                    <br />
+                    #101317
+                  </div>
+                  <div
+                    style="
+                      height: 54px;
+                      border-radius: 8px;
+                      background: #181b20;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 6px;
+                      font: 600 10px var(--mono);
+                      color: #e5e7ec;
+                    "
+                  >
+                    surface
+                    <br />
+                    #181B20
+                  </div>
+                  <div
+                    style="
+                      height: 54px;
+                      border-radius: 8px;
+                      background: #272b32;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 6px;
+                      font: 600 10px var(--mono);
+                      color: #e5e7ec;
+                    "
+                  >
+                    surface-3
+                    <br />
+                    #272B32
+                  </div>
+                  <div
+                    style="
+                      height: 54px;
+                      border-radius: 8px;
+                      background: #9ecaff;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 6px;
+                      font: 700 10px var(--mono);
+                      color: #003258;
+                    "
+                  >
+                    primary
+                    <br />
+                    #9ECAFF
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="max-width: 760px">
+            <h3 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; font-family: var(--mono)">
+              preview/colors-detail.html
+            </h3>
+            <div class="cf">
+              <div class="cf-h">Material 3 Detail extension</div>
+              <div class="cf-b">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px">
+                  <div
+                    style="
+                      height: 54px;
+                      border-radius: 8px;
+                      background: #1f5bb5;
+                      color: #fff;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 6px;
+                      font: 600 10px var(--mono);
+                    "
+                  >
+                    d-primary
+                    <br />
+                    #1F5BB5
+                  </div>
+                  <div
+                    style="
+                      height: 54px;
+                      border-radius: 8px;
+                      background: #d8e2ff;
+                      color: #001a41;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 6px;
+                      font: 600 10px var(--mono);
+                    "
+                  >
+                    d-primary-c
+                    <br />
+                    #D8E2FF
+                  </div>
+                  <div
+                    style="
+                      height: 54px;
+                      border-radius: 8px;
+                      background: #b3261e;
+                      color: #fff;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 6px;
+                      font: 600 10px var(--mono);
+                    "
+                  >
+                    d-error
+                    <br />
+                    #B3261E
+                  </div>
+                  <div
+                    style="
+                      height: 54px;
+                      border-radius: 8px;
+                      background: #f9dedc;
+                      color: #410e0b;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 6px;
+                      font: 600 10px var(--mono);
+                    "
+                  >
+                    d-err-c
+                    <br />
+                    #F9DEDC
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="max-width: 760px">
+            <h3 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; font-family: var(--mono)">
+              preview/colors-surfaces.html
+            </h3>
+            <div class="cf">
+              <div class="cf-h">Surface containers (lowest → highest)</div>
+              <div class="cf-b">
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px">
+                  <div
+                    style="
+                      height: 48px;
+                      border-radius: 6px;
+                      background: #ffffff;
+                      border: 0.5px solid var(--r6-hairline);
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 4px;
+                      font: 600 9.5px var(--mono);
+                    "
+                  >
+                    c-lowest
+                  </div>
+                  <div
+                    style="
+                      height: 48px;
+                      border-radius: 6px;
+                      background: #f4f4f8;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 4px;
+                      font: 600 9.5px var(--mono);
+                    "
+                  >
+                    c-low
+                  </div>
+                  <div
+                    style="
+                      height: 48px;
+                      border-radius: 6px;
+                      background: #edeef3;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 4px;
+                      font: 600 9.5px var(--mono);
+                    "
+                  >
+                    c
+                  </div>
+                  <div
+                    style="
+                      height: 48px;
+                      border-radius: 6px;
+                      background: #e7e8ee;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 4px;
+                      font: 600 9.5px var(--mono);
+                    "
+                  >
+                    c-high
+                  </div>
+                  <div
+                    style="
+                      height: 48px;
+                      border-radius: 6px;
+                      background: #e1e2e8;
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 4px;
+                      font: 600 9.5px var(--mono);
+                    "
+                  >
+                    c-highest
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="max-width: 760px">
+            <h3 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; font-family: var(--mono)">
+              preview/type-display-title.html · type-body-meta.html
+            </h3>
+            <div class="cf">
+              <div class="cf-h">Type specimens</div>
+              <div class="cf-b">
+                <div style="font: 700 28px/1.2 var(--jp)">医薬品検索</div>
+                <div style="font: 700 20px/1.25 var(--jp); margin-top: 10px">アムロジピン錠 5mg</div>
+                <div style="font: 700 16px/1.3 var(--jp); margin-top: 10px">用法・用量</div>
+                <div style="font: 400 14px/1.55 var(--jp); margin-top: 6px">
+                  通常、成人にはアムロジピンとして1日1回 2.5–5mg を経口投与する。
+                </div>
+                <div style="font: 500 12px/1.4 var(--jp); color: #44464e; margin-top: 8px">
+                  改訂 2024-08-12 · ATC: C08CA01
+                </div>
+                <div style="font: 400 11px/1.4 var(--mono); color: #44464e; margin-top: 4px">YJ: 2171022F1095</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="max-width: 760px">
+            <h3 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; font-family: var(--mono)">
+              preview/spacing-scale.html
+            </h3>
+            <div class="cf">
+              <div class="cf-h">4 · 8 · 12 · 16 · 20 · 24 · 32 · 40</div>
+              <div class="cf-b">
+                <div class="spacing-row">
+                  <div class="name">4</div>
+                  <div class="px">--s-1</div>
+                  <div class="bar" style="width: 4px"></div>
+                </div>
+                <div class="spacing-row">
+                  <div class="name">8</div>
+                  <div class="px">--s-2</div>
+                  <div class="bar" style="width: 8px"></div>
+                </div>
+                <div class="spacing-row">
+                  <div class="name">12</div>
+                  <div class="px">--s-3</div>
+                  <div class="bar" style="width: 12px"></div>
+                </div>
+                <div class="spacing-row">
+                  <div class="name">16</div>
+                  <div class="px">--s-4</div>
+                  <div class="bar" style="width: 16px"></div>
+                </div>
+                <div class="spacing-row">
+                  <div class="name">20</div>
+                  <div class="px">--s-5</div>
+                  <div class="bar" style="width: 20px"></div>
+                </div>
+                <div class="spacing-row">
+                  <div class="name">24</div>
+                  <div class="px">--s-6</div>
+                  <div class="bar" style="width: 24px"></div>
+                </div>
+                <div class="spacing-row">
+                  <div class="name">32</div>
+                  <div class="px">--s-8</div>
+                  <div class="bar" style="width: 32px"></div>
+                </div>
+                <div class="spacing-row">
+                  <div class="name">40</div>
+                  <div class="px">--s-10</div>
+                  <div class="bar" style="width: 40px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="max-width: 760px">
+            <h3 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; font-family: var(--mono)">
+              preview/radii.html
+            </h3>
+            <div class="cf">
+              <div class="cf-h">xs · s · m · l · xl · 2xl · pill</div>
+              <div class="cf-b">
+                <div class="radii-row" style="gap: 18px">
+                  <div class="ri">
+                    <div class="sq" style="border-radius: 4px"></div>
+                    <div class="nm">xs</div>
+                    <div>4</div>
+                  </div>
+                  <div class="ri">
+                    <div class="sq" style="border-radius: 8px"></div>
+                    <div class="nm">s</div>
+                    <div>8</div>
+                  </div>
+                  <div class="ri">
+                    <div class="sq" style="border-radius: 10px"></div>
+                    <div class="nm">m</div>
+                    <div>10</div>
+                  </div>
+                  <div class="ri">
+                    <div class="sq" style="border-radius: 12px"></div>
+                    <div class="nm">l</div>
+                    <div>12</div>
+                  </div>
+                  <div class="ri">
+                    <div class="sq" style="border-radius: 18px"></div>
+                    <div class="nm">xl</div>
+                    <div>18</div>
+                  </div>
+                  <div class="ri">
+                    <div class="sq" style="border-radius: 22px"></div>
+                    <div class="nm">2xl</div>
+                    <div>22</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="max-width: 760px">
+            <h3 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; font-family: var(--mono)">
+              preview/elevation.html
+            </h3>
+            <div class="cf">
+              <div class="cf-h">card · footer · sheet</div>
+              <div class="cf-b">
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px">
+                  <div
+                    style="
+                      height: 80px;
+                      background: #fff;
+                      border-radius: 10px;
+                      box-shadow:
+                        0 1px 2px rgba(15, 23, 42, 0.04),
+                        0 0 0 0.5px var(--r6-hairline);
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 8px;
+                      font: 600 11px var(--mono);
+                    "
+                  >
+                    --elev-card
+                  </div>
+                  <div
+                    style="
+                      height: 80px;
+                      background: #fff;
+                      border-radius: 10px;
+                      box-shadow:
+                        0 -4px 12px rgba(15, 23, 42, 0.08),
+                        0 0 0 0.5px var(--r6-hairline);
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 8px;
+                      font: 600 11px var(--mono);
+                    "
+                  >
+                    --elev-footer
+                  </div>
+                  <div
+                    style="
+                      height: 80px;
+                      background: #fff;
+                      border-radius: 10px;
+                      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+                      display: flex;
+                      align-items: flex-end;
+                      padding: 8px;
+                      font: 600 11px var(--mono);
+                    "
+                  >
+                    --elev-sheet
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="max-width: 760px">
+            <h3 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; font-family: var(--mono)">
+              preview/iconography.html
+            </h3>
+            <div class="cf">
+              <div class="cf-h">Material Symbols + FILL axis</div>
+              <div class="cf-b">
+                <div
+                  style="
+                    display: grid;
+                    grid-template-columns: repeat(8, 1fr);
+                    gap: 10px;
+                    text-align: center;
+                    font: 500 10px var(--mono);
+                    color: #44464e;
+                  "
+                >
+                  <div>
+                    <span class="msym" style="font-size: 24px">search</span>
+                    <br />
+                    FILL 0
+                  </div>
+                  <div>
+                    <span class="msym fill" style="font-size: 24px">search</span>
+                    <br />
+                    FILL 1
+                  </div>
+                  <div>
+                    <span class="msym" style="font-size: 24px">bookmark</span>
+                    <br />
+                    FILL 0
+                  </div>
+                  <div>
+                    <span class="msym fill" style="font-size: 24px">bookmark</span>
+                    <br />
+                    FILL 1
+                  </div>
+                  <div>
+                    <span class="msym" style="font-size: 24px">tune</span>
+                    <br />
+                    tune
+                  </div>
+                  <div>
+                    <span class="msym" style="font-size: 24px">sort</span>
+                    <br />
+                    sort
+                  </div>
+                  <div>
+                    <span class="msym" style="font-size: 24px">history</span>
+                    <br />
+                    history
+                  </div>
+                  <div>
+                    <span class="msym" style="font-size: 24px">settings</span>
+                    <br />
+                    settings
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="max-width: 760px">
+            <h3 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; font-family: var(--mono)">
+              preview/component-drug-card.html
+            </h3>
+            <div class="cf">
+              <div class="cf-h">DrugCard — image + brand + meta</div>
+              <div class="cf-b">
+                <div class="dcard">
+                  <div class="img" style="background: linear-gradient(135deg, #d8e2ff, #f2daff)"></div>
+                  <div class="col">
+                    <div class="brand">アムロジピン錠 5mg</div>
+                    <div class="gen">あむろじぴん</div>
+                    <div class="meta">
+                      <span>処方箋医薬品</span>
+                      <span>内服</span>
+                      <span>錠剤</span>
+                    </div>
+                    <div class="meta" style="font-family: var(--mono); font-size: 10.5px; margin-top: 2px">
+                      <span>ATC: C08CA01</span>
+                      <span>改訂 2024-08-12</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="max-width: 760px">
+            <h3 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; font-family: var(--mono)">
+              preview/component-disease-card.html
+            </h3>
+            <div class="cf">
+              <div class="cf-h">DiseaseCard — no image</div>
+              <div class="cf-b">
+                <div class="dcard">
+                  <div class="col">
+                    <div class="brand">本態性高血圧症</div>
+                    <div class="gen">ほんたいせいこうけつあつしょう</div>
+                    <div class="meta">
+                      <span>IX 循環器系</span>
+                      <span>慢性</span>
+                      <span>循環器内科</span>
+                    </div>
+                    <div class="meta" style="font-family: var(--mono); font-size: 10.5px; margin-top: 2px">
+                      <span>ICD-10: I10</span>
+                      <span>改訂 2024-09-01</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="max-width: 760px">
+            <h3 style="margin: 0 0 8px; font-size: 13px; font-weight: 700; font-family: var(--mono)">
+              preview/disclaimer-ribbon.html
+            </h3>
+            <div class="cf">
+              <div class="cf-h">Disclaimer — visual + a11y contract</div>
+              <div class="cf-b" style="padding: 0">
+                <div class="ribbon-stage light" style="border-radius: 0; border: none; height: 64px">
+                  <div class="disclaimer-ribbon">
+                    <span class="dot"></span>
+                    <span>FICTIONAL DATA - NOT FOR MEDICAL USE</span>
+                    <span class="dot"></span>
+                    <span class="accent">架空データ・医療判断には使用不可</span>
+                    <span class="dot"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================== L. DO / DON'T =================== -->
+        <section class="block" id="dodont">
+          <h2 class="section-title">
+            <span class="tag">L</span>
+            Do / Don&rsquo;t
+          </h2>
+          <p class="section-sub">
+            Codifies the prohibition list from the hard contract with paired examples. When in doubt, the rule is:
+            <strong>flat, neutral, clinical</strong>
+            .
+          </p>
+
+          <div class="dd-grid">
+            <div class="dd">
+              <div class="h ok">
+                <span class="pill">Do</span>
+                Flat surface, hairline border
+              </div>
+              <p>
+                Cards use a single 0.5 px hairline at
+                <code>rgba(60,60,67,.13)</code>
+                and one card shadow. The surface itself is solid
+                <code>#FFFFFF</code>
+                .
+              </p>
+              <div class="example good-flat">アムロジピン錠 5mg</div>
+            </div>
+            <div class="dd">
+              <div class="h no">
+                <span class="pill">Don&rsquo;t</span>
+                Multi-stop gradient backgrounds
+              </div>
+              <p>
+                No gradient fills on pages, cards, or chips. The cool placeholder gradient (
+                <code>#D8E2FF → #F2DAFF</code>
+                ) is reserved for drug-card image rectangles only.
+              </p>
+              <div class="example bad-grad">page bg ← not allowed</div>
+            </div>
+
+            <div class="dd">
+              <div class="h ok">
+                <span class="pill">Do</span>
+                Material Symbols Outlined
+              </div>
+              <p>
+                Outlined for unselected; FILL=1 for selected. We do not draw glyphs by hand and do not ship an SVG icon
+                set.
+              </p>
+              <div class="example good-icon">
+                <span class="msym" style="font-size: 22px">search</span>
+                検索
+              </div>
+            </div>
+            <div class="dd">
+              <div class="h no">
+                <span class="pill">Don&rsquo;t</span>
+                Emoji
+              </div>
+              <p>Never. Emoji break neutrality and l10n. Use Material Symbols even when the affordance is obvious.</p>
+              <div class="example bad-emoji">💊 🏥 💉</div>
+            </div>
+
+            <div class="dd">
+              <div class="h ok">
+                <span class="pill">Do</span>
+                Three shadow tokens only
+              </div>
+              <p>Card, footer (negative-y soft), and bottom sheet. Nothing else.</p>
+              <div class="example good-flat" style="box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18)">--elev-sheet</div>
+            </div>
+            <div class="dd">
+              <div class="h no">
+                <span class="pill">Don&rsquo;t</span>
+                Inner shadows
+              </div>
+              <p>
+                Inner shadows imply sunken inputs we don&rsquo;t use. Input fields are
+                <code>--surface-3</code>
+                with a hairline border.
+              </p>
+              <div class="example bad-inner">inset shadow ← not allowed</div>
+            </div>
+
+            <div class="dd">
+              <div class="h ok">
+                <span class="pill">Do</span>
+                Tinted halo behind nav icon
+              </div>
+              <p>
+                Active bottom-nav uses a 56×30 selection pill at
+                <code>rgba(0,122,255,.12)</code>
+                behind the FILL=1 glyph. The glow ends there.
+              </p>
+              <div class="example good-flat" style="gap: 8px">
+                <span
+                  class="msym fill"
+                  style="
+                    background: rgba(0, 122, 255, 0.12);
+                    padding: 4px 10px;
+                    border-radius: 14px;
+                    color: #007aff;
+                    font-size: 20px;
+                  "
+                >
+                  search
+                </span>
+                検索
+              </div>
+            </div>
+            <div class="dd">
+              <div class="h no">
+                <span class="pill">Don&rsquo;t</span>
+                Glow text or chromatic aura
+              </div>
+              <p>
+                No
+                <code>text-shadow</code>
+                glows, no chromatic aberration, no neon. The system is mobile, clinical, and reads under fluorescent
+                light.
+              </p>
+              <div class="example bad-glow">医薬品検索</div>
+            </div>
+
+            <div class="dd">
+              <div class="h ok">
+                <span class="pill">Do</span>
+                Half-width Arabic numerals
+              </div>
+              <p>
+                <code>5mg · 2024-08-12 · 1:8</code>
+                . Mono for code identifiers (ATC, YJ).
+              </p>
+              <div class="example good-flat" style="font-family: var(--mono); font-size: 12px">
+                5mg · 2024-08-12 · 1:8
+              </div>
+            </div>
+            <div class="dd">
+              <div class="h no">
+                <span class="pill">Don&rsquo;t</span>
+                Full-width numerals or kanji units
+              </div>
+              <p>
+                Never
+                <code>５ｍｇ</code>
+                or
+                <code>㎎</code>
+                . Half-width digits and Latin units only inside code/meta contexts.
+              </p>
+              <div class="example bad-emoji" style="font-family: var(--mono); font-size: 13px; color: #b3261e">
+                ５㎎ ・ ２０２４年
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =================== M. IMPLEMENTATION =================== -->
+        <section class="block" id="implementation">
+          <h2 class="section-title">
+            <span class="tag">M</span>
+            Implementation guidance
+          </h2>
+          <p class="section-sub">
+            Restated from
+            <code>SKILL.md</code>
+            : how to use this design system depending on whether you are making throwaway visual artifacts or production
+            Flutter code.
+          </p>
+
+          <div class="card">
+            <h3 style="margin: 0 0 8px; font-size: 14px; font-weight: 700">
+              If creating visual artifacts (slides, mocks, throwaway prototypes)
+            </h3>
+            <ol style="padding-left: 20px; margin: 0; color: var(--page-fg); font-size: 13.5px; line-height: 1.7">
+              <li>
+                Copy the assets out:
+                <code>fonts/</code>
+                ,
+                <code>colors_and_type.css</code>
+                ,
+                <code>disclaimer-ribbon.css</code>
+                ,
+                <code>ui_kits/flutter_app/Components.jsx</code>
+                .
+              </li>
+              <li>Create static HTML files for the user to view (this document is one such artifact).</li>
+              <li>
+                Use Google Fonts CDN (
+                <code>Noto Sans JP</code>
+                +
+                <code>JetBrains Mono</code>
+                ) or
+                <code>@font-face</code>
+                with the bundled OTFs. Never reference
+                <code>fonts/*.otf</code>
+                by relative path from a single-file artifact.
+              </li>
+              <li>
+                Reproduce previews inline — never
+                <code>&lt;img src="preview/..."&gt;</code>
+                .
+              </li>
+              <li>Always render the disclaimer ribbon when mocking a screen with medical content.</li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 8px; font-size: 14px; font-weight: 700">
+              If working on production Flutter / Dart code
+            </h3>
+            <ol style="padding-left: 20px; margin: 0; color: var(--page-fg); font-size: 13.5px; line-height: 1.7">
+              <li>
+                Copy the design tokens into your theme (
+                <code>lib/theme/app_palette.dart</code>
+                ,
+                <code>detail_color_extension.dart</code>
+                ). Do not paste JSX into the Flutter codebase.
+              </li>
+              <li>
+                Bind all visible Japanese strings to
+                <code>lib/l10n/app_ja.arb</code>
+                . The
+                <code>app_ja.arb</code>
+                file is the verified mirror of the mock-server Kotlin KDoc and is enforced by
+                <code>test/l10n/drug_filter_alignment_test.dart</code>
+                .
+              </li>
+              <li>
+                Render the disclaimer via
+                <code>MaterialApp.builder</code>
+                as a shell-layer overlay, not as a per-screen widget.
+              </li>
+              <li>
+                Implement bottom-nav with
+                <code>selectedIcon</code>
+                (filled) vs
+                <code>icon</code>
+                (outlined). Round6
+                <code>#007AFF</code>
+                for selection pill tint.
+              </li>
+              <li>
+                Sort values are snake_case with leading minus:
+                <code>-revised_at</code>
+                ,
+                <code>brand_name_kana</code>
+                ,
+                <code>atc_code</code>
+                ,
+                <code>therapeutic_category_name</code>
+                ,
+                <code>name_kana</code>
+                ,
+                <code>icd10_chapter</code>
+                .
+              </li>
+            </ol>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 8px; font-size: 14px; font-weight: 700">Internal-contradiction fixes</h3>
+            <table class="spec">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Fix</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>F1</strong></td>
+                  <td>
+                    Bottom-nav uses
+                    <strong>
+                      Round6 primary
+                      <code>#007AFF</code>
+                    </strong>
+                    . Detail primary
+                    <code>#1F5BB5</code>
+                    is reserved for the Material 3 detail color extension only.
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>F2</strong></td>
+                  <td>
+                    Toggleable footer &ldquo;active&rdquo; tokens are
+                    <code>--d-primary-container</code>
+                    <code>#D8E2FF</code>
+                    /
+                    <code>--d-on-primary-container</code>
+                    <code>#001A41</code>
+                    ; off-state uses
+                    <code>--d-surface-c</code>
+                    <code>#EDEEF3</code>
+                    . No more ad-hoc hex.
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>F4</strong></td>
+                  <td>
+                    Sort values use snake_case + leading minus:
+                    <code>-revised_at</code>
+                    ,
+                    <code>brand_name_kana</code>
+                    ,
+                    <code>atc_code</code>
+                    ,
+                    <code>therapeutic_category_name</code>
+                    ,
+                    <code>name_kana</code>
+                    ,
+                    <code>icd10_chapter</code>
+                    .
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>F5</strong></td>
+                  <td>
+                    Bottom-nav uses
+                    <code>selectedIcon</code>
+                    (filled, FILL=1) vs
+                    <code>icon</code>
+                    (outlined, FILL=0). Implementations must declare both states per destination.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <h3 style="margin: 0 0 8px; font-size: 14px; font-weight: 700">Font substitution flag</h3>
+            <p class="lead" style="margin: 0">
+              NotoSansJP Regular and Bold are bundled in
+              <code>fonts/</code>
+              . Other weights (300, 500, 900) are not provided; fall back to the OS Japanese stack defined in
+              <code>--font-jp</code>
+              . JetBrains Mono is referenced for
+              <code>--font-mono</code>
+              but
+              <strong>not bundled</strong>
+              — install via Google Fonts in production, or accept the OS monospace fallback.
+              <strong>→ flag:</strong>
+              ask the user to provide a JetBrains Mono OTF/TTF if mono codes need pixel-perfect rendering.
+            </p>
+          </div>
+
+          <footer class="page">
+            <span>医薬品・疾患リファレンス — Design System · single-file consolidation</span>
+            <span style="font-family: var(--mono)">v1.0 · ja-JP · Flutter / Material 3</span>
+          </footer>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

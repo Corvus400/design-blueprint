@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 14px 16px;
+        background: var(--surface);
+      }
+      .row {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        padding: 6px 0;
+        border-bottom: 0.5px solid var(--hairline);
+      }
+      .row:last-child {
+        border-bottom: none;
+      }
+      .tok {
+        font: var(--t-mono-s);
+        color: var(--fg-muted);
+        flex: 0 0 110px;
+      }
+      .meta {
+        font: var(--t-label-m);
+        color: var(--fg-muted);
+        flex: 0 0 76px;
+      }
+      .spec {
+        color: var(--fg);
+      }
+    </style>
+    <title>Type Display Title — Preview</title>
+  </head>
+  <body>
+    <div class="row">
+      <div class="tok">--t-display-m</div>
+      <div class="meta">700 · 28 / 33</div>
+      <div class="spec" style="font: var(--t-display-m)">医薬品・疾患リファレンス</div>
+    </div>
+    <div class="row">
+      <div class="tok">--t-display-s</div>
+      <div class="meta">700 · 22 / 27</div>
+      <div class="spec" style="font: var(--t-display-s)">医薬品・疾患リファレンス</div>
+    </div>
+    <div class="row">
+      <div class="tok">--t-title-l</div>
+      <div class="meta">700 · 20 / 25</div>
+      <div class="spec" style="font: var(--t-title-l)">トレデキム</div>
+    </div>
+    <div class="row">
+      <div class="tok">--t-title-m</div>
+      <div class="meta">700 · 16 / 21</div>
+      <div class="spec" style="font: var(--t-title-m)">用法・用量</div>
+    </div>
+    <div class="row">
+      <div class="tok">--t-title-s</div>
+      <div class="meta">700 · 14 / 19</div>
+      <div class="spec" style="font: var(--t-title-s)">急性 · 内科</div>
+    </div>
+  </body>
+</html>

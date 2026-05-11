@@ -5,7 +5,7 @@ export function git(args, options = {}) {
 }
 
 export function stagedFiles(pathspec) {
-  const args = ["diff", "--cached", "--name-only", "--diff-filter=ACM"];
+  const args = ["-c", "core.quotePath=false", "diff", "--cached", "--name-only", "--diff-filter=ACM"];
   if (pathspec) args.push("--", pathspec);
   return git(args).split("\n").filter(Boolean);
 }

@@ -1,0 +1,220 @@
+{
+  "pages": [
+    {
+      "name": "design-system-main",
+      "file": "Design System/Design System.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "ui-kit-flutter-app",
+      "file": "Design System/ui_kits/flutter_app/index.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-chips-icd10",
+      "file": "Design System/preview/chips-icd10.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-radii",
+      "file": "Design System/preview/radii.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-iconography",
+      "file": "Design System/preview/iconography.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-colors-detail",
+      "file": "Design System/preview/colors-detail.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-colors-app-light",
+      "file": "Design System/preview/colors-app-light.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-type-display-title",
+      "file": "Design System/preview/type-display-title.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-chips-exam-category",
+      "file": "Design System/preview/chips-exam-category.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-disclaimer-ribbon",
+      "file": "Design System/preview/disclaimer-ribbon.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-chips-disease",
+      "file": "Design System/preview/chips-disease.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-spacing-scale",
+      "file": "Design System/preview/spacing-scale.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-chips-onset-pattern",
+      "file": "Design System/preview/chips-onset-pattern.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-component-drug-card",
+      "file": "Design System/preview/component-drug-card.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-chips-precaution",
+      "file": "Design System/preview/chips-precaution.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-component-disease-card",
+      "file": "Design System/preview/component-disease-card.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-type-body-meta",
+      "file": "Design System/preview/type-body-meta.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-chips-drug",
+      "file": "Design System/preview/chips-drug.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-component-buttons",
+      "file": "Design System/preview/component-buttons.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-colors-surfaces",
+      "file": "Design System/preview/colors-surfaces.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-colors-app-dark",
+      "file": "Design System/preview/colors-app-dark.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-elevation",
+      "file": "Design System/preview/elevation.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "preview-components-uikit",
+      "file": "Design System/preview/components-uikit.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "showcase-index",
+      "file": "Design System/showcase/index.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "detail-spec",
+      "file": "詳細画面/Detail Spec.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "calc-tools-spec",
+      "file": "計算ツール/Calc Tools Spec.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "browsing-history",
+      "file": "閲覧履歴/browsing-history.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    }
+  ]
+}

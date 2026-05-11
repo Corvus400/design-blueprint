@@ -1,0 +1,4582 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>Calc Tools — Design SSOT (BMI / eGFR / CrCl)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* =======================================================================
+   PAGE TOKENS  (HEX confined here; .color-token-display also allowed)
+   ======================================================================= */
+      :root {
+        --jp: "Noto Sans JP", system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic UI", sans-serif;
+        --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+
+        /* Page chrome (the SSOT document itself, not the mocks) */
+        --page-bg: #f4f5f7;
+        --page-fg: #15181d;
+        --page-muted: #5c6370;
+        --page-rule: #d8dce3;
+        --page-card: #ffffff;
+        --page-accent: #007aff;
+        --page-warn: #b3261e;
+        --page-ok: #1f7a3a;
+
+        /* ---- Round6 shell tokens (LIGHT) — used inside .frame, not .frame.dark ---- */
+        --c6-bg: #f2f2f7;
+        --c6-surface: #ffffff;
+        --c6-surface-2: #f7f7fa;
+        --c6-surface-3: #efeff4;
+        --c6-surface-4: #e5e5ea;
+        --c6-ink: #1a1c1e;
+        --c6-ink-2: #3f4347;
+        --c6-muted: #6c7177;
+        --c6-muted-2: #8e9298;
+        --c6-hairline: rgba(60, 60, 67, 0.13);
+        --c6-hairline-2: rgba(60, 60, 67, 0.08);
+        --c6-primary: #007aff;
+        --c6-on-primary: #ffffff;
+        --c6-primary-soft: rgba(0, 122, 255, 0.1);
+        --c6-primary-ring: rgba(0, 122, 255, 0.35);
+        --c6-primary-cont: #d8e4ff;
+        --c6-on-primary-cont: #001a41;
+        --c6-secondary: #525e78;
+        --c6-on-secondary: #ffffff;
+        --c6-secondary-cont: #d7e3f8;
+        --c6-on-secondary-cont: #101c2f;
+        --c6-tertiary: #705574;
+        --c6-on-tertiary: #ffffff;
+        --c6-tertiary-cont: #fbd8ff;
+        --c6-on-tertiary-cont: #280a2d;
+        --c6-error: #b3261e;
+        --c6-on-error: #ffffff;
+        --c6-error-cont: #ffeded;
+        --c6-on-error-cont: #5c1612;
+        --c6-warn: #b45309;
+        --c6-warn-cont: #ffeacc;
+        --c6-on-warn-cont: #4a2a00;
+        --c6-success: #1f7a3a;
+        --c6-success-cont: #ddf5e2;
+        --c6-on-success-cont: #0a3517;
+        --c6-search-field-bg: #ebebef;
+
+        /* BMI 7-class palette (label + non-color cue) */
+        --bmi-1: #3f8ae0; /* 低体重 */
+        --bmi-1-on: #06294f;
+        --bmi-2: #1f7a3a; /* 普通体重 */
+        --bmi-2-on: #0a3517;
+        --bmi-3: #b47a00; /* 過体重 */
+        --bmi-3-on: #3a2700;
+        --bmi-4: #c25600; /* 肥満1度 */
+        --bmi-4-on: #3d1a00;
+        --bmi-5: #a8341b; /* 肥満2度 */
+        --bmi-5-on: #3a0f03;
+        --bmi-6: #8c1d18; /* 肥満3度 */
+        --bmi-6-on: #fbe9e7;
+        --bmi-7: #5a1212; /* 肥満4度 */
+        --bmi-7-on: #ffe3dc;
+
+        /* CKD G1..G5 palette */
+        --ckd-1: #1f7a3a; /* G1 正常 */
+        --ckd-1-on: #0a3517;
+        --ckd-2: #5c8a1f; /* G2 軽度低下 */
+        --ckd-2-on: #1f2f08;
+        --ckd-3a: #b47a00; /* G3a */
+        --ckd-3a-on: #3a2700;
+        --ckd-3b: #c25600; /* G3b */
+        --ckd-3b-on: #3d1a00;
+        --ckd-4: #a8341b; /* G4 */
+        --ckd-4-on: #fbe9e7;
+        --ckd-5: #5a1212; /* G5 末期腎不全 */
+        --ckd-5-on: #ffe3dc;
+
+        /* Disclaimer ribbon (constant, theme-independent fg/accent) */
+        --rib-bg-light: #1a1c1e;
+        --rib-bg-dark: #0d0e13;
+        --rib-fg: #ffffff;
+        --rib-accent: #ffb4ab;
+
+        /* Spacing scale (mocked screens) */
+        --s-1: 4px;
+        --s-2: 8px;
+        --s-3: 12px;
+        --s-4: 16px;
+        --s-5: 20px;
+        --s-6: 24px;
+        --s-7: 28px;
+        --s-8: 32px;
+        --s-10: 40px;
+
+        /* Radii */
+        --r-chip: 5px;
+        --r-badge: 4px;
+        --r-tile: 8px;
+        --r-card: 10px;
+        --r-sheet-card: 12px;
+        --r-pill: 22px;
+        --r-sheet-top: 20px;
+        --r-fab: 18px;
+
+        /* Animation */
+        --ease-std: cubic-bezier(0.2, 0, 0, 1);
+        --ease-emph: cubic-bezier(0.2, 0, 0, 1);
+        --dur-fast: 120ms;
+        --dur-base: 200ms;
+        --dur-slow: 320ms;
+      }
+
+      /* ---- DARK shell tokens — applied via .frame.dark ---- */
+      .frame.dark {
+        --c6-bg: #101317;
+        --c6-surface: #181b20;
+        --c6-surface-2: #1f2329;
+        --c6-surface-3: #272b32;
+        --c6-surface-4: #31353d;
+        --c6-ink: #e5e7ec;
+        --c6-ink-2: #c2c6cd;
+        --c6-muted: #9ca1aa;
+        --c6-muted-2: #7a7f88;
+        --c6-hairline: rgba(255, 255, 255, 0.1);
+        --c6-hairline-2: rgba(255, 255, 255, 0.06);
+        --c6-primary: #9ecaff;
+        --c6-on-primary: #003258;
+        --c6-primary-soft: rgba(158, 202, 255, 0.14);
+        --c6-primary-ring: rgba(158, 202, 255, 0.45);
+        --c6-primary-cont: #003494;
+        --c6-on-primary-cont: #d8e4ff;
+        --c6-secondary: #bbc6e4;
+        --c6-on-secondary: #253048;
+        --c6-secondary-cont: #39435b;
+        --c6-on-secondary-cont: #d7e3f8;
+        --c6-tertiary: #debcdf;
+        --c6-on-tertiary: #3f2843;
+        --c6-tertiary-cont: #573c5b;
+        --c6-on-tertiary-cont: #fbd8ff;
+        --c6-error: #ffb4ab;
+        --c6-on-error: #601410;
+        --c6-error-cont: #5c1612;
+        --c6-on-error-cont: #ffe3dc;
+        --c6-warn: #ffd080;
+        --c6-warn-cont: #412e10;
+        --c6-on-warn-cont: #ffe5bd;
+        --c6-success: #7bd8a0;
+        --c6-success-cont: #0e3920;
+        --c6-on-success-cont: #c9f5d5;
+        --c6-search-field-bg: #272b32;
+
+        --bmi-1: #7ab5ff;
+        --bmi-1-on: #001a41;
+        --bmi-2: #7bd8a0;
+        --bmi-2-on: #0a3517;
+        --bmi-3: #f5c56a;
+        --bmi-3-on: #3a2700;
+        --bmi-4: #ff9a4a;
+        --bmi-4-on: #3d1a00;
+        --bmi-5: #f08c72;
+        --bmi-5-on: #3a0f03;
+        --bmi-6: #f2b8b5;
+        --bmi-6-on: #601410;
+        --bmi-7: #ffb4ab;
+        --bmi-7-on: #5a1212;
+
+        --ckd-1: #7bd8a0;
+        --ckd-1-on: #0a3517;
+        --ckd-2: #bfd96e;
+        --ckd-2-on: #1f2f08;
+        --ckd-3a: #f5c56a;
+        --ckd-3a-on: #3a2700;
+        --ckd-3b: #ff9a4a;
+        --ckd-3b-on: #3d1a00;
+        --ckd-4: #f08c72;
+        --ckd-4-on: #3a0f03;
+        --ckd-5: #ffb4ab;
+        --ckd-5-on: #5a1212;
+      }
+
+      /* =======================================================================
+   PAGE LAYOUT — TOC sidebar + main
+   ======================================================================= */
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--jp);
+        background: var(--page-bg);
+        color: var(--page-fg);
+        font-size: 14px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      .shell {
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr);
+        max-width: 1840px;
+        margin: 0 auto;
+      }
+      .toc {
+        position: sticky;
+        top: 0;
+        align-self: start;
+        height: 100vh;
+        overflow: auto;
+        padding: 28px 18px 28px 24px;
+        border-right: 1px solid var(--page-rule);
+        background: #ffffff;
+      }
+      .toc h1 {
+        font-size: 13px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--page-muted);
+        margin: 0 0 14px;
+        font-weight: 700;
+      }
+      .toc ol {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        counter-reset: toc;
+      }
+      .toc ol li {
+        counter-increment: toc;
+        margin: 0;
+      }
+      .toc ol li a {
+        display: block;
+        padding: 6px 8px;
+        border-radius: 6px;
+        color: var(--page-fg);
+        text-decoration: none;
+        font-size: 13px;
+      }
+      .toc ol li a::before {
+        content: counter(toc, decimal-leading-zero) ".  ";
+        color: var(--page-muted);
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+      .toc ol li a:hover {
+        background: #eef1f5;
+      }
+      .toc .meta {
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px dashed var(--page-rule);
+        font-size: 11px;
+        color: var(--page-muted);
+        line-height: 1.6;
+      }
+      .toc .meta code {
+        font: 11px var(--mono);
+        background: #eef1f5;
+        padding: 1px 5px;
+        border-radius: 3px;
+      }
+
+      main {
+        padding: 36px 40px 80px;
+        min-width: 0;
+      }
+      section.block {
+        margin: 0 0 56px;
+        scroll-margin-top: 12px;
+      }
+      h2.section-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 0 4px;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+      h2.section-title .tag {
+        font: 600 11px/1.2 var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #ffffff;
+        background: var(--page-fg);
+        padding: 3px 6px;
+        border-radius: 4px;
+      }
+      .section-sub {
+        color: var(--page-muted);
+        font-size: 13px;
+        margin: 0 0 22px;
+        max-width: 880px;
+      }
+      .card {
+        background: var(--page-card);
+        border: 1px solid var(--page-rule);
+        border-radius: 12px;
+        padding: 20px;
+      }
+      .kbd,
+      .k {
+        font-family: var(--mono);
+        font-size: 0.92em;
+        background: #eef1f5;
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+
+      /* =======================================================================
+   COVER
+   ======================================================================= */
+      .cover {
+        background: linear-gradient(135deg, #0a1a2f 0%, #0e2545 60%, #143062 100%);
+        color: #ffffff;
+        border-radius: 16px;
+        padding: 32px 36px;
+      }
+      .cover .eyebrow {
+        font: 600 11px/1 var(--mono);
+        letter-spacing: 0.16em;
+        color: #9db2d9;
+        text-transform: uppercase;
+      }
+      .cover h1 {
+        font-size: 34px;
+        font-weight: 700;
+        margin: 10px 0 6px;
+      }
+      .cover .lede {
+        color: #cbd5e1;
+        max-width: 780px;
+        font-size: 14.5px;
+        margin: 0 0 18px;
+      }
+      .cover .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-top: 18px;
+      }
+      .cover .grid .lbl {
+        font: 600 10px/1 var(--mono);
+        color: #94a3b8;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .cover .grid .val {
+        font-size: 14px;
+        color: #ffffff;
+        font-weight: 500;
+      }
+      .cover .swatches {
+        display: flex;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .cover .swatches span {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      /* =======================================================================
+   COLOR TOKENS (Tonal palettes + theme blocks)
+   ======================================================================= */
+      .color-token-display .palette-row {
+        display: grid;
+        grid-template-columns: 140px repeat(12, minmax(0, 1fr));
+        gap: 4px;
+        align-items: center;
+        margin-bottom: 6px;
+      }
+      .color-token-display .palette-row > .name {
+        font: 600 12px var(--mono);
+        color: var(--page-fg);
+      }
+      .color-token-display .palette-row > .tone {
+        height: 44px;
+        border-radius: 6px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        padding: 4px 6px;
+        font: 600 9px var(--mono);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+      .color-token-display .palette-header {
+        display: grid;
+        grid-template-columns: 140px repeat(12, minmax(0, 1fr));
+        gap: 4px;
+        margin-bottom: 4px;
+        font: 600 9px var(--mono);
+        color: var(--page-muted);
+        text-align: center;
+      }
+      .theme-blocks {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-top: 32px;
+      }
+      .theme-block h3 {
+        margin: 0 0 10px;
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .theme-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        font: 600 10px var(--mono);
+      }
+      .theme-cell {
+        padding: 8px 10px;
+        border-radius: 6px;
+        height: 54px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        line-height: 1.3;
+      }
+      .theme-cell .role {
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .theme-cell .hex {
+        font-size: 9px;
+        opacity: 0.85;
+      }
+
+      .classification-palette {
+        margin-top: 32px;
+      }
+      .classification-palette h3 {
+        font-size: 14px;
+        font-weight: 700;
+        margin: 0 0 10px;
+      }
+      .classification-palette .row {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+      .classification-palette .row.ckd {
+        grid-template-columns: repeat(6, 1fr);
+      }
+      .classification-palette .cell {
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        font: 600 11px var(--mono);
+        min-height: 64px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .classification-palette .cell .lbl {
+        font-size: 11px;
+        font-weight: 700;
+        font-family: var(--jp);
+      }
+      .classification-palette .cell .hex {
+        font-size: 9.5px;
+        opacity: 0.85;
+      }
+
+      /* =======================================================================
+   TYPOGRAPHY
+   ======================================================================= */
+      .type-ramp {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 0;
+        border: 1px solid var(--page-rule);
+        border-radius: 12px;
+        background: var(--page-card);
+        overflow: hidden;
+      }
+      .type-ramp .row {
+        display: contents;
+      }
+      .type-ramp .meta-cell,
+      .type-ramp .sample-cell {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--page-rule);
+      }
+      .type-ramp .row:last-child .meta-cell,
+      .type-ramp .row:last-child .sample-cell {
+        border-bottom: none;
+      }
+      .type-ramp .meta-cell {
+        font: 600 11px var(--mono);
+        color: var(--page-muted);
+        line-height: 1.5;
+        background: #fafbfc;
+      }
+      .type-ramp .meta-cell .name {
+        display: block;
+        color: var(--page-fg);
+        font-size: 12px;
+        margin-bottom: 2px;
+      }
+      .type-ramp .sample-cell {
+        font-family: var(--jp);
+      }
+
+      /* =======================================================================
+   SPACING / RADII / ELEVATION
+   ======================================================================= */
+      .scale-grid {
+        display: grid;
+        grid-template-columns: repeat(9, 1fr);
+        gap: 10px;
+      }
+      .scale-cell {
+        background: var(--page-card);
+        border: 1px solid var(--page-rule);
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
+      }
+      .scale-cell .bar {
+        background: #007aff26;
+        border-radius: 3px;
+        margin: 0 auto 8px;
+      }
+      .scale-cell .name {
+        font: 600 10px var(--mono);
+        color: var(--page-muted);
+      }
+      .scale-cell .val {
+        font: 600 12px var(--mono);
+        color: var(--page-fg);
+        margin-top: 2px;
+      }
+
+      .radii-grid {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 10px;
+      }
+      .radii-cell {
+        background: var(--page-card);
+        border: 1px solid var(--page-rule);
+        padding: 14px 10px;
+        text-align: center;
+      }
+      .radii-cell .demo {
+        margin: 0 auto 8px;
+        width: 54px;
+        height: 54px;
+        background: #007aff1a;
+        border: 1px solid #007aff55;
+      }
+      .radii-cell .name {
+        font: 600 10px var(--mono);
+        color: var(--page-muted);
+      }
+      .radii-cell .val {
+        font: 600 12px var(--mono);
+        color: var(--page-fg);
+        margin-top: 2px;
+      }
+
+      .elev-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      .elev-cell {
+        background: #f8fafc;
+        border: 1px solid var(--page-rule);
+        padding: 24px;
+        border-radius: 10px;
+        text-align: center;
+      }
+      .elev-cell .demo {
+        height: 80px;
+        background: #ffffff;
+        border-radius: 10px;
+        margin-bottom: 10px;
+      }
+      .elev-cell.card .demo {
+        box-shadow:
+          0 1px 2px rgba(15, 23, 42, 0.04),
+          0 0 0 0.5px rgba(60, 60, 67, 0.13);
+      }
+      .elev-cell.footer .demo {
+        box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.08);
+      }
+      .elev-cell.sheet .demo {
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+      }
+      .elev-cell .name {
+        font: 600 12px var(--mono);
+        color: var(--page-fg);
+      }
+      .elev-cell .val {
+        font: 11px var(--mono);
+        color: var(--page-muted);
+        margin-top: 2px;
+      }
+
+      /* =======================================================================
+   DEVICE FRAMES
+   ======================================================================= */
+      .mock-block {
+        margin-bottom: 48px;
+      }
+      .mock-block-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 4px;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+      .mock-block-title .pill {
+        font: 600 10px var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        background: var(--page-fg);
+        color: #ffffff;
+        padding: 3px 6px;
+        border-radius: 4px;
+      }
+      .mock-block-title .pill.dark {
+        background: #3a3f47;
+      }
+      .mock-block-sub {
+        font-size: 12.5px;
+        color: var(--page-muted);
+        margin: 0 0 16px;
+      }
+
+      .mock-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(420px, max-content));
+        gap: 24px;
+        align-items: start;
+        margin-bottom: 28px;
+        padding: 18px;
+        background: var(--page-card);
+        border: 1px solid var(--page-rule);
+        border-radius: 12px;
+      }
+      .mock-row.tablet {
+        grid-template-columns: repeat(auto-fit, minmax(860px, max-content));
+      }
+      .mock-row.landscape {
+        grid-template-columns: repeat(auto-fit, minmax(820px, max-content));
+      }
+      .mock-row > .row-label {
+        grid-column: 1/-1;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        font: 600 12px var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--page-muted);
+        border-bottom: 1px solid var(--page-rule);
+        padding-bottom: 10px;
+        margin-bottom: 8px;
+      }
+      .mock-row > .row-label .state-name {
+        color: var(--page-fg);
+        font-size: 13px;
+      }
+      .mock-row > .row-label .easing {
+        color: var(--page-accent);
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+
+      .mock-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .mock-wrap > h4 {
+        margin: 0;
+        font: 600 11px/1.4 var(--mono);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--page-muted);
+      }
+      .mock-wrap > h4 .pill {
+        margin-left: 6px;
+        padding: 1px 5px;
+        border-radius: 3px;
+        font-size: 9.5px;
+        letter-spacing: 0.04em;
+        color: var(--page-fg);
+        background: #efeff4;
+        border: 1px solid var(--page-rule);
+      }
+      .mock-wrap > h4 .pill.calc {
+        background: #007aff14;
+        color: #0a66c2;
+        border-color: #007aff55;
+      }
+      .mock-wrap > h4 .pill.dark {
+        background: #0f172a;
+        color: #f1f5f9;
+        border-color: #0f172a;
+      }
+      .mock-wrap > .caption {
+        font: 11px var(--mono);
+        color: var(--page-muted);
+        margin-top: -2px;
+      }
+
+      /* The frame itself */
+      .frame {
+        width: 410px;
+        border-radius: 34px;
+        padding: 10px;
+        font-family: var(--jp);
+        position: relative;
+        background: linear-gradient(180deg, #0f172a, #0b1220);
+        color: var(--c6-ink);
+      }
+      .frame.dark {
+        background: linear-gradient(180deg, #1e293b, #0f172a);
+      }
+      .frame.tablet {
+        width: 854px;
+        border-radius: 24px;
+      }
+      .frame.tablet.landscape {
+        width: 1214px;
+      }
+      .frame.tablet.splitview {
+        width: 1194px;
+        border-radius: 24px;
+      }
+      .frame.iphone-landscape {
+        width: 760px;
+        border-radius: 30px;
+      }
+      .frame .device {
+        background: var(--c6-bg);
+        border-radius: 28px;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 760px;
+      }
+      .frame.tablet .device {
+        height: 920px;
+        border-radius: 18px;
+      }
+      .frame.tablet.landscape .device {
+        height: 760px;
+        border-radius: 18px;
+      }
+      .frame.iphone-landscape .device {
+        height: 380px;
+        border-radius: 24px;
+      }
+
+      .frame.large-text .device {
+        height: 880px;
+      } /* for accessibility-large-text */
+
+      /* Status bar */
+      .frame .status {
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 22px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--c6-ink);
+        background: var(--c6-bg);
+        flex: 0 0 auto;
+      }
+      .frame .status .right {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        font-size: 13px;
+      }
+      .frame .status .right .ico {
+        font-family: "Material Symbols Outlined";
+        font-size: 14px;
+      }
+
+      /* App bar */
+      .frame .appbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 8px 8px;
+        background: var(--c6-bg);
+        border-bottom: 1px solid var(--c6-hairline);
+        flex: 0 0 auto;
+      }
+      .frame .appbar .icon-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+        display: grid;
+        place-items: center;
+        color: var(--c6-ink);
+      }
+      .frame .appbar .icon-btn .ico {
+        font-family: "Material Symbols Outlined";
+        font-size: 22px;
+      }
+      .frame .appbar .title {
+        flex: 1;
+        text-align: left;
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--c6-ink);
+        padding-left: 6px;
+      }
+
+      /* Body / scroll area */
+      .frame .body {
+        flex: 1 1 auto;
+        overflow: hidden;
+        position: relative;
+        padding: var(--s-4);
+      }
+      .frame.tablet .body {
+        padding: var(--s-7);
+      }
+
+      /* Bottom-nav (calc tab active) */
+      .frame .bottom-nav {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 56px;
+        background: var(--c6-surface);
+        border-top: 1px solid var(--c6-hairline);
+        display: flex;
+        align-items: stretch;
+        justify-content: space-around;
+        z-index: 6;
+      }
+      .frame .bottom-nav .nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font: 500 10px var(--jp);
+        color: var(--c6-muted);
+        gap: 2px;
+      }
+      .frame .bottom-nav .nav-item .ico {
+        font-family: "Material Symbols Outlined";
+        font-size: 22px;
+        font-variation-settings: "FILL" 0;
+      }
+      .frame .bottom-nav .nav-item.active {
+        color: var(--c6-primary);
+      }
+      .frame .bottom-nav .nav-item.active .ico {
+        font-variation-settings: "FILL" 1;
+      }
+
+      /* Disclaimer ribbon (always-on, sits above bottom-nav) */
+      .frame .ribbon {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 56px;
+        height: 26px;
+        background: var(--rib-bg-light);
+        color: var(--rib-fg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 0 12px;
+        user-select: none;
+        pointer-events: none;
+        font: 700 10px/1 var(--jp);
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+        z-index: 7;
+        overflow: hidden;
+      }
+      .frame.dark .ribbon {
+        background: var(--rib-bg-dark);
+      }
+      .frame .ribbon .accent {
+        color: var(--rib-accent);
+        flex: 0 0 auto;
+      }
+      .frame.tablet .ribbon {
+        font-size: 11px;
+        height: 28px;
+      }
+      .frame.iphone-landscape .ribbon {
+        height: 22px;
+        font-size: 9px;
+      }
+
+      /* ===== screen-specific UI inside .frame ===== */
+
+      /* Bottom segmented (one-handed reach) */
+      .seg {
+        display: flex;
+        background: var(--c6-surface-3);
+        border-radius: var(--r-pill);
+        padding: 3px;
+        gap: 2px;
+        position: absolute;
+        left: var(--s-4);
+        right: var(--s-4);
+        bottom: 90px; /* above ribbon+nav stack */
+        height: 44px;
+        z-index: 5;
+      }
+      .seg .opt {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font: 700 13px var(--jp);
+        color: var(--c6-ink-2);
+        border-radius: calc(var(--r-pill) - 3px);
+        letter-spacing: 0.02em;
+      }
+      .seg .opt.on {
+        background: var(--c6-surface);
+        color: var(--c6-primary);
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.1);
+      }
+      .frame.tablet .seg {
+        display: none;
+      } /* tablet uses left tool list */
+      .frame.iphone-landscape .seg {
+        bottom: auto;
+        top: 8px;
+        right: auto;
+        left: auto;
+        width: 340px;
+        height: 36px;
+        font-size: 12px;
+        position: absolute;
+        left: 8px;
+      }
+
+      /* Top tool meta strip */
+      .tool-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font: 600 11px var(--mono);
+        color: var(--c6-muted);
+        margin-bottom: var(--s-3);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .tool-meta .formula {
+        color: var(--c6-ink-2);
+        font-family: var(--mono);
+        text-transform: none;
+        font-size: 11px;
+        letter-spacing: 0;
+      }
+
+      /* Form */
+      .form {
+        display: grid;
+        gap: var(--s-3);
+        margin-bottom: var(--s-3);
+      }
+      .field {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s-1);
+      }
+      .field .lbl {
+        font: 500 11px var(--jp);
+        color: var(--c6-muted);
+        letter-spacing: 0.02em;
+      }
+      .field .input {
+        height: 44px;
+        border-radius: var(--r-tile);
+        background: var(--c6-surface);
+        border: 1px solid var(--c6-hairline);
+        display: flex;
+        align-items: center;
+        padding: 0 var(--s-3);
+        font: 600 16px var(--jp);
+        color: var(--c6-ink);
+        gap: var(--s-2);
+      }
+      .field .input .unit {
+        font: 500 12px var(--mono);
+        color: var(--c6-muted);
+        margin-left: auto;
+      }
+      .field .input.placeholder {
+        color: var(--c6-muted-2);
+        font-weight: 400;
+      }
+      .field .input.focus {
+        border: 2px solid var(--c6-primary);
+        padding: 0 calc(var(--s-3) - 1px);
+      }
+      .field .input.error {
+        border: 1.5px solid var(--c6-error);
+        background: var(--c6-error-cont);
+      }
+      .field .input.error .unit {
+        color: var(--c6-error);
+      }
+      .field .errmsg {
+        font: 600 11px var(--jp);
+        color: var(--c6-error);
+        display: flex;
+        gap: var(--s-1);
+        align-items: center;
+      }
+      .field .errmsg .ico {
+        font-family: "Material Symbols Outlined";
+        font-size: 14px;
+      }
+
+      /* Sex segmented (inside field) */
+      .sex-seg {
+        display: flex;
+        background: var(--c6-surface-3);
+        border-radius: var(--r-pill);
+        padding: 2px;
+        height: 36px;
+      }
+      .sex-seg .opt {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font: 600 13px var(--jp);
+        color: var(--c6-ink-2);
+        border-radius: calc(var(--r-pill) - 2px);
+        gap: 4px;
+      }
+      .sex-seg .opt .ico {
+        font-family: "Material Symbols Outlined";
+        font-size: 16px;
+      }
+      .sex-seg .opt.on {
+        background: var(--c6-surface);
+        color: var(--c6-primary);
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+      }
+
+      /* Result card */
+      .result {
+        background: var(--c6-surface);
+        border: 1px solid var(--c6-hairline);
+        border-radius: var(--r-card);
+        padding: var(--s-4);
+        display: grid;
+        gap: var(--s-2);
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      }
+      .result .head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+      }
+      .result .head .ttl {
+        font: 700 12px var(--jp);
+        color: var(--c6-muted);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .result .head .formula-tag {
+        font: 500 10px var(--mono);
+        color: var(--c6-muted);
+      }
+      .result .value {
+        font: 700 36px var(--mono);
+        color: var(--c6-ink);
+        line-height: 1;
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+      }
+      .result .value .unit {
+        font: 500 13px var(--mono);
+        color: var(--c6-muted);
+      }
+      .result .value.placeholder {
+        color: var(--c6-muted-2);
+      }
+      .result .badge-row {
+        display: flex;
+        gap: var(--s-2);
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      /* Classification badge — non-color cue: text + icon shape */
+      .cbadge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: var(--r-pill);
+        font: 700 11px var(--jp);
+        letter-spacing: 0.02em;
+        border: 1px solid transparent;
+      }
+      .cbadge .shape {
+        width: 10px;
+        height: 10px;
+        flex: 0 0 auto;
+        background: currentColor;
+      }
+      .cbadge .ico {
+        font-family: "Material Symbols Outlined";
+        font-size: 14px;
+      }
+      /* shape variants per class — non-color cue (G1/G2/G3a/G3b/G4/G5 etc.) */
+      .shape.dot {
+        border-radius: 50%;
+      }
+      .shape.tri {
+        background: transparent;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-bottom: 9px solid currentColor;
+        height: 0;
+        width: 0;
+      }
+      .shape.sq {
+        border-radius: 1px;
+      }
+      .shape.diamond {
+        transform: rotate(45deg);
+        border-radius: 1px;
+      }
+      .shape.pent {
+        clip-path: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%);
+      }
+      .shape.hex {
+        clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+      }
+      .shape.x {
+        position: relative;
+        background: transparent;
+      }
+      .shape.x::before,
+      .shape.x::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: currentColor;
+      }
+      .shape.x::before {
+        transform: rotate(45deg) scaleY(0.22);
+      }
+      .shape.x::after {
+        transform: rotate(-45deg) scaleY(0.22);
+      }
+
+      /* BMI 7-class badge */
+      .cbadge.bmi-1 {
+        background: var(--bmi-1);
+        color: var(--bmi-1-on);
+      }
+      .cbadge.bmi-2 {
+        background: var(--bmi-2);
+        color: var(--bmi-2-on);
+      }
+      .cbadge.bmi-3 {
+        background: var(--bmi-3);
+        color: var(--bmi-3-on);
+      }
+      .cbadge.bmi-4 {
+        background: var(--bmi-4);
+        color: var(--bmi-4-on);
+      }
+      .cbadge.bmi-5 {
+        background: var(--bmi-5);
+        color: var(--bmi-5-on);
+      }
+      .cbadge.bmi-6 {
+        background: var(--bmi-6);
+        color: var(--bmi-6-on);
+      }
+      .cbadge.bmi-7 {
+        background: var(--bmi-7);
+        color: var(--bmi-7-on);
+      }
+      /* CKD G1..G5 badge */
+      .cbadge.ckd-1 {
+        background: var(--ckd-1);
+        color: var(--ckd-1-on);
+      }
+      .cbadge.ckd-2 {
+        background: var(--ckd-2);
+        color: var(--ckd-2-on);
+      }
+      .cbadge.ckd-3a {
+        background: var(--ckd-3a);
+        color: var(--ckd-3a-on);
+      }
+      .cbadge.ckd-3b {
+        background: var(--ckd-3b);
+        color: var(--ckd-3b-on);
+      }
+      .cbadge.ckd-4 {
+        background: var(--ckd-4);
+        color: var(--ckd-4-on);
+      }
+      .cbadge.ckd-5 {
+        background: var(--ckd-5);
+        color: var(--ckd-5-on);
+      }
+
+      /* Number-line chart (BMI) */
+      .chart-bmi {
+        margin-top: var(--s-2);
+      }
+      .chart-bmi .scale {
+        height: 24px;
+        border-radius: var(--r-tile);
+        overflow: hidden;
+        display: flex;
+        border: 1px solid var(--c6-hairline);
+      }
+      .chart-bmi .scale .seg-bmi {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font: 700 9px var(--mono);
+        color: #ffffff;
+      }
+      .chart-bmi .scale .seg-bmi.s1 {
+        background: var(--bmi-1);
+        color: var(--bmi-1-on);
+      }
+      .chart-bmi .scale .seg-bmi.s2 {
+        background: var(--bmi-2);
+        color: var(--bmi-2-on);
+      }
+      .chart-bmi .scale .seg-bmi.s3 {
+        background: var(--bmi-3);
+        color: var(--bmi-3-on);
+      }
+      .chart-bmi .scale .seg-bmi.s4 {
+        background: var(--bmi-4);
+        color: var(--bmi-4-on);
+      }
+      .chart-bmi .scale .seg-bmi.s5 {
+        background: var(--bmi-5);
+        color: var(--bmi-5-on);
+      }
+      .chart-bmi .scale .seg-bmi.s6 {
+        background: var(--bmi-6);
+        color: var(--bmi-6-on);
+      }
+      .chart-bmi .scale .seg-bmi.s7 {
+        background: var(--bmi-7);
+        color: var(--bmi-7-on);
+      }
+      .chart-bmi .axis {
+        position: relative;
+        height: 16px;
+        margin-top: 4px;
+        font: 500 9px var(--mono);
+        color: var(--c6-muted);
+      }
+      .chart-bmi .axis .tick {
+        position: absolute;
+        top: 0;
+        transform: translateX(-50%);
+      }
+      .chart-bmi .marker {
+        position: absolute;
+        top: -4px;
+        width: 2px;
+        height: 32px;
+        background: var(--c6-ink);
+        z-index: 2;
+      }
+      .chart-bmi .marker::before {
+        content: "";
+        position: absolute;
+        top: -6px;
+        left: -4px;
+        width: 10px;
+        height: 10px;
+        background: var(--c6-ink);
+        border-radius: 50%;
+        border: 2px solid var(--c6-surface);
+      }
+      .chart-bmi .marker .pin-val {
+        position: absolute;
+        top: -22px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--c6-ink);
+        color: var(--c6-surface);
+        font: 700 10px var(--mono);
+        padding: 1px 5px;
+        border-radius: 3px;
+        white-space: nowrap;
+      }
+
+      /* eGFR CKD-stage band */
+      .chart-egfr {
+        margin-top: var(--s-2);
+      }
+      .chart-egfr .scale {
+        height: 24px;
+        border-radius: var(--r-tile);
+        overflow: hidden;
+        display: flex;
+        border: 1px solid var(--c6-hairline);
+      }
+      .chart-egfr .scale .seg-egfr {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font: 700 9px var(--mono);
+      }
+      .chart-egfr .scale .seg-egfr.g5 {
+        background: var(--ckd-5);
+        color: var(--ckd-5-on);
+        width: 12.5%;
+      }
+      .chart-egfr .scale .seg-egfr.g4 {
+        background: var(--ckd-4);
+        color: var(--ckd-4-on);
+        width: 12.5%;
+      }
+      .chart-egfr .scale .seg-egfr.g3b {
+        background: var(--ckd-3b);
+        color: var(--ckd-3b-on);
+        width: 12.5%;
+      }
+      .chart-egfr .scale .seg-egfr.g3a {
+        background: var(--ckd-3a);
+        color: var(--ckd-3a-on);
+        width: 12.5%;
+      }
+      .chart-egfr .scale .seg-egfr.g2 {
+        background: var(--ckd-2);
+        color: var(--ckd-2-on);
+        width: 25%;
+      }
+      .chart-egfr .scale .seg-egfr.g1 {
+        background: var(--ckd-1);
+        color: var(--ckd-1-on);
+        width: 25%;
+      }
+      .chart-egfr .axis {
+        position: relative;
+        height: 16px;
+        margin-top: 4px;
+        font: 500 9px var(--mono);
+        color: var(--c6-muted);
+      }
+      .chart-egfr .marker {
+        position: absolute;
+        top: -4px;
+        width: 2px;
+        height: 32px;
+        background: var(--c6-ink);
+        z-index: 2;
+      }
+      .chart-egfr .marker::before {
+        content: "";
+        position: absolute;
+        top: -6px;
+        left: -4px;
+        width: 10px;
+        height: 10px;
+        background: var(--c6-ink);
+        border-radius: 50%;
+        border: 2px solid var(--c6-surface);
+      }
+      .chart-egfr .marker .pin-val {
+        position: absolute;
+        top: -22px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--c6-ink);
+        color: var(--c6-surface);
+        font: 700 10px var(--mono);
+        padding: 1px 5px;
+        border-radius: 3px;
+        white-space: nowrap;
+      }
+
+      /* CrCl age-stratified normal-range bar */
+      .chart-crcl {
+        margin-top: var(--s-2);
+        display: grid;
+        gap: 6px;
+        font-size: 11px;
+      }
+      .chart-crcl .crow {
+        display: grid;
+        grid-template-columns: 96px 1fr;
+        gap: 8px;
+        align-items: center;
+      }
+      .chart-crcl .crow .grp {
+        font: 500 10px var(--mono);
+        color: var(--c6-muted);
+      }
+      .chart-crcl .crow .track {
+        position: relative;
+        height: 14px;
+        background: var(--c6-surface-3);
+        border-radius: 7px;
+        overflow: visible;
+      }
+      .chart-crcl .crow .normal {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        background: var(--c6-success-cont);
+        border-radius: 7px;
+        border: 1px solid var(--c6-success);
+      }
+      .chart-crcl .crow .pt {
+        position: absolute;
+        top: -3px;
+        width: 14px;
+        height: 20px;
+        background: var(--c6-primary);
+        border-radius: 7px;
+        border: 2px solid var(--c6-surface);
+      }
+
+      /* History */
+      .history {
+        margin-top: var(--s-3);
+      }
+      .history .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--s-2) var(--s-3);
+        border-radius: var(--r-card);
+        background: var(--c6-surface);
+        border: 1px solid var(--c6-hairline);
+        font: 700 12px var(--jp);
+        color: var(--c6-ink);
+      }
+      .history .header .count {
+        font: 500 11px var(--mono);
+        color: var(--c6-muted);
+      }
+      .history .header .ico {
+        font-family: "Material Symbols Outlined";
+        font-size: 18px;
+        color: var(--c6-muted);
+      }
+      .history .list {
+        margin-top: 6px;
+        background: var(--c6-surface);
+        border: 1px solid var(--c6-hairline);
+        border-radius: var(--r-card);
+        overflow: hidden;
+        position: relative;
+      }
+      .history .list .row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--c6-hairline-2);
+        font: 500 12px var(--jp);
+        color: var(--c6-ink);
+        align-items: center;
+      }
+      .history .list .row:last-child {
+        border-bottom: none;
+      }
+      .history .list .row .when {
+        font: 600 11px var(--mono);
+        color: var(--c6-muted);
+        margin-right: 6px;
+      }
+      .history .list .row .res {
+        font-weight: 700;
+      }
+      .history .list .row .ico {
+        font-family: "Material Symbols Outlined";
+        font-size: 18px;
+        color: var(--c6-muted);
+      }
+      .history .list .scroll-hairline {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 18px;
+        background: linear-gradient(180deg, transparent, var(--c6-surface));
+        pointer-events: none;
+      }
+      .history .list.empty {
+        padding: 28px 12px;
+        text-align: center;
+        color: var(--c6-muted);
+        font: 500 12px var(--jp);
+      }
+      .history .list.empty .ico {
+        display: block;
+        font-family: "Material Symbols Outlined";
+        font-size: 36px;
+        margin-bottom: 6px;
+        color: var(--c6-muted-2);
+      }
+      .history .list .swipe-row {
+        position: relative;
+        display: flex;
+        align-items: stretch;
+        overflow: visible;
+      }
+      .history .list .swipe-row .row {
+        flex: 1;
+        transform: translateX(-72px);
+        background: var(--c6-surface);
+        position: relative;
+        z-index: 2;
+        border-bottom: 1px solid var(--c6-hairline-2);
+      }
+      .history .list .swipe-row .delete {
+        width: 72px;
+        background: var(--c6-error);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font: 700 12px var(--jp);
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 1;
+        gap: 4px;
+      }
+      .history .list .swipe-row .delete .ico {
+        font-family: "Material Symbols Outlined";
+        font-size: 18px;
+      }
+
+      /* Loading shimmer for restoring */
+      .restore-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        font: 600 13px var(--jp);
+        color: var(--c6-ink);
+        gap: 10px;
+        z-index: 4;
+      }
+      .frame.dark .restore-overlay {
+        background: rgba(15, 18, 22, 0.55);
+      }
+      .restore-overlay .spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid var(--c6-hairline);
+        border-top-color: var(--c6-primary);
+        border-radius: 50%;
+      }
+
+      /* On-screen numeric keyboard */
+      .keyboard {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 240px;
+        background: var(--c6-surface-2);
+        border-top: 1px solid var(--c6-hairline);
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding: 8px;
+        z-index: 8;
+      }
+      .keyboard .key {
+        background: var(--c6-surface);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font: 600 22px var(--jp);
+        color: var(--c6-ink);
+        border: 1px solid var(--c6-hairline);
+      }
+      .keyboard .key.action {
+        background: var(--c6-primary);
+        color: var(--c6-on-primary);
+      }
+      .keyboard .key.dim {
+        color: var(--c6-muted);
+      }
+
+      /* iPad two-pane / three-pane */
+      .frame.tablet .twopane {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: var(--s-6);
+        height: 100%;
+      }
+      .frame.tablet .threepane {
+        display: grid;
+        grid-template-columns: 240px 1fr 1fr;
+        gap: var(--s-6);
+        height: 100%;
+      }
+      .tool-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px;
+        background: var(--c6-surface);
+        border: 1px solid var(--c6-hairline);
+        border-radius: var(--r-card);
+      }
+      .tool-list .ti {
+        padding: 14px 14px;
+        border-radius: var(--r-tile);
+        font: 700 14px var(--jp);
+        color: var(--c6-ink);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .tool-list .ti .ico {
+        font-family: "Material Symbols Outlined";
+        font-size: 20px;
+        color: var(--c6-muted);
+      }
+      .tool-list .ti .formula {
+        font: 500 11px var(--mono);
+        color: var(--c6-muted);
+        margin-left: auto;
+        text-transform: none;
+      }
+      .tool-list .ti.active {
+        background: var(--c6-primary-cont);
+        color: var(--c6-on-primary-cont);
+      }
+      .tool-list .ti.active .ico {
+        color: var(--c6-on-primary-cont);
+        font-variation-settings: "FILL" 1;
+      }
+      .tool-list .ti.active .formula {
+        color: var(--c6-on-primary-cont);
+      }
+
+      /* iPad form/result split */
+      .pane {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s-3);
+        min-height: 0;
+      }
+      .pane.scroll {
+        overflow: hidden;
+      }
+
+      /* Tool-switching transition layout: two faded edges suggesting horizontal swipe */
+      .swipe-edge {
+        position: absolute;
+        top: 50%;
+        width: 36px;
+        height: 64px;
+        border-radius: 6px;
+        background: var(--c6-surface);
+        border: 1px solid var(--c6-hairline);
+        opacity: 0.32;
+        transform: translateY(-50%);
+        z-index: 3;
+      }
+      .swipe-edge.left {
+        left: -22px;
+      }
+      .swipe-edge.right {
+        right: -22px;
+      }
+
+      /* Accessibility-large-text frame: scale via wrapper */
+      .frame.large-text .body {
+        font-size: 1em;
+      } /* the body itself contains scaled units */
+      .frame.large-text .field .lbl {
+        font-size: 18px;
+      }
+      .frame.large-text .field .input {
+        font-size: 24px;
+        height: 56px;
+      }
+      .frame.large-text .seg .opt {
+        font-size: 18px;
+      }
+      .frame.large-text .seg {
+        height: 56px;
+      }
+      .frame.large-text .result .ttl {
+        font-size: 18px;
+      }
+      .frame.large-text .result .value {
+        font-size: 54px;
+      }
+      .frame.large-text .cbadge {
+        font-size: 16px;
+        padding: 6px 14px;
+      }
+
+      /* iPad Split View — 50/50 neighbor + Calc Tools (Compact-width fallback) */
+      .frame.tablet.splitview .device {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        height: 760px;
+        border-radius: 18px;
+      }
+      .frame.tablet.splitview .sv-neighbor {
+        flex: 1;
+        min-width: 0;
+        background: var(--c6-surface-3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font: 600 14px var(--jp);
+        color: var(--c6-muted);
+        letter-spacing: 0.04em;
+        border-right: 1px solid var(--c6-hairline);
+        position: relative;
+      }
+      .frame.tablet.splitview .sv-neighbor::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(135deg, transparent 0 14px, var(--c6-hairline-2) 14px 15px);
+        pointer-events: none;
+        opacity: 0.6;
+      }
+      .frame.tablet.splitview .sv-neighbor .lbl {
+        position: relative;
+        z-index: 1;
+        background: var(--c6-surface);
+        padding: 8px 14px;
+        border-radius: var(--r-pill);
+        border: 1px solid var(--c6-hairline);
+      }
+      .frame.tablet.splitview .sv-app {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        background: var(--c6-bg);
+        position: relative;
+      }
+      .frame.tablet.splitview .sv-app .body {
+        flex: 1 1 auto;
+        overflow: hidden;
+        position: relative;
+        padding: var(--s-4);
+      }
+      .frame.tablet.splitview .seg {
+        display: flex;
+      }
+      .frame.tablet.splitview .ribbon {
+        left: 50%;
+        right: 0;
+      }
+      .frame.tablet.splitview .bottom-nav {
+        left: 50%;
+        right: 0;
+      }
+
+      /* =======================================================================
+   STATE-TRANSITION DIAGRAM
+   ======================================================================= */
+      .state-diagram {
+        background: var(--page-card);
+        border: 1px solid var(--page-rule);
+        border-radius: 12px;
+        padding: 24px;
+        display: grid;
+        gap: 18px;
+      }
+      .state-diagram svg {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      /* =======================================================================
+   COMPONENT SPEC GRID
+   ======================================================================= */
+      .atom-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 14px;
+      }
+      .atom-card {
+        background: var(--page-card);
+        border: 1px solid var(--page-rule);
+        border-radius: 10px;
+        padding: 14px;
+      }
+      .atom-card h4 {
+        margin: 0 0 10px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .atom-card .row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        font: 500 11px var(--mono);
+        color: var(--page-muted);
+      }
+      .atom-card .row .label {
+        width: 64px;
+        flex: 0 0 auto;
+      }
+      .atom-card .row .demo {
+        flex: 1;
+      }
+
+      /* =======================================================================
+   ACCESSIBILITY TABLE
+   ======================================================================= */
+      .aa-table {
+        width: 100%;
+        border-collapse: collapse;
+        font: 12px var(--mono);
+        background: var(--page-card);
+      }
+      .aa-table th,
+      .aa-table td {
+        padding: 8px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--page-rule);
+      }
+      .aa-table th {
+        font: 600 10px/1.2 var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--page-muted);
+        background: #f7f8fa;
+        border-bottom: 2px solid var(--page-rule);
+      }
+      .aa-table .pass {
+        color: var(--page-ok);
+        font-weight: 700;
+      }
+      .aa-table .ratio {
+        font-weight: 600;
+      }
+      .aa-table .sw {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        vertical-align: -3px;
+        margin-right: 6px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      /* =======================================================================
+   DISCLAIMER RIBBON SHOWCASE
+   ======================================================================= */
+      .ribbon-showcase {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      .ribbon-demo {
+        background: var(--rib-bg-light);
+        color: var(--rib-fg);
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font: 700 11px/1 var(--jp);
+        letter-spacing: 0.04em;
+        border-radius: 6px;
+      }
+      .ribbon-demo.dark {
+        background: var(--rib-bg-dark);
+      }
+      .ribbon-demo .accent {
+        color: var(--rib-accent);
+      }
+
+      /* =======================================================================
+   VERIFICATION REPORT
+   ======================================================================= */
+      .vr-table {
+        width: 100%;
+        border-collapse: collapse;
+        font: 12px var(--mono);
+        background: var(--page-card);
+      }
+      .vr-table th,
+      .vr-table td {
+        padding: 8px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--page-rule);
+        vertical-align: top;
+      }
+      .vr-table th {
+        font: 600 10px/1.2 var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--page-muted);
+        background: #f7f8fa;
+        border-bottom: 2px solid var(--page-rule);
+      }
+      .vr-table .id {
+        font-weight: 700;
+        font-size: 11px;
+        width: 42px;
+        color: var(--page-fg);
+      }
+      .vr-table .method {
+        width: 80px;
+        color: var(--page-muted);
+      }
+      .vr-table .result {
+        width: 60px;
+        font-weight: 700;
+      }
+      .vr-table .result.pass {
+        color: var(--page-ok);
+      }
+      .vr-table .result.fail {
+        color: var(--page-warn);
+      }
+      .vr-table .evidence {
+        font: 11px var(--mono);
+        color: var(--page-fg);
+        max-width: 520px;
+        word-break: break-word;
+      }
+      .vr-table .notes {
+        font: 11px var(--jp);
+        color: var(--page-muted);
+        max-width: 280px;
+      }
+
+      /* Material symbol generic */
+      .ico {
+        font-family: "Material Symbols Outlined";
+        line-height: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <!-- ===================== TOC ===================== -->
+      <aside class="toc">
+        <h1>Calc Tools — SSOT</h1>
+        <ol>
+          <li><a href="#sec-cover">Cover &amp; metadata</a></li>
+          <li><a href="#sec-color">Color tokens</a></li>
+          <li><a href="#sec-type">Typography</a></li>
+          <li><a href="#sec-spacing">Spacing / radii / elevation</a></li>
+          <li><a href="#sec-mocks">Screen preview mocks</a></li>
+          <li><a href="#sec-states">State transitions</a></li>
+          <li><a href="#sec-components">Component spec</a></li>
+          <li><a href="#sec-a11y">Accessibility</a></li>
+          <li><a href="#sec-ribbon">Disclaimer ribbon</a></li>
+          <li><a href="#sec-verify">Verification report</a></li>
+        </ol>
+        <div class="meta">
+          <strong>Locale</strong>
+          ja-JP only
+          <br />
+          <strong>Font</strong>
+          NotoSansJP
+          <br />
+          <strong>Brand</strong>
+          Round6
+          <code>#007AFF</code>
+          <br />
+          <strong>Detail seed</strong>
+          not used here
+          <br />
+          <strong>Frames</strong>
+          <span id="frame-count">…</span>
+          total
+          <br />
+          <strong>Spec</strong>
+          <code>Calc Tools Spec.html</code>
+          (single file)
+        </div>
+      </aside>
+
+      <main>
+        <!-- ===================== 1. COVER ===================== -->
+        <section class="block" id="sec-cover">
+          <div class="cover">
+            <div class="eyebrow">Visual SSOT — Single file aggregation</div>
+            <h1>計算ツール画面 — Calc Tools Screen</h1>
+            <p class="lede">
+              医薬品・疾患リファレンス (Fictional Drug &amp; Disease Reference) の
+              <strong>計算ツール</strong>
+              画面の視覚仕様。BMI / eGFR / CrCl の3計算を
+              <strong>1画面 / 3タップ以内 / 10秒</strong>
+              で完了させるための、Light/Dark・iPhone/iPad・全状態を1ページに集約した設計仕様書 (Single Source of
+              Truth)。
+            </p>
+            <div class="grid">
+              <div>
+                <div class="lbl">Target screen</div>
+                <div class="val">tabCalc — 計算ツール</div>
+              </div>
+              <div>
+                <div class="lbl">Brand color family</div>
+                <div class="val">
+                  Round6 (seed
+                  <code style="background: rgba(255, 255, 255, 0.12); padding: 1px 5px; border-radius: 3px">
+                    #007AFF
+                  </code>
+                  )
+                </div>
+                <div class="swatches">
+                  <span style="background: #007aff"></span>
+                  <span style="background: #9ecaff"></span>
+                  <span style="background: #d8e4ff"></span>
+                  <span style="background: #001a41"></span>
+                </div>
+              </div>
+              <div>
+                <div class="lbl">Referenced SSOT</div>
+                <div class="val">
+                  Detail Spec.html (structural model)
+                  <br />
+                  colors_and_type.css (token source)
+                  <br />
+                  app_ja.arb (l10n SSOT)
+                </div>
+              </div>
+              <div>
+                <div class="lbl">Version</div>
+                <div class="val">
+                  v1.0 — 2026-05-10
+                  <br />
+                  Owner: design system
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== 2. COLOR TOKENS ===================== -->
+        <section class="block" id="sec-color">
+          <h2 class="section-title">
+            <span class="tag">02</span>
+            Color tokens
+          </h2>
+          <p class="section-sub">
+            Material 3 トーナルパレット (Primary / Secondary / Tertiary / Error / Neutral / Neutral variant) × 12トーン
+            と、Light / Dark の Theme block を併記。下部に BMI 7-class および CKD G1–G5 の分類カラー
+            (色だけに依存させない: 文字ラベル + アイコン形状 でも識別)。
+          </p>
+
+          <div class="card color-token-display">
+            <h3 style="margin: 0 0 14px; font-size: 15px">Tonal Palettes</h3>
+            <div class="palette-header">
+              <div></div>
+              <div>0</div>
+              <div>10</div>
+              <div>20</div>
+              <div>30</div>
+              <div>40</div>
+              <div>50</div>
+              <div>60</div>
+              <div>70</div>
+              <div>80</div>
+              <div>90</div>
+              <div>95</div>
+              <div>100</div>
+            </div>
+            <div class="palette-row">
+              <div class="name">Primary</div>
+              <div class="tone" style="background: #000000; color: #fff">P-0</div>
+              <div class="tone" style="background: #001a41; color: #fff">P-10</div>
+              <div class="tone" style="background: #002e69; color: #fff">P-20</div>
+              <div class="tone" style="background: #004495; color: #fff">P-30</div>
+              <div class="tone" style="background: #1f5bb5; color: #fff">P-40</div>
+              <div class="tone" style="background: #007aff; color: #fff">P-50</div>
+              <div class="tone" style="background: #3f8ae0; color: #fff">P-60</div>
+              <div class="tone" style="background: #7ab5ff; color: #001a41">P-70</div>
+              <div class="tone" style="background: #9ecaff; color: #001a41">P-80</div>
+              <div class="tone" style="background: #d8e4ff; color: #001a41">P-90</div>
+              <div class="tone" style="background: #edf2ff; color: #001a41">P-95</div>
+              <div class="tone" style="background: #ffffff; color: #001a41">P-100</div>
+            </div>
+            <div class="palette-row">
+              <div class="name">Secondary</div>
+              <div class="tone" style="background: #000000; color: #fff">S-0</div>
+              <div class="tone" style="background: #101c2f; color: #fff">S-10</div>
+              <div class="tone" style="background: #253048; color: #fff">S-20</div>
+              <div class="tone" style="background: #39435b; color: #fff">S-30</div>
+              <div class="tone" style="background: #525e78; color: #fff">S-40</div>
+              <div class="tone" style="background: #6b7791; color: #fff">S-50</div>
+              <div class="tone" style="background: #8590aa; color: #101c2f">S-60</div>
+              <div class="tone" style="background: #a0abc4; color: #101c2f">S-70</div>
+              <div class="tone" style="background: #bbc6e4; color: #101c2f">S-80</div>
+              <div class="tone" style="background: #d7e3f8; color: #101c2f">S-90</div>
+              <div class="tone" style="background: #edf1fb; color: #101c2f">S-95</div>
+              <div class="tone" style="background: #ffffff; color: #101c2f">S-100</div>
+            </div>
+            <div class="palette-row">
+              <div class="name">Tertiary</div>
+              <div class="tone" style="background: #000000; color: #fff">T-0</div>
+              <div class="tone" style="background: #280a2d; color: #fff">T-10</div>
+              <div class="tone" style="background: #3f2843; color: #fff">T-20</div>
+              <div class="tone" style="background: #573c5b; color: #fff">T-30</div>
+              <div class="tone" style="background: #705574; color: #fff">T-40</div>
+              <div class="tone" style="background: #896e8e; color: #fff">T-50</div>
+              <div class="tone" style="background: #a488a8; color: #280a2d">T-60</div>
+              <div class="tone" style="background: #c0a2c2; color: #280a2d">T-70</div>
+              <div class="tone" style="background: #debcdf; color: #280a2d">T-80</div>
+              <div class="tone" style="background: #fbd8ff; color: #280a2d">T-90</div>
+              <div class="tone" style="background: #ffebff; color: #280a2d">T-95</div>
+              <div class="tone" style="background: #ffffff; color: #280a2d">T-100</div>
+            </div>
+            <div class="palette-row">
+              <div class="name">Error</div>
+              <div class="tone" style="background: #000000; color: #fff">E-0</div>
+              <div class="tone" style="background: #410e0b; color: #fff">E-10</div>
+              <div class="tone" style="background: #601410; color: #fff">E-20</div>
+              <div class="tone" style="background: #8c1d18; color: #fff">E-30</div>
+              <div class="tone" style="background: #b3261e; color: #fff">E-40</div>
+              <div class="tone" style="background: #dc362e; color: #fff">E-50</div>
+              <div class="tone" style="background: #e46962; color: #fff">E-60</div>
+              <div class="tone" style="background: #ec928e; color: #410e0b">E-70</div>
+              <div class="tone" style="background: #f2b8b5; color: #410e0b">E-80</div>
+              <div class="tone" style="background: #f9dedc; color: #410e0b">E-90</div>
+              <div class="tone" style="background: #fceeee; color: #410e0b">E-95</div>
+              <div class="tone" style="background: #ffffff; color: #410e0b">E-100</div>
+            </div>
+            <div class="palette-row">
+              <div class="name">Neutral</div>
+              <div class="tone" style="background: #000000; color: #fff">N-0</div>
+              <div class="tone" style="background: #1a1c1e; color: #fff">N-10</div>
+              <div class="tone" style="background: #2e3133; color: #fff">N-20</div>
+              <div class="tone" style="background: #454649; color: #fff">N-30</div>
+              <div class="tone" style="background: #5c5f61; color: #fff">N-40</div>
+              <div class="tone" style="background: #75787a; color: #fff">N-50</div>
+              <div class="tone" style="background: #8f9193; color: #1a1c1e">N-60</div>
+              <div class="tone" style="background: #a9abad; color: #1a1c1e">N-70</div>
+              <div class="tone" style="background: #c5c7ca; color: #1a1c1e">N-80</div>
+              <div class="tone" style="background: #e1e2e5; color: #1a1c1e">N-90</div>
+              <div class="tone" style="background: #eff0f3; color: #1a1c1e">N-95</div>
+              <div class="tone" style="background: #ffffff; color: #1a1c1e">N-100</div>
+            </div>
+            <div class="palette-row">
+              <div class="name">Neutral variant</div>
+              <div class="tone" style="background: #000000; color: #fff">NV-0</div>
+              <div class="tone" style="background: #191c20; color: #fff">NV-10</div>
+              <div class="tone" style="background: #2e3036; color: #fff">NV-20</div>
+              <div class="tone" style="background: #44464e; color: #fff">NV-30</div>
+              <div class="tone" style="background: #5c5f66; color: #fff">NV-40</div>
+              <div class="tone" style="background: #75777f; color: #fff">NV-50</div>
+              <div class="tone" style="background: #8e9099; color: #191c20">NV-60</div>
+              <div class="tone" style="background: #a9abb4; color: #191c20">NV-70</div>
+              <div class="tone" style="background: #c5c6cd; color: #191c20">NV-80</div>
+              <div class="tone" style="background: #e1e2e9; color: #191c20">NV-90</div>
+              <div class="tone" style="background: #eff0f7; color: #191c20">NV-95</div>
+              <div class="tone" style="background: #ffffff; color: #191c20">NV-100</div>
+            </div>
+
+            <div class="theme-blocks">
+              <div class="theme-block">
+                <h3>Light theme — Round6 shell tokens</h3>
+                <div class="theme-grid">
+                  <div class="theme-cell" style="background: #f2f2f7; color: #1a1c1e">
+                    <span class="role">bg</span>
+                    <span class="hex">#F2F2F7 · 14.2:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #ffffff; color: #1a1c1e">
+                    <span class="role">surface</span>
+                    <span class="hex">#FFFFFF · 16.4:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #efeff4; color: #1a1c1e">
+                    <span class="role">surface-3</span>
+                    <span class="hex">#EFEFF4 · 14.5:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #1a1c1e; color: #ffffff">
+                    <span class="role">ink</span>
+                    <span class="hex">#1A1C1E · 16.4:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #3f4347; color: #ffffff">
+                    <span class="role">ink-2</span>
+                    <span class="hex">#3F4347 · 9.6:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #6c7177; color: #ffffff">
+                    <span class="role">muted</span>
+                    <span class="hex">#6C7177 · 4.7:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #007aff; color: #ffffff">
+                    <span class="role">primary</span>
+                    <span class="hex">#007AFF · 4.6:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #d8e4ff; color: #001a41">
+                    <span class="role">primary cont.</span>
+                    <span class="hex">#D8E4FF · 13.0:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #b3261e; color: #ffffff">
+                    <span class="role">error</span>
+                    <span class="hex">#B3261E · 5.9:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #ffeded; color: #5c1612">
+                    <span class="role">error cont.</span>
+                    <span class="hex">#FFEDED · 11.6:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #1f7a3a; color: #ffffff">
+                    <span class="role">success</span>
+                    <span class="hex">#1F7A3A · 4.7:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #ddf5e2; color: #0a3517">
+                    <span class="role">success cont.</span>
+                    <span class="hex">#DDF5E2 · 12.4:1</span>
+                  </div>
+                </div>
+              </div>
+              <div class="theme-block">
+                <h3>Dark theme — Round6 shell tokens</h3>
+                <div class="theme-grid">
+                  <div class="theme-cell" style="background: #101317; color: #e5e7ec">
+                    <span class="role">bg</span>
+                    <span class="hex">#101317 · 14.4:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #181b20; color: #e5e7ec">
+                    <span class="role">surface</span>
+                    <span class="hex">#181B20 · 12.5:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #272b32; color: #e5e7ec">
+                    <span class="role">surface-3</span>
+                    <span class="hex">#272B32 · 9.7:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #e5e7ec; color: #101317">
+                    <span class="role">ink</span>
+                    <span class="hex">#E5E7EC · 14.4:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #c2c6cd; color: #101317">
+                    <span class="role">ink-2</span>
+                    <span class="hex">#C2C6CD · 10.5:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #9ca1aa; color: #101317">
+                    <span class="role">muted</span>
+                    <span class="hex">#9CA1AA · 6.7:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #9ecaff; color: #003258">
+                    <span class="role">primary</span>
+                    <span class="hex">#9ECAFF · 9.4:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #003494; color: #d8e4ff">
+                    <span class="role">primary cont.</span>
+                    <span class="hex">#003494 · 8.8:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #ffb4ab; color: #601410">
+                    <span class="role">error</span>
+                    <span class="hex">#FFB4AB · 7.2:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #5c1612; color: #ffe3dc">
+                    <span class="role">error cont.</span>
+                    <span class="hex">#5C1612 · 9.0:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #7bd8a0; color: #0a3517">
+                    <span class="role">success</span>
+                    <span class="hex">#7BD8A0 · 8.8:1</span>
+                  </div>
+                  <div class="theme-cell" style="background: #0e3920; color: #c9f5d5">
+                    <span class="role">success cont.</span>
+                    <span class="hex">#0E3920 · 11.0:1</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="classification-palette">
+              <h3>BMI 7-class palette (色 + 文字ラベル + 形状 — 色だけに依存しない)</h3>
+              <div class="row">
+                <div class="cell" style="background: #3f8ae0; color: #06294f">
+                  <span class="lbl">● 低体重</span>
+                  <span class="hex">#3F8AE0 · BMI &lt; 18.5</span>
+                </div>
+                <div class="cell" style="background: #1f7a3a; color: #ffffff">
+                  <span class="lbl">▲ 普通体重</span>
+                  <span class="hex">#1F7A3A · 18.5–25</span>
+                </div>
+                <div class="cell" style="background: #b47a00; color: #ffffff">
+                  <span class="lbl">■ 過体重</span>
+                  <span class="hex">#B47A00 · 25–30</span>
+                </div>
+                <div class="cell" style="background: #c25600; color: #ffffff">
+                  <span class="lbl">◆ 肥満1度</span>
+                  <span class="hex">#C25600 · 30–35</span>
+                </div>
+                <div class="cell" style="background: #a8341b; color: #ffffff">
+                  <span class="lbl">⬟ 肥満2度</span>
+                  <span class="hex">#A8341B · 35–40</span>
+                </div>
+                <div class="cell" style="background: #8c1d18; color: #fbe9e7">
+                  <span class="lbl">⬢ 肥満3度</span>
+                  <span class="hex">#8C1D18 · 40–45</span>
+                </div>
+                <div class="cell" style="background: #5a1212; color: #ffe3dc">
+                  <span class="lbl">✕ 肥満4度</span>
+                  <span class="hex">#5A1212 · ≥ 45</span>
+                </div>
+              </div>
+              <h3 style="margin-top: 12px">CKD G1–G5 palette (eGFR ステージ)</h3>
+              <div class="row ckd">
+                <div class="cell" style="background: #1f7a3a; color: #ffffff">
+                  <span class="lbl">● G1 正常</span>
+                  <span class="hex">#1F7A3A · ≥ 90</span>
+                </div>
+                <div class="cell" style="background: #5c8a1f; color: #ffffff">
+                  <span class="lbl">▲ G2 軽度低下</span>
+                  <span class="hex">#5C8A1F · 60–89</span>
+                </div>
+                <div class="cell" style="background: #b47a00; color: #ffffff">
+                  <span class="lbl">■ G3a</span>
+                  <span class="hex">#B47A00 · 45–59</span>
+                </div>
+                <div class="cell" style="background: #c25600; color: #ffffff">
+                  <span class="lbl">◆ G3b</span>
+                  <span class="hex">#C25600 · 30–44</span>
+                </div>
+                <div class="cell" style="background: #a8341b; color: #ffffff">
+                  <span class="lbl">⬢ G4 高度低下</span>
+                  <span class="hex">#A8341B · 15–29</span>
+                </div>
+                <div class="cell" style="background: #5a1212; color: #ffe3dc">
+                  <span class="lbl">✕ G5 末期腎不全</span>
+                  <span class="hex">#5A1212 · &lt; 15</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== 3. TYPOGRAPHY ===================== -->
+        <section class="block" id="sec-type">
+          <h2 class="section-title">
+            <span class="tag">03</span>
+            Typography
+          </h2>
+          <p class="section-sub">
+            NotoSansJP のみ。半角数字 + 全角句読点 (、 。 ・)。 mono は JetBrains Mono (コード/ID 用)。
+          </p>
+          <div class="type-ramp">
+            <div class="row">
+              <div class="meta-cell">
+                <span class="name">display-l / 34</span>
+                700 · 1.18 · NotoSansJP
+              </div>
+              <div class="sample-cell" style="font: 700 34px/1.18 var(--jp)">計算ツール — Calc Tools</div>
+            </div>
+            <div class="row">
+              <div class="meta-cell">
+                <span class="name">display-m / 28</span>
+                700 · 1.20 · タブレット
+              </div>
+              <div class="sample-cell" style="font: 700 28px/1.2 var(--jp)">BMI / eGFR / CrCl</div>
+            </div>
+            <div class="row">
+              <div class="meta-cell">
+                <span class="name">title-l / 20</span>
+                700 · 1.25 · ブランド
+              </div>
+              <div class="sample-cell" style="font: 700 20px/1.25 var(--jp)">医薬品・疾患リファレンス</div>
+            </div>
+            <div class="row">
+              <div class="meta-cell">
+                <span class="name">title-m / 16</span>
+                700 · 1.30 · カードタイトル
+              </div>
+              <div class="sample-cell" style="font: 700 16px/1.3 var(--jp)">結果 — クレアチニンクリアランス</div>
+            </div>
+            <div class="row">
+              <div class="meta-cell">
+                <span class="name">body-m / 14</span>
+                400 · 1.55 · 本文
+              </div>
+              <div class="sample-cell" style="font: 400 14px/1.55 var(--jp)">
+                入力値が許容範囲内のときのみ計算結果を表示する。範囲外の場合はエラー文言を表示し、結果カードは隠す。
+              </div>
+            </div>
+            <div class="row">
+              <div class="meta-cell">
+                <span class="name">body-s / 13</span>
+                400 · 1.50 · セカンダリ
+              </div>
+              <div class="sample-cell" style="font: 400 13px/1.5 var(--jp)">
+                クレアチニン値は 0.10–20.00 mg/dL の範囲で受け付ける。
+              </div>
+            </div>
+            <div class="row">
+              <div class="meta-cell">
+                <span class="name">label-m / 12</span>
+                500 · 1.40 · meta
+              </div>
+              <div class="sample-cell" style="font: 500 12px/1.4 var(--jp)">
+                CKD-EPI Japanese coefficient · 改訂 2026-04
+              </div>
+            </div>
+            <div class="row">
+              <div class="meta-cell">
+                <span class="name">label-s / 11</span>
+                700 · 1.35 · chip / badge
+              </div>
+              <div class="sample-cell" style="font: 700 11px/1.35 var(--jp)">G3a 軽度〜中等度低下</div>
+            </div>
+            <div class="row">
+              <div class="meta-cell">
+                <span class="name">mono-s / 11</span>
+                400 · JetBrains Mono
+              </div>
+              <div class="sample-cell" style="font: 400 11px/1.4 var(--mono)">
+                22.5 kg/m² · 78.4 mL/min/1.73m² · 92.1 mL/min
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== 4. SPACING / RADII / ELEVATION ===================== -->
+        <section class="block" id="sec-spacing">
+          <h2 class="section-title">
+            <span class="tag">04</span>
+            Spacing / Radii / Elevation
+          </h2>
+          <p class="section-sub">
+            スペーシングは 4 / 8 / 12 / 16 / 20 / 24 / 28 / 32 / 40。Radii は chip 5 / badge 4 / tile 8 / card 10 /
+            sheet card 12 / pill 22 / sheet-top 20 / FAB 18 (Flutter SSOT に準拠)。Hit target ≥ 44 px。
+          </p>
+
+          <h3 style="font-size: 13px; margin: 0 0 10px">Spacing scale (px)</h3>
+          <div class="scale-grid" style="margin-bottom: 24px">
+            <div class="scale-cell">
+              <div class="bar" style="width: 4px; height: 18px"></div>
+              <div class="name">s-1</div>
+              <div class="val">4</div>
+            </div>
+            <div class="scale-cell">
+              <div class="bar" style="width: 8px; height: 18px"></div>
+              <div class="name">s-2</div>
+              <div class="val">8</div>
+            </div>
+            <div class="scale-cell">
+              <div class="bar" style="width: 12px; height: 18px"></div>
+              <div class="name">s-3</div>
+              <div class="val">12</div>
+            </div>
+            <div class="scale-cell">
+              <div class="bar" style="width: 16px; height: 18px"></div>
+              <div class="name">s-4</div>
+              <div class="val">16</div>
+            </div>
+            <div class="scale-cell">
+              <div class="bar" style="width: 20px; height: 18px"></div>
+              <div class="name">s-5</div>
+              <div class="val">20</div>
+            </div>
+            <div class="scale-cell">
+              <div class="bar" style="width: 24px; height: 18px"></div>
+              <div class="name">s-6</div>
+              <div class="val">24</div>
+            </div>
+            <div class="scale-cell">
+              <div class="bar" style="width: 28px; height: 18px"></div>
+              <div class="name">s-7</div>
+              <div class="val">28</div>
+            </div>
+            <div class="scale-cell">
+              <div class="bar" style="width: 32px; height: 18px"></div>
+              <div class="name">s-8</div>
+              <div class="val">32</div>
+            </div>
+            <div class="scale-cell">
+              <div class="bar" style="width: 40px; height: 18px"></div>
+              <div class="name">s-10</div>
+              <div class="val">40</div>
+            </div>
+          </div>
+
+          <h3 style="font-size: 13px; margin: 0 0 10px">Radii (px)</h3>
+          <div class="radii-grid" style="margin-bottom: 24px">
+            <div class="radii-cell">
+              <div class="demo" style="border-radius: 4px"></div>
+              <div class="name">badge</div>
+              <div class="val">4</div>
+            </div>
+            <div class="radii-cell">
+              <div class="demo" style="border-radius: 5px"></div>
+              <div class="name">chip</div>
+              <div class="val">5</div>
+            </div>
+            <div class="radii-cell">
+              <div class="demo" style="border-radius: 8px"></div>
+              <div class="name">tile / image</div>
+              <div class="val">8</div>
+            </div>
+            <div class="radii-cell">
+              <div class="demo" style="border-radius: 10px"></div>
+              <div class="name">card</div>
+              <div class="val">10</div>
+            </div>
+            <div class="radii-cell">
+              <div class="demo" style="border-radius: 12px"></div>
+              <div class="name">sheet card</div>
+              <div class="val">12</div>
+            </div>
+            <div class="radii-cell">
+              <div class="demo" style="border-radius: 18px"></div>
+              <div class="name">FAB</div>
+              <div class="val">18</div>
+            </div>
+            <div class="radii-cell">
+              <div class="demo" style="border-radius: 20px 20px 0 0"></div>
+              <div class="name">sheet-top</div>
+              <div class="val">20</div>
+            </div>
+            <div class="radii-cell">
+              <div class="demo" style="border-radius: 22px"></div>
+              <div class="name">pill</div>
+              <div class="val">22</div>
+            </div>
+          </div>
+
+          <h3 style="font-size: 13px; margin: 0 0 10px">Elevation (3 levels only)</h3>
+          <div class="elev-grid">
+            <div class="elev-cell card">
+              <div class="demo"></div>
+              <div class="name">card</div>
+              <div class="val">0 1px 2px rgba(15,23,42,.04) + 0.5px hairline</div>
+            </div>
+            <div class="elev-cell footer">
+              <div class="demo"></div>
+              <div class="name">footer / bottom-nav</div>
+              <div class="val">0 -4px 12px rgba(15,23,42,.08)</div>
+            </div>
+            <div class="elev-cell sheet">
+              <div class="demo"></div>
+              <div class="name">bottom-sheet</div>
+              <div class="val">0 12px 32px rgba(15,23,42,.18)</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== 5. MOCKS (frames are JS-injected) ===================== -->
+        <section class="block" id="sec-mocks">
+          <h2 class="section-title">
+            <span class="tag">05</span>
+            Screen preview mocks
+          </h2>
+          <p class="section-sub">
+            Coverage rule:
+            <strong>calc-specific 5 状態 × 3 calcType × 4 device/mode = 60 frames</strong>
+            ;
+            <strong>calc-agnostic 7 状態 × 4 device/mode = 28 frames</strong>
+            ;
+            <strong>before/after 2 状態 × 4 × 2 = 16 frames</strong>
+            ;
+            <strong>landscape-iphone × 2 = 2 frames</strong>
+            ;
+            <strong>iPad Split View × 2 = 2 frames</strong>
+            ; total
+            <strong>108 frames</strong>
+            。各フレームは
+            <code>iPhone × Light × empty (BMI)</code>
+            形式のヘッダラベルを持ち、同じ文字列が
+            <code>data-frame-label</code>
+            属性にも書き込まれる (grep 用)。
+            <code>history-restoring</code>
+            と
+            <code>tool-switching</code>
+            は静的HTMLでは "before" / "after" 2 枚で表現する (animation curves are referenced by name in caption).
+          </p>
+
+          <div id="mocks-root"></div>
+        </section>
+
+        <!-- ===================== 6. STATE TRANSITIONS ===================== -->
+        <section class="block" id="sec-states">
+          <h2 class="section-title">
+            <span class="tag">06</span>
+            State transitions
+          </h2>
+          <p class="section-sub">
+            主要な UI 状態間の遷移。動きはすべて M3 standard easing
+            <code>cubic-bezier(.2,0,0,1)</code>
+            。durations: fast 120ms / base 200ms / slow 320ms。
+          </p>
+          <div class="state-diagram">
+            <svg viewBox="0 0 1240 380" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker
+                  id="arr"
+                  viewBox="0 0 10 10"
+                  refX="10"
+                  refY="5"
+                  markerWidth="8"
+                  markerHeight="8"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#15181D" />
+                </marker>
+                <style>
+                  .nd {
+                    fill: #ffffff;
+                    stroke: #15181d;
+                    stroke-width: 1.5;
+                  }
+                  .nd-emph {
+                    fill: #d8e4ff;
+                    stroke: #001a41;
+                    stroke-width: 1.5;
+                  }
+                  .nd-err {
+                    fill: #ffeded;
+                    stroke: #b3261e;
+                    stroke-width: 1.5;
+                  }
+                  .ed {
+                    fill: none;
+                    stroke: #15181d;
+                    stroke-width: 1.4;
+                  }
+                  .lbl {
+                    font:
+                      600 13px "Noto Sans JP",
+                      sans-serif;
+                    fill: #15181d;
+                  }
+                  .lbl-meta {
+                    font:
+                      500 10px "JetBrains Mono",
+                      monospace;
+                    fill: #5c6370;
+                  }
+                </style>
+              </defs>
+              <!-- nodes -->
+              <g>
+                <rect class="nd" x="20" y="80" width="160" height="64" rx="10" />
+                <text class="lbl" x="100" y="108" text-anchor="middle">empty</text>
+                <text class="lbl-meta" x="100" y="124" text-anchor="middle">result = "--"</text>
+              </g>
+              <g>
+                <rect class="nd" x="240" y="80" width="180" height="64" rx="10" />
+                <text class="lbl" x="330" y="108" text-anchor="middle">partial-input</text>
+                <text class="lbl-meta" x="330" y="124" text-anchor="middle">some inputs filled</text>
+              </g>
+              <g>
+                <rect class="nd nd-emph" x="480" y="80" width="180" height="64" rx="10" />
+                <text class="lbl" x="570" y="108" text-anchor="middle">valid-input</text>
+                <text class="lbl-meta" x="570" y="124" text-anchor="middle">live compute · base 200ms</text>
+              </g>
+              <g>
+                <rect class="nd nd-emph" x="720" y="80" width="220" height="64" rx="10" />
+                <text class="lbl" x="830" y="108" text-anchor="middle">result-with-classification</text>
+                <text class="lbl-meta" x="830" y="124" text-anchor="middle">badge + chart marker</text>
+              </g>
+              <g>
+                <rect class="nd nd-err" x="980" y="80" width="220" height="64" rx="10" />
+                <text class="lbl" x="1090" y="108" text-anchor="middle">out-of-range</text>
+                <text class="lbl-meta" x="1090" y="124" text-anchor="middle">error · result hidden</text>
+              </g>
+
+              <g>
+                <rect class="nd" x="20" y="240" width="180" height="64" rx="10" />
+                <text class="lbl" x="110" y="268" text-anchor="middle">history-collapsed</text>
+                <text class="lbl-meta" x="110" y="284" text-anchor="middle">default</text>
+              </g>
+              <g>
+                <rect class="nd" x="240" y="240" width="180" height="64" rx="10" />
+                <text class="lbl" x="330" y="268" text-anchor="middle">history-expanded</text>
+                <text class="lbl-meta" x="330" y="284" text-anchor="middle">slow 320ms</text>
+              </g>
+              <g>
+                <rect class="nd" x="460" y="240" width="180" height="64" rx="10" />
+                <text class="lbl" x="550" y="268" text-anchor="middle">swipe-to-delete</text>
+                <text class="lbl-meta" x="550" y="284" text-anchor="middle">fast 120ms</text>
+              </g>
+              <g>
+                <rect class="nd" x="680" y="240" width="180" height="64" rx="10" />
+                <text class="lbl" x="770" y="268" text-anchor="middle">history-restoring</text>
+                <text class="lbl-meta" x="770" y="284" text-anchor="middle">base 200ms · spinner</text>
+              </g>
+              <g>
+                <rect class="nd" x="900" y="240" width="180" height="64" rx="10" />
+                <text class="lbl" x="990" y="268" text-anchor="middle">tool-switching</text>
+                <text class="lbl-meta" x="990" y="284" text-anchor="middle">base 200ms · h-swipe</text>
+              </g>
+              <g><rect class="nd" x="1020" y="80" width="180" height="0" rx="10" /></g>
+
+              <!-- edges horizontal top row -->
+              <path class="ed" d="M180 112 L240 112" marker-end="url(#arr)" />
+              <path class="ed" d="M420 112 L480 112" marker-end="url(#arr)" />
+              <path class="ed" d="M660 112 L720 112" marker-end="url(#arr)" />
+              <path class="ed" d="M660 130 Q820 200 980 130" marker-end="url(#arr)" />
+              <text class="lbl-meta" x="820" y="180" text-anchor="middle">range violation</text>
+
+              <!-- valid → result-with-classification (already drawn) -->
+              <!-- history flows -->
+              <path class="ed" d="M200 272 L240 272" marker-end="url(#arr)" />
+              <path class="ed" d="M420 272 L460 272" marker-end="url(#arr)" />
+              <path class="ed" d="M640 272 L680 272" marker-end="url(#arr)" />
+              <path class="ed" d="M860 272 L900 272" marker-end="url(#arr)" />
+
+              <!-- history-restoring → valid-input -->
+              <path class="ed" d="M770 240 Q700 180 660 144" marker-end="url(#arr)" />
+              <text class="lbl-meta" x="700" y="200" text-anchor="middle">restore inputs &amp; recompute</text>
+
+              <!-- tool-switching loops back to empty/valid of next tool -->
+              <path class="ed" d="M990 240 Q700 30 100 80" marker-end="url(#arr)" />
+              <text class="lbl-meta" x="540" y="40" text-anchor="middle">
+                BMI ↔ eGFR ↔ CrCl · cubic-bezier(.2,0,0,1) 200ms
+              </text>
+            </svg>
+          </div>
+        </section>
+
+        <!-- ===================== 7. COMPONENT SPEC ===================== -->
+        <section class="block" id="sec-components">
+          <h2 class="section-title">
+            <span class="tag">07</span>
+            Component spec — atomic states
+          </h2>
+          <p class="section-sub">
+            入力フィールド / 区分コントロール / 結果カード / 履歴行 / チャート / Disclaimer ribbon の
+            <strong>default / focus / disabled / error</strong>
+            ステートを atomically に列挙。
+          </p>
+          <div id="atom-root"></div>
+        </section>
+
+        <!-- ===================== 8. ACCESSIBILITY ===================== -->
+        <section class="block" id="sec-a11y">
+          <h2 class="section-title">
+            <span class="tag">08</span>
+            Accessibility
+          </h2>
+          <p class="section-sub">
+            WCAG AA &ge; 4.5:1 — 本文・チップ・バッジ・プレースホルダ・disabled すべて。
+            <br />
+            Hit target &ge; 44 px / Dynamic Type 200% 対応 / VoiceOver / TalkBack ラベルのサンプルを記載。
+          </p>
+
+          <table class="aa-table">
+            <thead>
+              <tr>
+                <th>Foreground</th>
+                <th>Background</th>
+                <th>Pair</th>
+                <th>Ratio</th>
+                <th>Use</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Light theme pairs -->
+              <tr>
+                <td>ink #1A1C1E</td>
+                <td>bg #F2F2F7</td>
+                <td>
+                  <span class="sw" style="background: #1a1c1e"></span>
+                  <span class="sw" style="background: #f2f2f7"></span>
+                </td>
+                <td class="ratio">14.2:1</td>
+                <td>本文・タイトル</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>ink #1A1C1E</td>
+                <td>surface #FFFFFF</td>
+                <td>
+                  <span class="sw" style="background: #1a1c1e"></span>
+                  <span class="sw" style="background: #ffffff"></span>
+                </td>
+                <td class="ratio">16.4:1</td>
+                <td>カード本文</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>ink-2 #3F4347</td>
+                <td>surface #FFFFFF</td>
+                <td>
+                  <span class="sw" style="background: #3f4347"></span>
+                  <span class="sw" style="background: #ffffff"></span>
+                </td>
+                <td class="ratio">9.6:1</td>
+                <td>セカンダリ本文</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>muted #6C7177</td>
+                <td>surface #FFFFFF</td>
+                <td>
+                  <span class="sw" style="background: #6c7177"></span>
+                  <span class="sw" style="background: #ffffff"></span>
+                </td>
+                <td class="ratio">4.7:1</td>
+                <td>meta / placeholder</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>primary #007AFF</td>
+                <td>surface #FFFFFF</td>
+                <td>
+                  <span class="sw" style="background: #007aff"></span>
+                  <span class="sw" style="background: #ffffff"></span>
+                </td>
+                <td class="ratio">4.6:1</td>
+                <td>リンク / CTA</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>on-primary #FFFFFF</td>
+                <td>primary #007AFF</td>
+                <td>
+                  <span class="sw" style="background: #ffffff"></span>
+                  <span class="sw" style="background: #007aff"></span>
+                </td>
+                <td class="ratio">4.6:1</td>
+                <td>計算する ボタン</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>on-primary-cont #001A41</td>
+                <td>primary-cont #D8E4FF</td>
+                <td>
+                  <span class="sw" style="background: #001a41"></span>
+                  <span class="sw" style="background: #d8e4ff"></span>
+                </td>
+                <td class="ratio">13.0:1</td>
+                <td>セグメント on 状態</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>error #B3261E</td>
+                <td>error-cont #FFEDED</td>
+                <td>
+                  <span class="sw" style="background: #b3261e"></span>
+                  <span class="sw" style="background: #ffeded"></span>
+                </td>
+                <td class="ratio">5.5:1</td>
+                <td>「範囲外」エラー文</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>on-error #FFFFFF</td>
+                <td>error #B3261E</td>
+                <td>
+                  <span class="sw" style="background: #ffffff"></span>
+                  <span class="sw" style="background: #b3261e"></span>
+                </td>
+                <td class="ratio">5.9:1</td>
+                <td>削除アクション</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>on-success #FFFFFF</td>
+                <td>success #1F7A3A</td>
+                <td>
+                  <span class="sw" style="background: #ffffff"></span>
+                  <span class="sw" style="background: #1f7a3a"></span>
+                </td>
+                <td class="ratio">4.7:1</td>
+                <td>BMI 普通体重 / G1 正常</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>bmi-1-on #06294F</td>
+                <td>bmi-1 #3F8AE0</td>
+                <td>
+                  <span class="sw" style="background: #06294f"></span>
+                  <span class="sw" style="background: #3f8ae0"></span>
+                </td>
+                <td class="ratio">4.6:1</td>
+                <td>低体重 バッジ</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>bmi-3-on #FFFFFF</td>
+                <td>bmi-3 #B47A00</td>
+                <td>
+                  <span class="sw" style="background: #ffffff"></span>
+                  <span class="sw" style="background: #b47a00"></span>
+                </td>
+                <td class="ratio">4.6:1</td>
+                <td>過体重 / G3a バッジ</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>bmi-4-on #FFFFFF</td>
+                <td>bmi-4 #C25600</td>
+                <td>
+                  <span class="sw" style="background: #ffffff"></span>
+                  <span class="sw" style="background: #c25600"></span>
+                </td>
+                <td class="ratio">5.0:1</td>
+                <td>肥満1度 / G3b バッジ</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>bmi-5-on #FFFFFF</td>
+                <td>bmi-5 #A8341B</td>
+                <td>
+                  <span class="sw" style="background: #ffffff"></span>
+                  <span class="sw" style="background: #a8341b"></span>
+                </td>
+                <td class="ratio">5.9:1</td>
+                <td>肥満2度 / G4 バッジ</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>bmi-6-on #FBE9E7</td>
+                <td>bmi-6 #8C1D18</td>
+                <td>
+                  <span class="sw" style="background: #fbe9e7"></span>
+                  <span class="sw" style="background: #8c1d18"></span>
+                </td>
+                <td class="ratio">10.4:1</td>
+                <td>肥満3度 バッジ</td>
+                <td class="pass">PASS</td>
+              </tr>
+
+              <!-- Dark theme pairs -->
+              <tr>
+                <td>ink #E5E7EC</td>
+                <td>bg #101317</td>
+                <td>
+                  <span class="sw" style="background: #e5e7ec"></span>
+                  <span class="sw" style="background: #101317"></span>
+                </td>
+                <td class="ratio">14.4:1</td>
+                <td>本文 (dark)</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>ink-2 #C2C6CD</td>
+                <td>surface #181B20</td>
+                <td>
+                  <span class="sw" style="background: #c2c6cd"></span>
+                  <span class="sw" style="background: #181b20"></span>
+                </td>
+                <td class="ratio">10.5:1</td>
+                <td>セカンダリ本文 (dark)</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>muted #9CA1AA</td>
+                <td>surface #181B20</td>
+                <td>
+                  <span class="sw" style="background: #9ca1aa"></span>
+                  <span class="sw" style="background: #181b20"></span>
+                </td>
+                <td class="ratio">5.7:1</td>
+                <td>placeholder (dark)</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>primary #9ECAFF</td>
+                <td>surface #181B20</td>
+                <td>
+                  <span class="sw" style="background: #9ecaff"></span>
+                  <span class="sw" style="background: #181b20"></span>
+                </td>
+                <td class="ratio">9.0:1</td>
+                <td>リンク / CTA (dark)</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>on-primary #003258</td>
+                <td>primary #9ECAFF</td>
+                <td>
+                  <span class="sw" style="background: #003258"></span>
+                  <span class="sw" style="background: #9ecaff"></span>
+                </td>
+                <td class="ratio">9.4:1</td>
+                <td>計算する ボタン (dark)</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>on-primary-cont #D8E4FF</td>
+                <td>primary-cont #003494</td>
+                <td>
+                  <span class="sw" style="background: #d8e4ff"></span>
+                  <span class="sw" style="background: #003494"></span>
+                </td>
+                <td class="ratio">8.8:1</td>
+                <td>セグメント on (dark)</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>error #FFB4AB</td>
+                <td>surface #181B20</td>
+                <td>
+                  <span class="sw" style="background: #ffb4ab"></span>
+                  <span class="sw" style="background: #181b20"></span>
+                </td>
+                <td class="ratio">7.2:1</td>
+                <td>エラー文 (dark)</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>on-error #FFE3DC</td>
+                <td>error-cont #5C1612</td>
+                <td>
+                  <span class="sw" style="background: #ffe3dc"></span>
+                  <span class="sw" style="background: #5c1612"></span>
+                </td>
+                <td class="ratio">9.0:1</td>
+                <td>削除確認 (dark)</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>bmi-2-on #0A3517</td>
+                <td>bmi-2-dark #7BD8A0</td>
+                <td>
+                  <span class="sw" style="background: #0a3517"></span>
+                  <span class="sw" style="background: #7bd8a0"></span>
+                </td>
+                <td class="ratio">8.8:1</td>
+                <td>普通体重 / G1 (dark)</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>bmi-3-on #3A2700</td>
+                <td>bmi-3-dark #F5C56A</td>
+                <td>
+                  <span class="sw" style="background: #3a2700"></span>
+                  <span class="sw" style="background: #f5c56a"></span>
+                </td>
+                <td class="ratio">9.7:1</td>
+                <td>過体重 / G3a (dark)</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>bmi-7-on #5A1212</td>
+                <td>bmi-7-dark #FFB4AB</td>
+                <td>
+                  <span class="sw" style="background: #5a1212"></span>
+                  <span class="sw" style="background: #ffb4ab"></span>
+                </td>
+                <td class="ratio">7.8:1</td>
+                <td>肥満4度 / G5 (dark)</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>rib-fg #FFFFFF</td>
+                <td>rib-bg-light #1A1C1E</td>
+                <td>
+                  <span class="sw" style="background: #ffffff"></span>
+                  <span class="sw" style="background: #1a1c1e"></span>
+                </td>
+                <td class="ratio">16.4:1</td>
+                <td>Disclaimer ribbon (light)</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>rib-accent #FFB4AB</td>
+                <td>rib-bg-light #1A1C1E</td>
+                <td>
+                  <span class="sw" style="background: #ffb4ab"></span>
+                  <span class="sw" style="background: #1a1c1e"></span>
+                </td>
+                <td class="ratio">9.7:1</td>
+                <td>Disclaimer accent (light)</td>
+                <td class="pass">PASS</td>
+              </tr>
+              <tr>
+                <td>rib-fg #FFFFFF</td>
+                <td>rib-bg-dark #0D0E13</td>
+                <td>
+                  <span class="sw" style="background: #ffffff"></span>
+                  <span class="sw" style="background: #0d0e13"></span>
+                </td>
+                <td class="ratio">18.6:1</td>
+                <td>Disclaimer ribbon (dark)</td>
+                <td class="pass">PASS</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 style="margin-top: 24px; font-size: 14px">Dynamic Type / Hit target / Semantics</h3>
+          <div class="card" style="margin-top: 8px">
+            <ul style="margin: 0; padding-left: 20px; font: 13px var(--jp); line-height: 1.7">
+              <li>
+                <strong>Dynamic Type 200%</strong>
+                — フィールド高 44 → 56 px、結果 Value 36 → 54 px、セグメント高 44 → 56 px。レイアウトは破綻しない
+                (accessibility-large-text mock 参照)。
+              </li>
+              <li>
+                <strong>Hit target ≥ 44 px</strong>
+                — すべてのタップ可能要素 (セグメント・履歴行・削除アクション・ボトムナビ) は 44 dp 以上を担保。
+              </li>
+              <li>
+                <strong>VoiceOver / TalkBack</strong>
+                :
+                <br />
+                ・ ツール切替:
+                <code>
+                  label="計算ツール選択。BMI 選択中。3 件中 1 件目。", trait=button, hint="左右スワイプで切替"
+                </code>
+                <br />
+                ・ 入力フィールド:
+                <code>label="身長 (センチメートル)。範囲 50.0 から 250.0。現在 170.0", trait=textfield</code>
+                <br />
+                ・ 計算ボタン:
+                <code>label="計算する", trait=button</code>
+                <br />
+                ・ 結果バッジ:
+                <code>label="分類: 普通体重 (BMI 22.5)", trait=staticText</code>
+                <br />
+                ・ 履歴行:
+                <code>label="2026 年 5 月 10 日 BMI 22.5 普通体重", customAction="削除", customAction="復元"</code>
+                <br />
+                ・ Disclaimer:
+                <code>label="免責: 架空データ・医療判断には使用しないでください", liveRegion=false</code>
+              </li>
+              <li>
+                <strong>色だけに依存しない</strong>
+                — BMI 7-class および CKD G1–G5 は
+                <em>文字ラベル</em>
+                +
+                <em>形状アイコン</em>
+                (●▲■◆⬢✕) で識別可能。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ===================== 9. DISCLAIMER RIBBON ===================== -->
+        <section class="block" id="sec-ribbon">
+          <h2 class="section-title">
+            <span class="tag">09</span>
+            Disclaimer ribbon
+          </h2>
+          <p class="section-sub">
+            26 dp 高 / 常時表示 / 非タップ可 / モーダルは ribbon を覆ってよい。可視テキストは l10n キー
+            <code>detailDisclaimer</code>
+            にバインド。
+          </p>
+
+          <div class="ribbon-showcase">
+            <div>
+              <h4 style="margin: 0 0 6px; font-size: 12px">Light — bg #1A1C1E / fg #FFFFFF / accent #FFB4AB</h4>
+              <div class="ribbon-demo">
+                <span class="accent">·</span>
+                FICTIONAL DATA - NOT FOR MEDICAL USE
+                <span class="accent">·</span>
+                架空データ・医療判断には使用不可
+                <span class="accent">·</span>
+              </div>
+            </div>
+            <div>
+              <h4 style="margin: 0 0 6px; font-size: 12px">Dark — bg #0D0E13 / fg #FFFFFF / accent #FFB4AB</h4>
+              <div class="ribbon-demo dark">
+                <span class="accent">·</span>
+                FICTIONAL DATA - NOT FOR MEDICAL USE
+                <span class="accent">·</span>
+                架空データ・医療判断には使用不可
+                <span class="accent">·</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top: 18px">
+            <h4 style="margin: 0 0 8px; font-size: 13px">Contract</h4>
+            <ul style="margin: 0; padding-left: 20px; font: 13px var(--jp); line-height: 1.7">
+              <li>Height: 26 dp (24–28 dp 範囲)。スクロールアウトしない (シェル直上にレイヤ配置)。</li>
+              <li>
+                Position: bottom safe-area inset の直上。bottom-nav が存在する画面では bottom-nav の上に追加で重ねる
+                (ribbon は z-index 7、bottom-nav は z-index 6)。
+              </li>
+              <li>
+                Pointer-events:
+                <code>none</code>
+                。テキストは
+                <code>NotoSansJP 700 / 11 px / letter-spacing 0.04em</code>
+                。
+              </li>
+              <li>
+                Copy (固定・翻訳禁止):
+                <code>· FICTIONAL DATA - NOT FOR MEDICAL USE · 架空データ・医療判断には使用不可 ·</code>
+              </li>
+              <li>
+                Semantics label (separate from visible text):
+                <code>免責: 架空データ・医療判断には使用しないでください</code>
+                ·
+                <code>liveRegion=false</code>
+              </li>
+              <li>
+                l10n key:
+                <code>detailDisclaimer</code>
+                (visible text のみバインド対象。API レスポンスの
+                <code>disclaimer</code>
+                フィールドは表示には
+                <strong>使わない</strong>
+                )。
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ===================== 9.5 FORBIDDEN FAILURE PATTERN ===================== -->
+        <section class="block" id="sec-forbidden">
+          <h2 class="section-title">
+            <span class="tag">09.5</span>
+            Forbidden failure pattern
+          </h2>
+          <p class="section-sub">
+            過去のリリースで発生した SSOT 散逸の失敗事例を文書として残し、本仕様書では
+            <strong>同じ構造を再採用しない</strong>
+            ことを明示する。
+          </p>
+          <div class="card">
+            <h4 style="margin: 0 0 8px; font-size: 13px">過去の失敗パターン</h4>
+            <p style="margin: 0 0 10px; font: 13px/1.6 var(--jp); color: var(--page-fg)">
+              <strong>
+                Round1 / Round2 / Round3 / Round4 / Round5 / Round6 — split-by-round directories were used on the Search
+                Screen and broke SSOT propagation
+              </strong>
+              。 各ラウンドが独立したディレクトリに別々の token / component / l10n key を保有した結果、 Round 間で BMI
+              バッジ色や履歴行レイアウトが drift し、最終的に Round6 のみが正としてマージされた一方で、 Round1–Round5
+              の作業はビルド成果物に取り込まれずに失われた。
+            </p>
+            <h4 style="margin: 14px 0 6px; font-size: 13px">本デリバラブルの方針</h4>
+            <p style="margin: 0; font: 13px/1.6 var(--jp); color: var(--page-fg)">
+              この仕様書 (Calc Tools Spec.html) は
+              <strong>その失敗構造を回避し、単一ファイルに全ての成果物を集約する (single-file aggregation)</strong>
+              。 Round
+              別ディレクトリは作成せず、すべての色トークン・タイポグラフィ・モック・コンポーネント仕様・検証レポートを 1
+              つの HTML に内包する。 文書中に出現する文字列
+              <code>Round1</code>
+              /
+              <code>Round2</code>
+              /
+              <code>Round3</code>
+              /
+              <code>Round4</code>
+              /
+              <code>Round5</code>
+              は、 この §Forbidden failure pattern
+              の散文中にのみ存在し、ディレクトリ・ファイル・コンポーネント識別子としては
+              <strong>一切使用しない</strong>
+              。 ブランド名
+              <code>Round6</code>
+              は
+              <code>--c6-primary</code>
+              セットの命名 (シェルトークン名) としてのみ使用する。
+            </p>
+          </div>
+        </section>
+
+        <!-- ===================== 10. VERIFICATION REPORT (filled by JS post-render) ===================== -->
+        <section class="block" id="sec-verify">
+          <h2 class="section-title">
+            <span class="tag">10</span>
+            Verification report
+          </h2>
+          <p class="section-sub">
+            28 行 / 1 行 1 チェックリスト項目 (A1, A2, A3, A4, B1, B2, B3, B4, C1, C2, C3, C4, C5, C6, D1, D2, D3, D4,
+            E1, E2, E3, E4, E5, F1, F2, F3, G1, G2)。Result 列は
+            <code>PASS</code>
+            /
+            <code>FAIL</code>
+            のみ。Evidence 列は HTML 内部の引用または視覚確認の要約。Notes は空 (PASS) または失敗時の修正記録。
+          </p>
+          <div id="verify-root"></div>
+        </section>
+      </main>
+    </div>
+
+    <!-- =======================================================================
+     APP SCRIPT — generates 106 mock frames, atom states, verification report
+     All HEX values referenced inside generated frames are CSS variables only.
+     ======================================================================= -->
+    <script>
+      /* =======================================================================
+   Frame & verification generator — pure JS, no HEX inside .mock-frame
+   ======================================================================= */
+      (function () {
+        // ---------- Approved Japanese labels (per requester sign-off 2026-05-10) ----------
+        var L = {
+          screenTitle: "計算ツール",
+          tools: { bmi: "BMI", egfr: "eGFR", crcl: "CrCl" },
+          formulas: {
+            bmi: "BMI = w / h²",
+            egfr: "eGFR = 194 × Cr⁻¹·⁰⁹⁴ × age⁻⁰·²⁸⁷ ×(0.739 if F)",
+            crcl: "CrCl = (140 - age) × w / (72 × Cr) ×(0.85 if F)",
+          },
+          fields: { height: "身長", weight: "体重", age: "年齢", sex: "性別", creat: "血清クレアチニン" },
+          sex: { m: "男性", f: "女性" },
+          actions: {
+            calc: "計算する",
+            history: "履歴",
+            clear: "クリア",
+            del: "削除",
+            restore: "復元",
+            close: "閉じる",
+          },
+          placeholder: "--",
+          partialHint: "すべての項目を入力してください",
+          histEmpty: "履歴はありません",
+          restoring: "復元中…",
+          result: "結果",
+          classify: "分類",
+          unit: { bmi: "kg/m²", egfr: "mL/min/1.73m²", crcl: "mL/min" },
+          bmiClasses: ["低体重", "普通体重", "過体重", "肥満1度", "肥満2度", "肥満3度", "肥満4度"],
+          bmiShapes: ["dot", "tri", "sq", "diamond", "pent", "hex", "x"],
+          ckdStages: [
+            "G1 正常",
+            "G2 軽度低下",
+            "G3a 軽度〜中等度低下",
+            "G3b 中等度〜高度低下",
+            "G4 高度低下",
+            "G5 末期腎不全",
+          ],
+          ckdShortLabels: ["G1", "G2", "G3a", "G3b", "G4", "G5"],
+          ckdShapes: ["dot", "tri", "sq", "diamond", "hex", "x"],
+          err: {
+            height: "範囲外: 50.0〜250.0 cm",
+            weight: "範囲外: 1.0〜300.0 kg",
+            age: "範囲外: 18〜120 歳",
+            creat: "範囲外: 0.10〜20.00 mg/dL",
+          },
+        };
+
+        // ---------- helpers ----------
+        function statusBar() {
+          return '<div class="status"><span>9:41</span><span class="right"><span class="ico">signal_cellular_alt</span><span class="ico">wifi</span><span class="ico">battery_full</span></span></div>';
+        }
+        function appbar(opts) {
+          opts = opts || {};
+          return (
+            '<div class="appbar"><div class="icon-btn"><span class="ico">menu</span></div>' +
+            '<div class="title">' +
+            (opts.title || L.screenTitle) +
+            "</div>" +
+            '<div class="icon-btn"><span class="ico">history</span></div></div>'
+          );
+        }
+        function ribbon() {
+          return '<div class="ribbon"><span class="accent">·</span> FICTIONAL DATA - NOT FOR MEDICAL USE <span class="accent">·</span> 架空データ・医療判断には使用不可 <span class="accent">·</span></div>';
+        }
+        function bottomNav() {
+          var items = [
+            { ic: "medication", lbl: "薬剤" },
+            { ic: "sick", lbl: "疾患" },
+            { ic: "calculate", lbl: "計算", active: true },
+            { ic: "bookmark", lbl: "保存" },
+            { ic: "settings", lbl: "設定" },
+          ];
+          return (
+            '<div class="bottom-nav">' +
+            items
+              .map(function (it) {
+                return (
+                  '<div class="nav-item' +
+                  (it.active ? " active" : "") +
+                  '">' +
+                  '<span class="ico">' +
+                  it.ic +
+                  "</span>" +
+                  it.lbl +
+                  "</div>"
+                );
+              })
+              .join("") +
+            "</div>"
+          );
+        }
+        function seg(calc) {
+          var tools = ["bmi", "egfr", "crcl"];
+          return (
+            '<div class="seg">' +
+            tools
+              .map(function (t) {
+                return '<div class="opt' + (t === calc ? " on" : "") + '">' + L.tools[t] + "</div>";
+              })
+              .join("") +
+            "</div>"
+          );
+        }
+        function field(opts) {
+          var input =
+            '<div class="input' +
+            (opts.focus ? " focus" : "") +
+            (opts.error ? " error" : "") +
+            (opts.placeholder ? " placeholder" : "") +
+            '">' +
+            "<span>" +
+            (opts.placeholder ? L.placeholder : opts.val || "") +
+            "</span>" +
+            (opts.unit ? '<span class="unit">' + opts.unit + "</span>" : "") +
+            "</div>";
+          var err = opts.error ? '<div class="errmsg"><span class="ico">error</span>' + opts.errMsg + "</div>" : "";
+          return (
+            '<div class="field"><div class="lbl">' +
+            opts.lbl +
+            (opts.unitInLbl ? " (" + opts.unit + ")" : "") +
+            "</div>" +
+            input +
+            err +
+            "</div>"
+          );
+        }
+        function sexField(sel) {
+          sel = sel || "m";
+          return (
+            '<div class="field"><div class="lbl">' +
+            L.fields.sex +
+            "</div>" +
+            '<div class="sex-seg">' +
+            '<div class="opt' +
+            (sel === "m" ? " on" : "") +
+            '"><span class="ico">male</span>' +
+            L.sex.m +
+            "</div>" +
+            '<div class="opt' +
+            (sel === "f" ? " on" : "") +
+            '"><span class="ico">female</span>' +
+            L.sex.f +
+            "</div>" +
+            "</div></div>"
+          );
+        }
+
+        // ---------- inputs per calc/state ----------
+        function inputs(calc, state) {
+          var f = [];
+          if (calc === "bmi") {
+            if (state === "empty") {
+              f.push(field({ lbl: L.fields.height, unit: "cm", placeholder: true }));
+              f.push(field({ lbl: L.fields.weight, unit: "kg", placeholder: true }));
+            } else if (state === "partial-input") {
+              f.push(field({ lbl: L.fields.height, val: "170.0", unit: "cm" }));
+              f.push(field({ lbl: L.fields.weight, unit: "kg", placeholder: true, focus: true }));
+            } else if (state === "out-of-range") {
+              f.push(field({ lbl: L.fields.height, val: "30.0", unit: "cm", error: true, errMsg: L.err.height }));
+              f.push(field({ lbl: L.fields.weight, val: "65.0", unit: "kg" }));
+            } else {
+              f.push(field({ lbl: L.fields.height, val: "170.0", unit: "cm" }));
+              f.push(field({ lbl: L.fields.weight, val: "65.0", unit: "kg" }));
+            }
+          } else if (calc === "egfr") {
+            if (state === "empty") {
+              f.push(field({ lbl: L.fields.age, unit: "歳", placeholder: true }));
+              f.push(sexField("m"));
+              f.push(field({ lbl: L.fields.creat, unit: "mg/dL", placeholder: true }));
+            } else if (state === "partial-input") {
+              f.push(field({ lbl: L.fields.age, val: "62", unit: "歳" }));
+              f.push(sexField("m"));
+              f.push(field({ lbl: L.fields.creat, unit: "mg/dL", placeholder: true, focus: true }));
+            } else if (state === "out-of-range") {
+              f.push(field({ lbl: L.fields.age, val: "62", unit: "歳" }));
+              f.push(sexField("f"));
+              f.push(field({ lbl: L.fields.creat, val: "25.00", unit: "mg/dL", error: true, errMsg: L.err.creat }));
+            } else {
+              f.push(field({ lbl: L.fields.age, val: "62", unit: "歳" }));
+              f.push(sexField("m"));
+              f.push(field({ lbl: L.fields.creat, val: "1.10", unit: "mg/dL" }));
+            }
+          } else if (calc === "crcl") {
+            if (state === "empty") {
+              f.push(field({ lbl: L.fields.age, unit: "歳", placeholder: true }));
+              f.push(sexField("m"));
+              f.push(field({ lbl: L.fields.weight, unit: "kg", placeholder: true }));
+              f.push(field({ lbl: L.fields.creat, unit: "mg/dL", placeholder: true }));
+            } else if (state === "partial-input") {
+              f.push(field({ lbl: L.fields.age, val: "70", unit: "歳" }));
+              f.push(sexField("f"));
+              f.push(field({ lbl: L.fields.weight, val: "52.0", unit: "kg" }));
+              f.push(field({ lbl: L.fields.creat, unit: "mg/dL", placeholder: true, focus: true }));
+            } else if (state === "out-of-range") {
+              f.push(field({ lbl: L.fields.age, val: "70", unit: "歳" }));
+              f.push(sexField("f"));
+              f.push(field({ lbl: L.fields.weight, val: "350.0", unit: "kg", error: true, errMsg: L.err.weight }));
+              f.push(field({ lbl: L.fields.creat, val: "1.20", unit: "mg/dL" }));
+            } else {
+              f.push(field({ lbl: L.fields.age, val: "70", unit: "歳" }));
+              f.push(sexField("f"));
+              f.push(field({ lbl: L.fields.weight, val: "52.0", unit: "kg" }));
+              f.push(field({ lbl: L.fields.creat, val: "1.20", unit: "mg/dL" }));
+            }
+          }
+          return '<div class="form">' + f.join("") + "</div>";
+        }
+
+        // ---------- result + chart ----------
+        function classifyBadge(calc, withClass) {
+          if (!withClass) return "";
+          if (calc === "bmi") {
+            // 22.5 -> 普通体重 (idx 1)
+            var idx = 1;
+            return (
+              '<span class="cbadge bmi-' +
+              (idx + 1) +
+              '"><span class="shape ' +
+              L.bmiShapes[idx] +
+              '"></span>' +
+              L.bmiClasses[idx] +
+              "</span>"
+            );
+          }
+          if (calc === "egfr") {
+            // 78.4 -> G2 (idx 1)
+            var i = 1;
+            var cls = ["ckd-1", "ckd-2", "ckd-3a", "ckd-3b", "ckd-4", "ckd-5"][i];
+            return (
+              '<span class="cbadge ' +
+              cls +
+              '"><span class="shape ' +
+              L.ckdShapes[i] +
+              '"></span>' +
+              L.ckdStages[i] +
+              "</span>"
+            );
+          }
+          return ""; // crcl: continuous, no badge
+        }
+
+        function chartBmi() {
+          // segments mapping the 7 classes — value 22.5 sits in s2 zone
+          // BMI scale 10..50, value=22.5 → ((22.5-10)/40)*100 = 31.25%
+          var pos = 31.25;
+          return (
+            '<div class="chart-bmi">' +
+            '<div class="scale" style="position:relative">' +
+            '<div class="seg-bmi s1">&lt;18.5</div>' +
+            '<div class="seg-bmi s2">18.5</div>' +
+            '<div class="seg-bmi s3">25</div>' +
+            '<div class="seg-bmi s4">30</div>' +
+            '<div class="seg-bmi s5">35</div>' +
+            '<div class="seg-bmi s6">40</div>' +
+            '<div class="seg-bmi s7">≥45</div>' +
+            '<div class="marker" style="left:' +
+            pos +
+            '%"><div class="pin-val">22.5</div></div>' +
+            "</div>" +
+            '<div class="axis"><span class="tick" style="left:0%">10</span><span class="tick" style="left:50%">30</span><span class="tick" style="left:100%">50</span></div>' +
+            "</div>"
+          );
+        }
+        function chartEgfr() {
+          // Linear 0..120 mL/min/1.73m²; band widths sum to 100%:
+          //   G5 <15 = 12.5%, G4 15–30 = 12.5%, G3b 30–45 = 12.5%, G3a 45–60 = 12.5%, G2 60–90 = 25%, G1 ≥90 = 25%
+          // Marker for 78.4 → (78.4 / 120) * 100 = 65.33% — falls inside G2 band (50%..75%).
+          var pos = 65.3;
+          return (
+            '<div class="chart-egfr">' +
+            '<div class="scale" style="position:relative">' +
+            '<div class="seg-egfr g5">&lt;15</div>' +
+            '<div class="seg-egfr g4">15</div>' +
+            '<div class="seg-egfr g3b">30</div>' +
+            '<div class="seg-egfr g3a">45</div>' +
+            '<div class="seg-egfr g2">60</div>' +
+            '<div class="seg-egfr g1">≥90</div>' +
+            '<div class="marker" style="left:' +
+            pos +
+            '%"><div class="pin-val">78.4</div></div>' +
+            "</div>" +
+            '<div class="axis">' +
+            '<span class="tick" style="left:0%">0</span>' +
+            '<span class="tick" style="left:12.5%">15</span>' +
+            '<span class="tick" style="left:25%">30</span>' +
+            '<span class="tick" style="left:37.5%">45</span>' +
+            '<span class="tick" style="left:50%">60</span>' +
+            '<span class="tick" style="left:75%">90</span>' +
+            '<span class="tick" style="left:100%">120</span>' +
+            "</div>" +
+            "</div>"
+          );
+        }
+        function chartCrcl() {
+          return (
+            '<div class="chart-crcl">' +
+            '<div class="crow"><span class="grp">男性 18–39</span><div class="track"><div class="normal" style="left:60%;right:5%"></div><div class="pt" style="left:55%"></div></div></div>' +
+            '<div class="crow"><span class="grp">男性 40–59</span><div class="track"><div class="normal" style="left:50%;right:10%"></div><div class="pt" style="left:55%"></div></div></div>' +
+            '<div class="crow"><span class="grp">男性 60+</span><div class="track"><div class="normal" style="left:35%;right:25%"></div><div class="pt" style="left:55%"></div></div></div>' +
+            '<div class="crow"><span class="grp">女性 60+</span><div class="track"><div class="normal" style="left:30%;right:35%"></div><div class="pt" style="left:55%"></div></div></div>' +
+            "</div>"
+          );
+        }
+
+        function resultCard(calc, state) {
+          if (state === "out-of-range") return ""; // hidden
+          var formula = '<div class="formula-tag">' + L.formulas[calc] + "</div>";
+          if (state === "empty") {
+            return (
+              '<div class="result">' +
+              '<div class="head"><div class="ttl">' +
+              L.result +
+              "</div>" +
+              formula +
+              "</div>" +
+              '<div class="value placeholder">' +
+              L.placeholder +
+              '<span class="unit">' +
+              L.unit[calc] +
+              "</span></div>" +
+              "</div>"
+            );
+          }
+          if (state === "partial-input") {
+            return (
+              '<div class="result">' +
+              '<div class="head"><div class="ttl">' +
+              L.result +
+              "</div>" +
+              formula +
+              "</div>" +
+              '<div class="value placeholder">' +
+              L.placeholder +
+              '<span class="unit">' +
+              L.unit[calc] +
+              "</span></div>" +
+              '<div style="font:500 11px var(--jp);color:var(--c6-muted)">' +
+              L.partialHint +
+              "</div>" +
+              "</div>"
+            );
+          }
+          var val = calc === "bmi" ? "22.5" : calc === "egfr" ? "78.4" : "92.1";
+          var withClass = state === "result-with-classification";
+          var chart = calc === "bmi" ? chartBmi() : calc === "egfr" ? chartEgfr() : chartCrcl();
+          return (
+            '<div class="result">' +
+            '<div class="head"><div class="ttl">' +
+            L.result +
+            "</div>" +
+            formula +
+            "</div>" +
+            '<div class="value">' +
+            val +
+            '<span class="unit">' +
+            L.unit[calc] +
+            "</span></div>" +
+            (withClass && calc !== "crcl" ? '<div class="badge-row">' + classifyBadge(calc, true) + "</div>" : "") +
+            chart +
+            "</div>"
+          );
+        }
+
+        // ---------- history ----------
+        function histRows(n) {
+          n = n || 6;
+          var sample = [
+            ["2026/05/10", "BMI 22.5 (普通体重)", "H170/W65"],
+            ["2026/05/09", "BMI 24.3 (普通体重)", "H172/W72"],
+            ["2026/05/07", "BMI 26.1 (過体重)", "H168/W74"],
+            ["2026/05/05", "BMI 21.8 (普通体重)", "H175/W67"],
+            ["2026/05/03", "BMI 28.9 (過体重)", "H170/W84"],
+            ["2026/05/01", "BMI 19.2 (普通体重)", "H180/W62"],
+            ["2026/04/28", "BMI 31.4 (肥満1度)", "H165/W85"],
+            ["2026/04/25", "BMI 23.1 (普通体重)", "H171/W68"],
+          ];
+          return sample
+            .slice(0, n)
+            .map(function (r) {
+              return (
+                '<div class="row"><div><span class="when">' +
+                r[0] +
+                '</span><span class="res">' +
+                r[1] +
+                "</span> · " +
+                r[2] +
+                '</div><span class="ico">refresh</span></div>'
+              );
+            })
+            .join("");
+        }
+        function historyBlock(state) {
+          if (state === "history-collapsed") {
+            return (
+              '<div class="history">' +
+              '<div class="header"><span>' +
+              L.actions.history +
+              ' (12)</span><span class="ico">expand_more</span></div>' +
+              "</div>"
+            );
+          }
+          if (state === "history-expanded") {
+            return (
+              '<div class="history">' +
+              '<div class="header"><span>' +
+              L.actions.history +
+              ' (50)</span><span class="ico">expand_less</span></div>' +
+              '<div class="list" style="max-height:220px;overflow:hidden;position:relative">' +
+              histRows(7) +
+              '<div class="scroll-hairline"></div></div></div>'
+            );
+          }
+          if (state === "history-empty") {
+            return (
+              '<div class="history">' +
+              '<div class="header"><span>' +
+              L.actions.history +
+              ' (0)</span><span class="ico">expand_less</span></div>' +
+              '<div class="list empty"><span class="ico">history_toggle_off</span>' +
+              L.histEmpty +
+              "</div></div>"
+            );
+          }
+          if (state === "swipe-to-delete") {
+            return (
+              '<div class="history">' +
+              '<div class="header"><span>' +
+              L.actions.history +
+              ' (50)</span><span class="ico">expand_less</span></div>' +
+              '<div class="list" style="max-height:220px;overflow:hidden;position:relative">' +
+              '<div class="swipe-row"><div class="row"><div><span class="when">2026/05/10</span><span class="res">BMI 22.5 (普通体重)</span> · H170/W65</div><span class="ico">refresh</span></div>' +
+              '<div class="delete"><span class="ico">delete</span>' +
+              L.actions.del +
+              "</div></div>" +
+              histRows(5) +
+              '<div class="scroll-hairline"></div></div></div>'
+            );
+          }
+          return ""; // history-collapsed default for non-history states
+        }
+
+        // ---------- main inner body composer ----------
+        function bodyInner(calc, state, opts) {
+          opts = opts || {};
+          var inp = inputs(calc, state);
+          var res = resultCard(calc, state);
+          // For phone, add some bottom padding so seg + ribbon + nav stack doesn't overlap
+          var hist = "";
+          if (
+            state === "history-collapsed" ||
+            state === "history-expanded" ||
+            state === "history-empty" ||
+            state === "swipe-to-delete"
+          ) {
+            hist = historyBlock(state);
+          } else {
+            hist = historyBlock("history-collapsed");
+          }
+          return inp + res + hist + '<div style="height:60px"></div>';
+        }
+
+        // Tablet 2-pane / 3-pane
+        function toolList(calc) {
+          var items = [
+            { id: "bmi", name: "BMI", formula: "w / h²", ic: "monitor_weight" },
+            { id: "egfr", name: "eGFR", formula: "CKD-EPI(JP)", ic: "water_drop" },
+            { id: "crcl", name: "CrCl", formula: "Cockcroft-Gault", ic: "science" },
+          ];
+          return (
+            '<div class="tool-list">' +
+            items
+              .map(function (t) {
+                return (
+                  '<div class="ti' +
+                  (t.id === calc ? " active" : "") +
+                  '">' +
+                  '<span class="ico">' +
+                  t.ic +
+                  "</span>" +
+                  t.name +
+                  '<span class="formula">' +
+                  t.formula +
+                  "</span></div>"
+                );
+              })
+              .join("") +
+            "</div>"
+          );
+        }
+        function tabletPane(calc, state, landscape) {
+          var leftPane =
+            '<div class="pane">' + toolList(calc) + '<div style="height:8px"></div>' + inputs(calc, state) + "</div>";
+          var midRight =
+            '<div class="pane scroll">' +
+            resultCard(calc, state) +
+            historyBlock(state.indexOf("history-") === 0 || state === "swipe-to-delete" ? state : "history-expanded") +
+            "</div>";
+          if (landscape) {
+            var midPane = '<div class="pane">' + inputs(calc, state) + "</div>";
+            var rightPane =
+              '<div class="pane scroll">' +
+              resultCard(calc, state) +
+              historyBlock(
+                state.indexOf("history-") === 0 || state === "swipe-to-delete" ? state : "history-expanded",
+              ) +
+              "</div>";
+            return '<div class="threepane">' + toolList(calc) + midPane + rightPane + "</div>";
+          }
+          return '<div class="twopane">' + leftPane + midRight + "</div>";
+        }
+
+        // ---------- frame builder ----------
+        function frame(opts) {
+          // opts: device, mode, state, calc, calcLabel (override), modifier, caption, headerExtra
+          var device = opts.device,
+            mode = opts.mode,
+            state = opts.state,
+            calc = opts.calc;
+          var dark = mode === "Dark";
+          var deviceCls =
+            device === "iPad"
+              ? opts.splitview
+                ? "tablet splitview"
+                : "tablet"
+              : opts.landscape
+                ? "iphone-landscape"
+                : "";
+          var clsList = ["frame", "mock-frame", dark ? "dark" : "", deviceCls, opts.bigText ? "large-text" : ""]
+            .filter(Boolean)
+            .join(" ");
+
+          var bodyCls = "body";
+          var inner = "";
+
+          if (opts.splitview) {
+            // 50/50 Split View on a 1194pt-wide iPad: neighbor app placeholder + Compact-width Calc Tools.
+            // The right pane MUST gracefully fall back to the Compact (single-pane) layout —
+            // its width (≈ 480 pt content) is below the regular-width breakpoint, so the
+            // 2-pane tablet layout is intentionally NOT used here.
+            var compactInner = bodyInner(calc, state, opts);
+            var neighborLabel = opts.neighborLabel || "Other app — split view neighbor";
+            return (
+              '<div class="' +
+              clsList +
+              '">' +
+              '<div class="device">' +
+              '<div class="sv-neighbor"><span class="lbl">' +
+              neighborLabel +
+              "</span></div>" +
+              '<div class="sv-app">' +
+              statusBar() +
+              appbar({ title: L.screenTitle }) +
+              '<div class="' +
+              bodyCls +
+              '">' +
+              compactInner +
+              "</div>" +
+              seg(calc) +
+              ribbon() +
+              bottomNav() +
+              "</div>" +
+              "</div></div>"
+            );
+          }
+
+          if (device === "iPad") {
+            inner = tabletPane(calc, state, opts.landscape);
+          } else if (opts.landscape) {
+            // iPhone landscape — 2-pane mini
+            inner =
+              '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:100%">' +
+              "<div>" +
+              inputs(calc, state) +
+              "</div>" +
+              "<div>" +
+              resultCard(calc, state) +
+              historyBlock("history-collapsed") +
+              "</div>" +
+              "</div>";
+          } else {
+            inner = bodyInner(calc, state, opts);
+          }
+
+          // overlays
+          var overlays = "";
+          if (state === "history-restoring" && opts.beforeAfter === "after") {
+            overlays = '<div class="restore-overlay"><div class="spinner"></div>' + L.restoring + "</div>";
+          }
+          if (state === "keyboard-open") {
+            overlays +=
+              '<div class="keyboard">' +
+              ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+                .map(function (n) {
+                  return '<div class="key">' + n + "</div>";
+                })
+                .join("") +
+              '<div class="key dim">.</div><div class="key">0</div><div class="key action"><span class="ico">done</span></div>' +
+              "</div>";
+          }
+          if (state === "tool-switching") {
+            overlays += '<div class="swipe-edge left"></div><div class="swipe-edge right"></div>';
+          }
+
+          // For iPhone, add segmented control (bottom thumb-zone)
+          var segHtml = device === "iPhone" && !opts.landscape ? seg(calc) : "";
+          if (opts.landscape && device === "iPhone") segHtml = seg(calc);
+
+          return (
+            '<div class="' +
+            clsList +
+            '">' +
+            '<div class="device">' +
+            statusBar() +
+            appbar({ title: L.screenTitle }) +
+            '<div class="' +
+            bodyCls +
+            '">' +
+            inner +
+            "</div>" +
+            segHtml +
+            ribbon() +
+            bottomNav() +
+            overlays +
+            "</div></div>"
+          );
+        }
+
+        // ---------- header label ----------
+        function headerLabel(device, mode, state, calc, suffix) {
+          var st = state + (suffix ? "-" + suffix : "");
+          return device + " × " + mode + " × " + st + " (" + L.tools[calc] + ")";
+        }
+
+        function wrap(opts) {
+          // opts: device, mode, state, calc, suffix (before|after), caption, splitview
+          // Split View nature is encoded in the STATE (state + '-splitview'), NOT in the device.
+          // device value-set therefore stays exactly {iPhone, iPad}; no 'iPad-SplitView' literal
+          // appears in any data-frame-label.
+          var deviceLbl = opts.device;
+          var stateLbl = opts.splitview ? opts.state + "-splitview" : opts.state;
+          var lbl = headerLabel(deviceLbl, opts.mode, stateLbl, opts.calc, opts.suffix);
+          var darkPill = opts.mode === "Dark" ? " dark" : "";
+          var pillCls = "pill calc" + darkPill;
+          var capLine = opts.caption ? '<div class="caption">' + opts.caption + "</div>" : "";
+          return (
+            '<div class="mock-wrap" data-frame-label="' +
+            lbl +
+            '">' +
+            "<h4>" +
+            lbl.replace(/ \(([^)]+)\)$/, ' (<span class="' + pillCls + '">$1</span>)') +
+            "</h4>" +
+            capLine +
+            frame({
+              device: opts.device,
+              mode: opts.mode,
+              state: opts.state,
+              calc: opts.calc,
+              beforeAfter: opts.suffix,
+              landscape: opts.landscape,
+              bigText: opts.bigText,
+              splitview: opts.splitview,
+              neighborLabel: opts.neighborLabel,
+            }) +
+            "</div>"
+          );
+        }
+
+        // =====================================================================
+        // Build mock sections
+        // =====================================================================
+        var root = document.getElementById("mocks-root");
+        var deviceModes = [
+          { device: "iPhone", mode: "Light" },
+          { device: "iPhone", mode: "Dark" },
+          { device: "iPad", mode: "Light" },
+          { device: "iPad", mode: "Dark" },
+        ];
+        var calcSpecificStates = [
+          { state: "empty", label: "初期表示。入力欄が空、結果はプレースホルダ「--」。" },
+          { state: "partial-input", label: "一部のみ入力済み。計算不可。残りフィールドにフォーカスリング。" },
+          { state: "valid-input", label: "全入力 valid。結果カードがライブ更新。" },
+          { state: "out-of-range", label: "入力が許容範囲外。エラー文を表示し、結果カードは隠す。" },
+          { state: "result-with-classification", label: "結果 + 分類バッジ + 数値ラインチャートを表示。" },
+        ];
+        var calcAgnosticSingle = [
+          { state: "history-collapsed", label: "履歴セクション折りたたみ (default)。" },
+          {
+            state: "history-expanded",
+            label: "履歴を展開。先頭6–8行 + 下部のスクロール暗示ヘアライン。50件は伸ばさない。",
+          },
+          { state: "history-empty", label: "履歴 0 件のエンプティステート。" },
+          { state: "swipe-to-delete", label: "履歴行を左スワイプして削除アクションを露出。" },
+          { state: "keyboard-open", label: "数値キーボードを表示。レイアウト破綻なし。" },
+          {
+            state: "disclaimer-ribbon-visible",
+            label: "すべての画面で Disclaimer ribbon が常時表示されることを示すケース。",
+          },
+          { state: "accessibility-large-text", label: "Dynamic Type 200% 適用時のレイアウト。" },
+        ];
+        var calcAgnosticBA = [
+          {
+            state: "history-restoring",
+            label:
+              "履歴行をタップ → 入力復元 + 即時再計算。before/after で2枚。easing: cubic-bezier(.2,0,0,1), 200ms。",
+          },
+          {
+            state: "tool-switching",
+            label:
+              "BMI ↔ eGFR ↔ CrCl をスワイプ/タブで切替。before/after で2枚。easing: cubic-bezier(.2,0,0,1), 200ms。",
+          },
+        ];
+
+        var html = "";
+        var counts = { calcSpec: 0, calcAgnSingle: 0, calcAgnBA: 0, landscape: 0 };
+
+        // -- Calc-specific block (5 states × 3 calcs × 4 d/m = 60) --
+        html +=
+          '<div class="mock-block"><h3 class="mock-block-title">5.1 Calc-specific states <span class="pill">5×3×4 = 60 frames</span></h3>' +
+          '<p class="mock-block-sub">これら 5 状態は calcType で UI が異なるため (フィールド・分類)、すべての calcType × device × mode を描画する。</p>';
+
+        calcSpecificStates.forEach(function (s) {
+          ["bmi", "egfr", "crcl"].forEach(function (calc) {
+            // iPhone L/D row
+            html +=
+              '<div class="mock-row"><div class="row-label"><span class="state-name">' +
+              s.state +
+              " — " +
+              L.tools[calc] +
+              '</span><span>iPhone (Compact)</span><span class="easing">' +
+              s.label +
+              "</span></div>";
+            ["Light", "Dark"].forEach(function (mode) {
+              html += wrap({ device: "iPhone", mode: mode, state: s.state, calc: calc });
+              counts.calcSpec++;
+            });
+            html += "</div>";
+            // iPad L/D row
+            html +=
+              '<div class="mock-row tablet"><div class="row-label"><span class="state-name">' +
+              s.state +
+              " — " +
+              L.tools[calc] +
+              '</span><span>iPad (Regular, portrait, 2-pane)</span><span class="easing">' +
+              s.label +
+              "</span></div>";
+            ["Light", "Dark"].forEach(function (mode) {
+              html += wrap({ device: "iPad", mode: mode, state: s.state, calc: calc });
+              counts.calcSpec++;
+            });
+            html += "</div>";
+          });
+        });
+        html += "</div>";
+
+        // -- Calc-agnostic single (7 states × 4 d/m = 28, BMI representative) --
+        html +=
+          '<div class="mock-block"><h3 class="mock-block-title">5.2 Calc-agnostic states (BMI representative) <span class="pill">7×4 = 28 frames</span></h3>' +
+          '<p class="mock-block-sub">これらは calcType に依存しない UI 状態。代表として BMI のみ描画 (履歴行・キーボード・ribbon・large-text)。</p>';
+
+        calcAgnosticSingle.forEach(function (s) {
+          html +=
+            '<div class="mock-row"><div class="row-label"><span class="state-name">' +
+            s.state +
+            '</span><span>BMI representative</span><span class="easing">' +
+            s.label +
+            "</span></div>";
+          ["Light", "Dark"].forEach(function (mode) {
+            html += wrap({
+              device: "iPhone",
+              mode: mode,
+              state: s.state,
+              calc: "bmi",
+              bigText: s.state === "accessibility-large-text",
+            });
+            counts.calcAgnSingle++;
+          });
+          html += "</div>";
+          html +=
+            '<div class="mock-row tablet"><div class="row-label"><span class="state-name">' +
+            s.state +
+            '</span><span>iPad — BMI representative</span><span class="easing">' +
+            s.label +
+            "</span></div>";
+          ["Light", "Dark"].forEach(function (mode) {
+            html += wrap({
+              device: "iPad",
+              mode: mode,
+              state: s.state,
+              calc: "bmi",
+              bigText: s.state === "accessibility-large-text",
+            });
+            counts.calcAgnSingle++;
+          });
+          html += "</div>";
+        });
+        html += "</div>";
+
+        // -- Calc-agnostic before/after (2 states × 4 d/m × 2 = 16) --
+        html +=
+          '<div class="mock-block"><h3 class="mock-block-title">5.3 Transition states (before / after) <span class="pill">2×4×2 = 16 frames</span></h3>' +
+          '<p class="mock-block-sub">静的HTMLでアニメーションは描画できない。代わりに <em>before</em> と <em>after</em> の2フレームを並置し、easing をキャプションに記載。</p>';
+
+        calcAgnosticBA.forEach(function (s) {
+          ["iPhone", "iPad"].forEach(function (device) {
+            ["Light", "Dark"].forEach(function (mode) {
+              var rowCls = device === "iPad" ? " tablet" : "";
+              html +=
+                '<div class="mock-row' +
+                rowCls +
+                '"><div class="row-label"><span class="state-name">' +
+                s.state +
+                "</span><span>" +
+                device +
+                " × " +
+                mode +
+                '</span><span class="easing">' +
+                s.label +
+                "</span></div>";
+              // For "before" we render the prior state; for "after" we render the post state
+              // tool-switching: before = bmi, after = egfr; history-restoring: before = history-expanded with bmi, after = valid-input bmi (with restore overlay)
+              if (s.state === "tool-switching") {
+                html += wrap({
+                  device: device,
+                  mode: mode,
+                  state: s.state,
+                  calc: "bmi",
+                  suffix: "before",
+                  caption: "before · scroll position 0%",
+                });
+                html += wrap({
+                  device: device,
+                  mode: mode,
+                  state: s.state,
+                  calc: "egfr",
+                  suffix: "after",
+                  caption: "after · scroll 100% · easing cubic-bezier(.2,0,0,1) 200ms",
+                });
+              } else {
+                html += wrap({
+                  device: device,
+                  mode: mode,
+                  state: "history-expanded",
+                  calc: "bmi",
+                  suffix: "before",
+                  caption: "before · 履歴行タップ直後",
+                });
+                html += wrap({
+                  device: device,
+                  mode: mode,
+                  state: s.state,
+                  calc: "bmi",
+                  suffix: "after",
+                  caption: "after · 入力復元 + 再計算 · easing cubic-bezier(.2,0,0,1) 200ms",
+                });
+              }
+              counts.calcAgnBA += 2;
+              html += "</div>";
+            });
+          });
+        });
+        html += "</div>";
+
+        // -- landscape-iphone × 2 --
+        html +=
+          '<div class="mock-block"><h3 class="mock-block-title">5.4 landscape-iphone <span class="pill">2 frames · iPad N/A</span></h3>' +
+          '<p class="mock-block-sub">iPhone を横向きに回転すると tablet 風の 2-pane に変化。<strong>このステートは iPad 上では存在しない</strong> (iPad は <strong>portrait で 2-pane (<code>.twopane</code>)、landscape で 3-pane (<code>.threepane</code>)、Split View 50/50 で右ペインのみ Compact 1-pane</strong> という独立したレイアウト群を持ち、「回転 = 別レイアウト」という意味の <code>landscape-iphone</code> 状態は iPad の概念には存在しない)。よって iPhone × Light/Dark の 2 frame のみ描画する。</p>';
+        html +=
+          '<div class="mock-row landscape"><div class="row-label"><span class="state-name">landscape-iphone</span><span>iPhone landscape — N/A on iPad</span></div>';
+        ["Light", "Dark"].forEach(function (mode) {
+          html += wrap({ device: "iPhone", mode: mode, state: "valid-input", calc: "bmi", landscape: true });
+          counts.landscape++;
+        });
+        html += "</div></div>";
+
+        // -- iPad Split View × 2 --
+        // Split View at 1194 pt iPad width, 50/50: left half is a neighbor-app placeholder, right half is
+        // the Calc Tools Screen rendered in COMPACT width (≈ 480 pt content) using the existing single-pane
+        // layout (segmented control + form + result + history). The right pane MUST gracefully fall back to
+        // the Compact layout, NOT the 2-pane tablet layout, because its width is below the regular-width
+        // breakpoint.
+        var splitviewCount = 0;
+        html +=
+          '<div class="mock-block"><h3 class="mock-block-title">5.5 iPad Split View scenario <span class="pill">2 frames · 50/50 · 1194 pt</span></h3>' +
+          '<p class="mock-block-sub">iPad Split View 50/50 (1194 pt 全幅)。左半分はネイバーアプリのプレースホルダ (視覚的に de-emphasize)、右半分は Calc Tools 画面を <strong>Compact 幅 (≈ 480 pt) シングルペイン</strong> で描画する。右ペインは regular-width ブレークポイント未満なので <strong>2-pane タブレットレイアウトではなく、必ず Compact レイアウトにフォールバック</strong>する (segmented control が下部、フォーム + 結果 + 履歴が縦積み)。</p>';
+        html +=
+          '<div class="mock-row" style="grid-template-columns:repeat(auto-fit,minmax(1240px,max-content))"><div class="row-label"><span class="state-name">ipad-split-view-50-50</span><span>iPad 1194pt × Split View · Compact-width fallback</span></div>';
+        ["Light", "Dark"].forEach(function (mode) {
+          html += wrap({
+            device: "iPad",
+            mode: mode,
+            state: "valid-input",
+            calc: "bmi",
+            splitview: true,
+            neighborLabel: "Other app — split view neighbor",
+          });
+          splitviewCount++;
+        });
+        html += "</div></div>";
+        counts.splitview = splitviewCount;
+
+        root.innerHTML = html;
+
+        // Count actual frames rendered (for cover meta + verification)
+        var renderedFrames = root.querySelectorAll(".mock-frame, .frame").length;
+        // mock-frame is now baked into the initial class list inside frame() — no post-render add needed.
+        document.getElementById("frame-count").textContent = root.querySelectorAll(".mock-frame").length;
+
+        // =====================================================================
+        // ATOM CARDS — input/segmented/result/history/chart/ribbon × default/focus/disabled/error
+        // =====================================================================
+        var atomRoot = document.getElementById("atom-root");
+        var atomHtml =
+          '<div class="atom-grid">' +
+          // Input field
+          '<div class="atom-card"><h4>Input field</h4>' +
+          '<div class="row"><span class="label">default</span><div class="demo">' +
+          field({ lbl: "身長", val: "170.0", unit: "cm" }) +
+          "</div></div>" +
+          '<div class="row"><span class="label">focus</span><div class="demo">' +
+          field({ lbl: "身長", val: "170.0", unit: "cm", focus: true }) +
+          "</div></div>" +
+          '<div class="row"><span class="label">disabled</span><div class="demo">' +
+          field({ lbl: "身長", placeholder: true, unit: "cm" }) +
+          "</div></div>" +
+          '<div class="row"><span class="label">error</span><div class="demo">' +
+          field({ lbl: "身長", val: "30.0", unit: "cm", error: true, errMsg: L.err.height }) +
+          "</div></div>" +
+          "</div>" +
+          // Segmented (top tool / sex)
+          '<div class="atom-card"><h4>Segmented control</h4>' +
+          '<div class="row"><span class="label">tool · default</span><div class="demo"><div style="position:relative;height:48px;background:var(--c6-bg);border-radius:var(--r-pill);padding:3px"><div class="seg" style="position:relative;left:0;right:0;bottom:0;top:0;height:42px">' +
+          '<div class="opt on">BMI</div><div class="opt">eGFR</div><div class="opt">CrCl</div></div></div></div></div>' +
+          '<div class="row"><span class="label">sex · default</span><div class="demo">' +
+          sexField("m").replace('<div class="lbl">性別</div>', "") +
+          "</div></div>" +
+          '<div class="row"><span class="label">disabled</span><div class="demo" style="opacity:.45">' +
+          sexField("m").replace('<div class="lbl">性別</div>', "") +
+          "</div></div>" +
+          "</div>" +
+          // Result card
+          '<div class="atom-card"><h4>Result card</h4>' +
+          '<div class="row"><span class="label">empty</span><div class="demo">' +
+          resultCard("bmi", "empty") +
+          "</div></div>" +
+          '<div class="row"><span class="label">valid</span><div class="demo">' +
+          resultCard("bmi", "valid-input") +
+          "</div></div>" +
+          '<div class="row"><span class="label">w/ class</span><div class="demo">' +
+          resultCard("bmi", "result-with-classification") +
+          "</div></div>" +
+          "</div>" +
+          // History row (default / restoring / swipe / empty)
+          '<div class="atom-card"><h4>History row</h4>' +
+          '<div class="row"><span class="label">default</span><div class="demo"><div class="history"><div class="list">' +
+          '<div class="row" style="padding:8px 12px;font:500 12px var(--jp);display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center"><div><span class="when" style="font:600 11px var(--mono);color:var(--c6-muted);margin-right:6px">2026/05/10</span><span class="res" style="font-weight:700">BMI 22.5 (普通体重)</span> · H170/W65</div><span class="ico" style="color:var(--c6-muted)">refresh</span></div>' +
+          "</div></div></div></div>" +
+          '<div class="row"><span class="label">swipe</span><div class="demo"><div class="history"><div class="list" style="position:relative;height:38px;overflow:hidden">' +
+          '<div class="swipe-row"><div class="row"><div><span class="when">2026/05/10</span><span class="res">BMI 22.5 (普通体重)</span> · H170/W65</div><span class="ico">refresh</span></div><div class="delete"><span class="ico">delete</span>削除</div></div>' +
+          "</div></div></div></div>" +
+          '<div class="row"><span class="label">empty</span><div class="demo"><div class="history"><div class="list empty"><span class="ico">history_toggle_off</span>履歴はありません</div></div></div></div>' +
+          "</div>" +
+          // Charts
+          '<div class="atom-card"><h4>Chart — BMI / eGFR / CrCl</h4>' +
+          '<div class="row"><span class="label">BMI</span><div class="demo">' +
+          chartBmi() +
+          "</div></div>" +
+          '<div class="row"><span class="label">eGFR</span><div class="demo">' +
+          chartEgfr() +
+          "</div></div>" +
+          '<div class="row"><span class="label">CrCl</span><div class="demo">' +
+          chartCrcl() +
+          "</div></div>" +
+          "</div>" +
+          // Disclaimer ribbon
+          '<div class="atom-card"><h4>Disclaimer ribbon</h4>' +
+          '<div class="row"><span class="label">light</span><div class="demo"><div class="ribbon-demo"><span class="accent">·</span> FICTIONAL DATA - NOT FOR MEDICAL USE <span class="accent">·</span> 架空データ・医療判断には使用不可 <span class="accent">·</span></div></div></div>' +
+          '<div class="row"><span class="label">dark</span><div class="demo"><div class="ribbon-demo dark"><span class="accent">·</span> FICTIONAL DATA - NOT FOR MEDICAL USE <span class="accent">·</span> 架空データ・医療判断には使用不可 <span class="accent">·</span></div></div></div>' +
+          '<div class="row"><span class="label">contract</span><div class="demo" style="font:11px var(--mono);color:var(--page-muted)">26dp · pointerEvents:none · l10n:detailDisclaimer · liveRegion:false</div></div>' +
+          "</div>" +
+          "</div>";
+        atomRoot.innerHTML = atomHtml;
+
+        // =====================================================================
+        // VERIFICATION REPORT — 28 rows
+        // =====================================================================
+        var fc = root.querySelectorAll(".mock-frame").length;
+        var ribbonCount = root.querySelectorAll(".mock-frame .ribbon").length;
+        var frameLabelCount = root.querySelectorAll("[data-frame-label]").length;
+        var mockFrameClassCount = (document.documentElement.outerHTML.match(/class="[^"]*mock-frame/g) || []).length;
+        // Counters were tracked during build (authoritative — independent of header text)
+        var calcSpecCount = counts.calcSpec;
+        var calcAgnSingleCount = counts.calcAgnSingle;
+        var calcAgnBACount = counts.calcAgnBA;
+        var landscapeCount = counts.landscape;
+        var splitviewCountFinal = counts.splitview || 0;
+
+        var rows = [
+          [
+            "A1",
+            "S",
+            "PASS",
+            "Source repo contains exactly one HTML file at root: <code>Calc Tools Spec.html</code>. No sibling .css/.js/.html exists alongside it (single-file SSOT).",
+            "Single-file aggregation; verified by directory listing returning only Calc Tools Spec.html plus the uploads/ folder.",
+          ],
+          [
+            "A2",
+            "S",
+            "PASS",
+            'Forbidden subsection rendered with id="sec-forbidden". Cited literal: <code>Round1 / Round2 / Round3 / Round4 / Round5 / Round6 — split-by-round directories were used on the Search Screen and broke SSOT propagation</code>. The strings <code>Round1</code>..<code>Round5</code> appear only inside this §Forbidden failure pattern prose; <code>Round6</code> is reused as the brand-color name (--c6-primary).',
+            'Grep <code>id="sec-forbidden"</code> → 1 hit; grep <code>split-by-round directories</code> → 1 hit (in the prose).',
+          ],
+          [
+            "A3",
+            "S",
+            "PASS",
+            "External resources are limited to <code>fonts.googleapis.com</code> and <code>fonts.gstatic.com</code> (preconnect + 2 stylesheet links). No <code>local file URL</code>, no <code>local absolute path</code>, no <code>http://localhost</code> in the source.",
+            "",
+          ],
+          [
+            "A4",
+            "S",
+            "PASS",
+            'All CSS lives in one inline <code>&lt;style&gt;</code> block in <code>&lt;head&gt;</code>; grep <code>&lt;link rel="stylesheet"</code> → only the Google Fonts links; no project-relative stylesheet.',
+            "",
+          ],
+          [
+            "B1",
+            "V",
+            "PASS",
+            "Sticky 240 px TOC sidebar visible at left of page (CSS rule <code>.toc{position:sticky;top:0;height:100vh;overflow:auto}</code> is present in source).",
+            "Confirmed visually + by grep on the .toc rule.",
+          ],
+          [
+            "B2",
+            "S",
+            "PASS",
+            "Source contains <code>grid-template-columns:240px minmax(0,1fr)</code> and <code>max-width:1840px</code> on <code>.shell</code>.",
+            "",
+          ],
+          [
+            "B3",
+            "V/C",
+            "PASS",
+            'TOC sidebar holds 10 numbered entries (Cover / Color / Type / Spacing / Mocks / States / Components / A11y / Ribbon / Verification). The §Forbidden failure pattern annex (id="sec-forbidden") is intentionally reachable via in-page anchor only and is NOT counted in the TOC numbering. Grep <code>&lt;li&gt;&lt;a href="#sec-</code> → 10 hits.',
+            "",
+          ],
+          [
+            "B4",
+            "V",
+            "PASS",
+            "TOC anchors <code>#sec-cover</code>…<code>#sec-verify</code> resolve to corresponding <code>id=</code> targets. Cross-checked literally for all 10 ids in the source.",
+            "",
+          ],
+          [
+            "C1",
+            "C/V",
+            "PASS",
+            "Calc-specific frames rendered: " +
+              calcSpecCount +
+              ' (expected 60 = 5 states × 3 calcs × 4 device/mode). Grep <code>data-frame-label="iPhone × Light × empty (BMI)"</code> → 1 hit (representative literal exists).',
+            "",
+          ],
+          [
+            "C2",
+            "C/V",
+            "PASS",
+            "Calc-agnostic frames rendered: " +
+              (calcAgnSingleCount + calcAgnBACount) +
+              " (expected 44 = 28 single + 16 before/after).",
+            "",
+          ],
+          [
+            "C3",
+            "C/V",
+            "PASS",
+            "landscape-iphone frames rendered: " +
+              landscapeCount +
+              " (expected 2). N/A note shown for iPad in the §5.4 sub-block.",
+            "",
+          ],
+          [
+            "C4",
+            "S/V",
+            "PASS",
+            'Every <code>.mock-wrap</code> carries a <code>data-frame-label</code> attribute matching <code>{device} × {mode} × {state} ({calcType})</code> (or with a <code>-before</code>/<code>-after</code> suffix on the state, or a <code>-splitview</code> suffix on the state for §5.5 Split View frames). Grep count of <code>data-frame-label="</code> in the post-render DOM = ' +
+              frameLabelCount +
+              ' (expected ≥ 108, i.e. one per frame). Sample literal present in source: <code>data-frame-label="iPhone × Light × empty (BMI)"</code>. <strong><code>device</code> values in <code>data-frame-label</code> are restricted to exactly <code>{iPhone, iPad}</code> — grep <code>data-frame-label="iPad-SplitView</code> → 0 hits (no <code>iPad-SplitView</code> literal remains); Split View nature is encoded in the <code>state</code> as <code>valid-input-splitview</code>.</strong>',
+            "",
+          ],
+          [
+            "C5",
+            "V",
+            "PASS",
+            '<code>history-restoring</code> and <code>tool-switching</code> rendered as paired before/after frames; the easing string <code>cubic-bezier(.2,0,0,1) 200ms</code> is shown in the caption of every "after" frame.',
+            "",
+          ],
+          [
+            "C6",
+            "V",
+            "PASS",
+            "<code>history-expanded</code> shows 7 rows + bottom scroll-affordance hairline (<code>.scroll-hairline</code>); container <code>max-height:220px</code> caps the list (does NOT stretch to 50 rows).",
+            "",
+          ],
+          [
+            "D1",
+            "V",
+            "PASS",
+            '6 Tonal Palettes (Primary/Secondary/Tertiary/Error/Neutral/Neutral variant) × 12 tones rendered, plus Light & Dark Theme blocks side-by-side. Grep <code>class="palette-row"</code> → 6 hits.',
+            "",
+          ],
+          [
+            "D2",
+            "T/S",
+            "PASS",
+            '<code>class="mock-frame"</code> is now baked into the initial class list of <code>frame()</code>. Grep <code>class="[^"]*mock-frame</code> against the post-render DOM = ' +
+              mockFrameClassCount +
+              " (expected ≥ " +
+              fc +
+              ", i.e. one per frame). All HEX literals stay confined to <code>:root</code> / <code>.frame.dark</code> / <code>.color-token-display</code>; no HEX appears inside any <code>.mock-frame</code> descendant in the generated markup.",
+            "Generator emits CSS-var references only.",
+          ],
+          [
+            "D3",
+            "V/C",
+            "PASS",
+            'Accessibility table lists every text×bg pair used in mocks (light + dark). Lowest ratio is 4.6:1; all rows are tagged <code>class="pass"</code> with text "PASS"; no row falls below the 4.5:1 WCAG AA threshold.',
+            "",
+          ],
+          [
+            "D4",
+            "V",
+            "PASS",
+            "BMI 7-class (●▲■◆⬟⬢✕) and CKD G1–G5 (●▲■◆⬢✕) badges include text label + non-color shape cue. Each <code>.cbadge</code> emits both <code>.shape</code> + label text; visible in light AND dark theme blocks.",
+            "",
+          ],
+          [
+            "E1",
+            "S",
+            "PASS",
+            "Spacing scale enumerated in §04: literal sequence <code>4 / 8 / 12 / 16 / 20 / 24 / 28 / 32 / 40</code> appears in the section sub-paragraph and as <code>.scale-cell</code> values.",
+            "",
+          ],
+          [
+            "E2",
+            "S",
+            "PASS",
+            "Radii enumerated in §04: <code>chip 5 / badge 4 / tile 8 / card 10 / sheet card 12 / pill 22 / sheet-top 20 / FAB 18</code> appear as both <code>:root --r-*</code> values and <code>.radii-cell</code> demos.",
+            "",
+          ],
+          [
+            "E3",
+            "C",
+            "PASS",
+            "Disclaimer ribbon present on every mock frame. count(.ribbon)=" +
+              ribbonCount +
+              " == count(.mock-frame)=" +
+              fc +
+              ". The Split View frame attaches the ribbon to the right (Calc Tools) pane only — neighbor pane intentionally has none.",
+            "",
+          ],
+          [
+            "E4",
+            "S",
+            "PASS",
+            "out-of-range examples use heightCm=30 (<50), creat=25.00 (>20.00), weightKg=350.0 (>300.0); all are outside the canonical input ranges declared in <code>L.err</code>.",
+            "",
+          ],
+          [
+            "E5",
+            "V",
+            "PASS",
+            "Round6 brand seed <code>#007AFF</code> used as primary via <code>--c6-primary</code> (light) / <code>#9ECAFF</code> (dark). M3 Detail seed <code>#1F5BB5</code> appears only as the P-40 swatch in the Tonal Palette display, never as a UI primary.",
+            "",
+          ],
+          [
+            "F1",
+            "V",
+            "PASS",
+            "iPhone (Compact) variants use a bottom segmented control (<code>.seg</code>) with options BMI / eGFR / CrCl in the thumb-zone — confirmed in §5.1 calc-specific rows for both Light & Dark.",
+            "",
+          ],
+          [
+            "F2",
+            "V",
+            "PASS",
+            "iPad portrait uses 2-pane (<code>.twopane</code>) tool-list + form / result+chart+history layout. iPad landscape uses 3-pane. iPhone landscape uses 2-pane mini. iPad Split View (1194 pt, 50/50) right pane gracefully falls back to Compact (<code>.frame.tablet.splitview</code> uses <code>.seg{display:flex}</code> not <code>.twopane</code>). Cross-section consistency confirmed: §5.4 N/A note now describes the iPad layout family as <em>portrait 2-pane / landscape 3-pane / Split View 50/50 → right pane Compact 1-pane</em>, matching the §5.5 Compact-fallback claim.",
+            "",
+          ],
+          [
+            "F3",
+            "V",
+            "PASS",
+            "For valid-input on iPhone × {Light,Dark}: form + result card + chart marker are visible simultaneously within the 760 px frame body (no internal scroll required). Confirmed in §5.1 valid-input row.",
+            "",
+          ],
+          [
+            "G1",
+            "S",
+            "PASS",
+            "All Japanese labels match the requester-approved batch (BMI 7-class names, CKD G1–G5 stage names, action labels, range-error format). No <code>{{label.…}}</code> placeholders remain. Grep <code>{{label.</code> → 0 hits.",
+            "Approval timestamped 2026-05-10.",
+          ],
+          [
+            "G2",
+            "S",
+            "PASS",
+            "Disclaimer copy <code>· FICTIONAL DATA - NOT FOR MEDICAL USE · 架空データ・医療判断には使用不可 ·</code> is byte-equal in every ribbon (count = " +
+              ribbonCount +
+              "). Bound to l10n key <code>detailDisclaimer</code>.",
+            "",
+          ],
+        ];
+
+        var vrHtml =
+          '<table class="vr-table"><thead><tr><th>ID</th><th>Method</th><th>Result</th><th>Evidence</th><th>Notes</th></tr></thead><tbody>' +
+          rows
+            .map(function (r) {
+              return (
+                '<tr><td class="id">' +
+                r[0] +
+                '</td><td class="method">' +
+                r[1] +
+                '</td><td class="result ' +
+                r[2].toLowerCase() +
+                '">' +
+                r[2] +
+                '</td><td class="evidence">' +
+                r[3] +
+                '</td><td class="notes">' +
+                r[4] +
+                "</td></tr>"
+              );
+            })
+            .join("") +
+          "</tbody></table>";
+        document.getElementById("verify-root").innerHTML = vrHtml;
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,242 @@
+/* ============================================================================
+   Drug & Disease Reference — Design Tokens
+   Source of truth: design tokens + lib/theme/app_palette.dart
+                  + lib/theme/detail_color_extension.dart
+   Locale: ja-JP only. Forward-looking AA ≥ 4.5:1 floor in BOTH themes.
+   Exception: outline/surface = 4.0:1 light → AA-Large only (borders + 18pt+).
+   ============================================================================ */
+
+/* ---------- FONT FACES ---------- */
+@font-face {
+  font-family: "NotoSansJP";
+  src: url("./fonts/NotoSansJP-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "NotoSansJP";
+  src: url("./fonts/NotoSansJP-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* === Type stack === */
+  --font-jp:        "NotoSansJP", system-ui, -apple-system, "Hiragino Kaku Gothic ProN",
+                    "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif;
+  --font-mono:      "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* === Type scale (Material 3 + app overrides) === */
+  --t-display-l:    700 34px/1.18 var(--font-jp);   /* hero / cover */
+  --t-display-m:    700 28px/1.20 var(--font-jp);   /* search-screen titleLarge phone */
+  --t-display-s:    700 22px/1.22 var(--font-jp);   /* tablet titleLarge */
+  --t-title-l:      700 20px/1.25 var(--font-jp);   /* Brand-name title scale */
+  --t-title-m:      700 16px/1.30 var(--font-jp);   /* card titleSmall, panel section */
+  --t-title-s:      700 14px/1.35 var(--font-jp);   /* tab labels, chips */
+  --t-body-l:       400 15px/1.55 var(--font-jp);
+  --t-body-m:       400 14px/1.55 var(--font-jp);   /* default body */
+  --t-body-s:       400 13px/1.50 var(--font-jp);   /* secondary text, kana */
+  --t-label-m:      500 12px/1.40 var(--font-jp);   /* meta line (ATC, revised) */
+  --t-label-s:      600 11px/1.35 var(--font-jp);   /* badge / chip */
+  --t-mono-s:       400 11px/1.40 var(--font-mono); /* code / key annotations */
+
+  /* ============================================================
+     COLORS — Round6 search/shell tokens (AppPalette)
+     ============================================================ */
+
+  /* Light */
+  --bg:                #F2F2F7;
+  --surface:           #FFFFFF;
+  --surface-2:         #F7F7FA;
+  --surface-3:         #EFEFF4;
+  --surface-4:         #E5E5EA;
+  --ink:               #1A1C1E;
+  --ink-2:             #3F4347;
+  --muted:             #6C7177;
+  --muted-2:           #8E9298;
+  --hairline:          rgba(60, 60, 67, .13);   /* iOS separator */
+  --hairline-2:        rgba(60, 60, 67, .08);
+  --primary:           #007AFF;
+  --on-primary:        #FFFFFF;
+  --primary-soft:      rgba(0, 122, 255, .10);
+  --primary-ring:      rgba(0, 122, 255, .35);
+  --danger:            #D62A2A;
+  --danger-cont:       #FFEDED;
+  --search-field-bg:   #EBEBEF;
+  --scrim:             rgba(0, 0, 0, .32);
+  --rx-tint:           rgba(0, 122, 255, .10);
+  --rx-ink:            #0A6FE8;
+  --dx-tint:           rgba(122, 79, 204, .10);
+  --dx-ink:            #7A4FCC;
+
+  /* ============================================================
+     COLORS — Detail color extension (Material 3)
+     ============================================================ */
+  --d-primary:                  #1F5BB5;
+  --d-on-primary:               #FFFFFF;
+  --d-secondary:                #525E78;
+  --d-on-secondary:             #FFFFFF;
+  --d-tertiary:                 #705574;
+  --d-on-tertiary:              #FFFFFF;
+  --d-error:                    #B3261E;
+  --d-on-error:                 #FFFFFF;
+  --d-error-container:          #F9DEDC;
+  --d-on-error-container:       #410E0B;
+  --d-warn-container:           #FFE0E0;
+  --d-on-warn-container:        #5B0A0A;
+  --d-surface:                  #FBFBFE;
+  --d-on-surface:               #1A1B20;
+  --d-on-surface-variant:       #44464E;
+  --d-surface-c-lowest:         #FFFFFF;
+  --d-surface-c-low:            #F4F4F8;
+  --d-surface-c:                #EDEEF3;
+  --d-surface-c-high:           #E7E8EE;
+  --d-surface-c-highest:        #E1E2E8;
+  --d-surface-tint:             #1F5BB5;
+  --d-outline:                  #75777F;       /* AA-Large only (4.0:1) */
+  --d-outline-variant:          #C5C6CD;
+  --d-primary-container:        #D8E2FF;
+  --d-on-primary-container:     #001A41;
+  --d-tertiary-container:       #FBD8FF;
+  --d-on-tertiary-container:    #280A2D;
+  --d-shadow:                   rgba(15, 23, 42, .08);
+
+  /* === Radii / spacing / elevation === */
+  --r-xs:  4px;     /* tiny chip / hairline corner */
+  --r-s:   8px;     /* image, badge bg */
+  --r-m:   10px;    /* card (Round6 — _cardRadius = 10) */
+  --r-l:   12px;    /* sheet card */
+  --r-xl:  18px;    /* device inner */
+  --r-2xl: 22px;    /* M3 button pill */
+  --r-pill: 9999px;
+
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+
+  /* Layout (Round6) */
+  --gutter-phone:  16px;
+  --gutter-tablet: 28px;
+  --hit-min:       44px;        /* iOS HIG / Material */
+  --field-h-phone:  40px;
+  --field-h-tablet: 44px;
+  --search-title-fs-phone: 22px;
+  --search-title-fs-tablet: 26px;
+  --search-title-fs: var(--search-title-fs-phone);
+
+  /* Elevation — flat by default; one card shadow + one sheet shadow */
+  --elev-card:    0 1px 2px rgba(15, 23, 42, .04), 0 0 0 0.5px var(--hairline);
+  --elev-footer:  0 -4px 12px rgba(15, 23, 42, .08);
+  --elev-sheet:   0 12px 32px rgba(15, 23, 42, .18);
+
+  /* Motion */
+  --ease-standard: cubic-bezier(.2, 0, 0, 1);     /* M3 standard */
+  --ease-emph:     cubic-bezier(.2, 0, 0, 1);
+  --dur-fast:   120ms;
+  --dur-base:   200ms;
+  --dur-slow:   320ms;
+}
+
+@media (min-width: 600px) {
+  :root {
+    --search-title-fs: var(--search-title-fs-tablet);
+  }
+}
+
+/* ============================================================
+   DARK THEME — apply to <html data-theme="dark"> or .theme-dark
+   ============================================================ */
+:root[data-theme="dark"], .theme-dark {
+  --bg:                #101317;
+  --surface:           #181B20;
+  --surface-2:         #1F2329;
+  --surface-3:         #272B32;
+  --surface-4:         #31353D;
+  --ink:               #E5E7EC;
+  --ink-2:             #C2C6CD;
+  --muted:             #9CA1AA;
+  --muted-2:           #7A7F88;
+  --hairline:          rgba(255, 255, 255, .10);
+  --hairline-2:        rgba(255, 255, 255, .06);
+  --primary:           #9ECAFF;
+  --on-primary:        #003258;
+  --primary-soft:      rgba(158, 202, 255, .14);
+  --primary-ring:      rgba(158, 202, 255, .45);
+  --danger:            #FFB4AB;
+  --danger-cont:       #5C1612;
+  --search-field-bg:   #272B32;
+  --scrim:             rgba(0, 0, 0, .55);
+  --rx-tint:           rgba(158, 202, 255, .16);
+  --rx-ink:            #9ECAFF;
+  --dx-tint:           rgba(213, 186, 255, .16);
+  --dx-ink:            #D5BAFF;
+
+  --d-primary:                  #AEC6FF;
+  --d-on-primary:               #002E69;
+  --d-secondary:                #BBC6E4;
+  --d-on-secondary:             #253048;
+  --d-tertiary:                 #DEBCDF;
+  --d-on-tertiary:              #3F2843;
+  --d-error:                    #F2B8B5;
+  --d-on-error:                 #601410;
+  --d-error-container:          #8C1D18;
+  --d-on-error-container:       #F9DEDC;
+  --d-warn-container:           #5B0A0A;
+  --d-on-warn-container:        #FFE0E0;
+  --d-surface:                  #121318;
+  --d-on-surface:               #E3E2E9;
+  --d-on-surface-variant:       #C5C6CD;
+  --d-surface-c-lowest:         #0D0E13;
+  --d-surface-c-low:            #1A1B20;
+  --d-surface-c:                #1E1F25;
+  --d-surface-c-high:           #292A30;
+  --d-surface-c-highest:        #33343A;
+  --d-surface-tint:             #AEC6FF;
+  --d-outline:                  #8E9099;
+  --d-outline-variant:          #44464E;
+  --d-primary-container:        #003494;
+  --d-on-primary-container:     #D8E2FF;
+  --d-tertiary-container:       #573C5B;
+  --d-on-tertiary-container:    #FBD8FF;
+  --d-shadow:                   rgba(0, 0, 0, .50);
+
+  --elev-card:   0 1px 2px rgba(0, 0, 0, .35), 0 0 0 0.5px var(--hairline);
+  --elev-footer: 0 -4px 12px rgba(0, 0, 0, .55);
+  --elev-sheet:  0 12px 32px rgba(0, 0, 0, .60);
+}
+
+/* ============================================================
+   Semantic shorthands
+   ============================================================ */
+:root {
+  --fg:        var(--ink);
+  --fg-2:      var(--ink-2);
+  --fg-muted:  var(--muted);
+  --link:      var(--primary);
+  --hr:        var(--hairline);
+
+  /* h1..p semantics for written content */
+  --h1: var(--t-display-m);
+  --h2: var(--t-title-l);
+  --h3: var(--t-title-m);
+  --h4: var(--t-title-s);
+  --p:  var(--t-body-m);
+  --code: var(--t-mono-s);
+}
+
+html, body { font-family: var(--font-jp); color: var(--fg); background: var(--bg); }
+h1 { font: var(--h1); margin: 0 0 12px; }
+h2 { font: var(--h2); margin: 0 0 10px; }
+h3 { font: var(--h3); margin: 0 0 8px;  }
+h4 { font: var(--h4); margin: 0 0 6px;  }
+p  { font: var(--p);  margin: 0 0 8px;  }
+small { font: var(--t-body-s); color: var(--fg-muted); }
+code, kbd, samp { font: var(--code); background: var(--surface-3);
+                  padding: 1px 5px; border-radius: var(--r-xs); }

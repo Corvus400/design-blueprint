@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 16px;
+        background: var(--surface);
+      }
+      .row {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+        border: 0.5px solid var(--hairline);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .sw {
+        flex: 1;
+        height: 52px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 5px 7px;
+      }
+      .lbl {
+        font: 700 9px/1.05 var(--font-jp);
+      }
+      .hx {
+        font: 400 9px/1.1 var(--font-mono, ui-monospace);
+        opacity: 0.85;
+      }
+      .pair {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .h {
+        font: var(--t-label-s);
+        color: var(--fg-muted);
+        margin: 8px 0 4px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+    </style>
+    <title>Colors Detail — Preview</title>
+  </head>
+  <body>
+    <div class="pair">
+      <div class="h">Detail · M3 · light</div>
+      <div class="row">
+        <div class="sw" style="background: #1f5bb5; color: #fff">
+          <div class="lbl">primary</div>
+          <div class="hx">#1F5BB5</div>
+        </div>
+        <div class="sw" style="background: #d8e2ff; color: #001a41">
+          <div class="lbl">primary-cont</div>
+          <div class="hx">#D8E2FF</div>
+        </div>
+        <div class="sw" style="background: #525e78; color: #fff">
+          <div class="lbl">secondary</div>
+          <div class="hx">#525E78</div>
+        </div>
+        <div class="sw" style="background: #705574; color: #fff">
+          <div class="lbl">tertiary</div>
+          <div class="hx">#705574</div>
+        </div>
+        <div class="sw" style="background: #fbd8ff; color: #280a2d">
+          <div class="lbl">tert-cont</div>
+          <div class="hx">#FBD8FF</div>
+        </div>
+        <div class="sw" style="background: #b3261e; color: #fff">
+          <div class="lbl">error</div>
+          <div class="hx">#B3261E</div>
+        </div>
+        <div class="sw" style="background: #f9dedc; color: #410e0b">
+          <div class="lbl">err-cont</div>
+          <div class="hx">#F9DEDC</div>
+        </div>
+        <div class="sw" style="background: #ffe0e0; color: #5b0a0a">
+          <div class="lbl">warn-cont</div>
+          <div class="hx">#FFE0E0</div>
+        </div>
+      </div>
+      <div class="h">Surface containers</div>
+      <div class="row">
+        <div class="sw" style="background: #ffffff; color: #1a1b20">
+          <div class="lbl">c-lowest</div>
+          <div class="hx">#FFFFFF</div>
+        </div>
+        <div class="sw" style="background: #f4f4f8; color: #1a1b20">
+          <div class="lbl">c-low</div>
+          <div class="hx">#F4F4F8</div>
+        </div>
+        <div class="sw" style="background: #edeef3; color: #1a1b20">
+          <div class="lbl">c</div>
+          <div class="hx">#EDEEF3</div>
+        </div>
+        <div class="sw" style="background: #e7e8ee; color: #1a1b20">
+          <div class="lbl">c-high</div>
+          <div class="hx">#E7E8EE</div>
+        </div>
+        <div class="sw" style="background: #e1e2e8; color: #1a1b20">
+          <div class="lbl">c-highest</div>
+          <div class="hx">#E1E2E8</div>
+        </div>
+        <div class="sw" style="background: #fbfbfe; color: #1a1b20; border-left: 0.5px solid var(--hairline)">
+          <div class="lbl">surface</div>
+          <div class="hx">#FBFBFE</div>
+        </div>
+        <div class="sw" style="background: #75777f; color: #fff">
+          <div class="lbl">outline⚠</div>
+          <div class="hx">#75777F</div>
+        </div>
+        <div class="sw" style="background: #c5c6cd; color: #1a1b20">
+          <div class="lbl">outline-var</div>
+          <div class="hx">#C5C6CD</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

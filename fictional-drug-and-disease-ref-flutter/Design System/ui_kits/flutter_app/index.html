@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>医薬品・疾患リファレンス — UI Kit</title>
+    <link rel="stylesheet" href="../../colors_and_type.css" />
+    <link rel="stylesheet" href="../../disclaimer-ribbon.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #0f1115;
+        color: #e5e7ec;
+        font-family: var(--font-jp);
+      }
+      .stage {
+        min-height: 100vh;
+        box-sizing: border-box;
+        display: grid;
+        grid-template-columns: 1fr minmax(360px, 420px) 1fr;
+        gap: 24px;
+        padding: 28px 24px 36px;
+      }
+      .meta {
+        align-self: start;
+        background: #14171d;
+        border: 0.5px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 18px 18px 14px;
+        color: #c5cad0;
+      }
+      .meta h1 {
+        font: 700 18px/1.3 var(--font-jp);
+        margin: 0 0 6px;
+        color: #ffffff;
+      }
+      .meta p {
+        font: 400 13px/1.55 var(--font-jp);
+        color: #9ca1aa;
+        margin: 0 0 10px;
+      }
+      .meta .lbl {
+        font: 700 10px/1.2 var(--font-jp);
+        letter-spacing: 0.08em;
+        color: #7a7f88;
+        text-transform: uppercase;
+        margin: 14px 0 6px;
+      }
+      .meta ul {
+        padding-left: 16px;
+        margin: 0;
+      }
+      .meta li {
+        font: 500 12px/1.65 var(--font-jp);
+        color: #c5cad0;
+      }
+      .meta li code {
+        font: var(--t-mono-s);
+        background: #1f2329;
+        color: #bfd7ff;
+        padding: 1px 6px;
+        border-radius: 4px;
+      }
+      .meta a {
+        color: #9ecaff;
+        text-decoration: none;
+      }
+      .meta a:hover {
+        text-decoration: underline;
+      }
+      .frame-col {
+        display: flex;
+        justify-content: center;
+      }
+      .device {
+        width: 390px;
+        height: 780px;
+        background: #000;
+        border-radius: 48px;
+        padding: 12px;
+        box-shadow:
+          0 30px 60px rgba(0, 0, 0, 0.55),
+          0 0 0 0.5px rgba(255, 255, 255, 0.08);
+        position: relative;
+      }
+      .screen {
+        width: 100%;
+        height: 100%;
+        background: #f2f2f7;
+        border-radius: 36px;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      .notch {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 110px;
+        height: 32px;
+        background: #000;
+        border-radius: 18px;
+        z-index: 50;
+      }
+      .status {
+        height: 44px;
+        padding: 0 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font:
+          600 15px/1 -apple-system,
+          "SF Pro",
+          var(--font-jp);
+        color: #1a1c1e;
+        flex: 0 0 auto;
+      }
+      .status .right {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .home-indicator {
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 134px;
+        height: 5px;
+        border-radius: 3px;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 60;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(158, 202, 255, 0.14);
+        color: #bfd7ff;
+        font: 700 10px/1 var(--font-jp);
+        letter-spacing: 0.06em;
+      }
+      .legend {
+        align-self: start;
+        background: #14171d;
+        border: 0.5px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 18px;
+      }
+      .legend h2 {
+        font: 700 12px/1.2 var(--font-jp);
+        letter-spacing: 0.08em;
+        color: #7a7f88;
+        text-transform: uppercase;
+        margin: 0 0 10px;
+      }
+      .legend .item {
+        padding: 10px 0;
+        border-bottom: 0.5px dashed rgba(255, 255, 255, 0.08);
+      }
+      .legend .item:last-child {
+        border-bottom: none;
+      }
+      .legend .name {
+        font: 700 13px/1.3 var(--font-jp);
+        color: #e5e7ec;
+      }
+      .legend .hint {
+        font: 400 12px/1.45 var(--font-jp);
+        color: #9ca1aa;
+        margin-top: 2px;
+      }
+      .legend .name code {
+        font: var(--t-mono-s);
+        background: #1f2329;
+        color: #ffb4ab;
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+      @media (max-width: 1100px) {
+        .stage {
+          grid-template-columns: 1fr;
+        }
+        .frame-col {
+          order: -1;
+        }
+      }
+    </style>
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel" src="Components.jsx"></script>
+
+    <script type="text/babel">
+      const { useState, useMemo } = React;
+
+      // --- sample fixture data (illustrative; not a prescription of real records) ---
+      const SAMPLE_DRUGS = [
+        {
+          brandName: "アムロジン錠 5mg",
+          genericName: "アムロジピンベシル酸塩",
+          atcCode: "C08CA01",
+          revisedAt: "2024-08-12",
+          regulatoryClass: ["prescription_required"],
+        },
+        {
+          brandName: "メチコバール錠 500μg",
+          genericName: "メコバラミン",
+          atcCode: "B03BA05",
+          revisedAt: "2024-05-30",
+          regulatoryClass: ["ordinary"],
+        },
+        {
+          brandName: "モルヒネ塩酸塩錠 10mg",
+          genericName: "モルヒネ塩酸塩水和物",
+          atcCode: "N02AA01",
+          revisedAt: "2024-09-04",
+          regulatoryClass: ["narcotic", "prescription_required"],
+        },
+      ];
+      const SAMPLE_DISEASES = [
+        {
+          name: "本態性高血圧症",
+          nameKana: "ほんたいせいこうけつあつしょう",
+          chronicity: "chronic",
+          infectious: false,
+          medicalDepartment: ["cardiology", "internal_medicine"],
+          icd10ChapterRoman: "IX",
+          revisedAt: "2024-07-20",
+        },
+        {
+          name: "急性虫垂炎",
+          nameKana: "きゅうせいちゅうすいえん",
+          chronicity: "acute",
+          infectious: true,
+          medicalDepartment: ["surgery", "emergency"],
+          icd10ChapterRoman: "XI",
+          revisedAt: "2024-04-11",
+        },
+        {
+          name: "気管支喘息",
+          nameKana: "きかんしぜんそく",
+          chronicity: "chronic",
+          infectious: false,
+          medicalDepartment: ["internal_medicine", "pediatrics"],
+          icd10ChapterRoman: "X",
+          revisedAt: "2024-06-02",
+        },
+      ];
+
+      function StatusBar() {
+        return (
+          <div className="status">
+            <span>9:41</span>
+            <span className="right">
+              <svg width="17" height="11" viewBox="0 0 17 11">
+                <path d="M1 8h2v3H1zM5 6h2v5H5zM9 4h2v7H9zM13 1h2v10h-2z" fill="#1A1C1E" />
+              </svg>
+              <svg width="15" height="11" viewBox="0 0 15 11">
+                <path
+                  d="M7.5 2c2.3 0 4.4.9 6 2.5l1-1A9.5 9.5 0 007.5 1 9.5 9.5 0 001 3.5l1 1C3.6 2.9 5.7 2 7.5 2zm0 3c1.4 0 2.7.5 3.7 1.5l1-1A7.5 7.5 0 007.5 4 7.5 7.5 0 002.8 5.5l1 1C4.8 5.5 6.1 5 7.5 5z"
+                  fill="#1A1C1E"
+                />
+                <circle cx="7.5" cy="9" r="1.5" fill="#1A1C1E" />
+              </svg>
+              <svg width="26" height="11" viewBox="0 0 26 11">
+                <rect x=".5" y=".5" width="22" height="10" rx="2.5" fill="none" stroke="#1A1C1E" strokeOpacity=".35" />
+                <rect x="2" y="2" width="19" height="7" rx="1.5" fill="#1A1C1E" />
+                <path d="M24 4v3c.6-.2 1-.7 1-1.5S24.6 4.2 24 4z" fill="#1A1C1E" fillOpacity=".4" />
+              </svg>
+            </span>
+          </div>
+        );
+      }
+
+      function DemoApp() {
+        const [tab, setTab] = useState("drugs");
+        const [query, setQuery] = useState("");
+        const [nav, setNav] = useState("search");
+        const [chips, setChips] = useState(["処方箋医薬品", "錠剤"]);
+        const [sort, setSort] = useState("-revised_at");
+        const [filterOpen, setFilterOpen] = useState(false);
+
+        const items = tab === "drugs" ? SAMPLE_DRUGS : SAMPLE_DISEASES;
+
+        return (
+          <div className="screen">
+            {/* Status / notch */}
+            <div className="notch"></div>
+            <StatusBar />
+
+            {/* Search chrome (component composition) */}
+            <window.SearchTopChrome
+              tab={tab}
+              onTab={setTab}
+              query={query}
+              onQuery={setQuery}
+              onClear={() => setQuery("")}
+              onSubmit={() => {}}
+            />
+
+            {/* Applied filter rail */}
+            <window.AppliedChipRail chips={chips} onRemoveAt={(i) => setChips((cs) => cs.filter((_, j) => j !== i))} />
+
+            {/* Result toolbar */}
+            <window.SearchResultToolbar count={items.length} tab={tab} sort={sort} onChangeSort={setSort} />
+
+            {/* Sample card list — composition demonstrator only */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "0 16px 132px" }}>
+              {tab === "drugs"
+                ? items.map((d, i) => <window.DrugCard key={i} item={d} onTap={() => {}} />)
+                : items.map((d, i) => <window.DiseaseCard key={i} item={d} onTap={() => {}} />)}
+            </div>
+
+            {/* Filter FAB */}
+            <window.FilterFab count={chips.length} onTap={() => setFilterOpen(true)} />
+
+            {/* Bottom nav */}
+            <window.BottomNav value={nav} onChange={setNav} />
+
+            {/* Always-on disclaimer ribbon — sits above bottom nav (80) */}
+            <window.Disclaimer bottom={80} />
+
+            {/* Filter sheet */}
+            <window.FilterSheet
+              open={filterOpen}
+              onClose={() => setFilterOpen(false)}
+              tab={tab}
+              applied={chips}
+              onClearAll={() => setChips([])}
+              onAddSample={(c) => setChips((cs) => (cs.includes(c) ? cs.filter((x) => x !== c) : [...cs, c]))}
+            />
+
+            {/* Home indicator */}
+            <div className="home-indicator"></div>
+          </div>
+        );
+      }
+
+      function App() {
+        return (
+          <div className="stage">
+            <aside className="meta">
+              <span className="pill">UI KIT · Flutter / Material 3</span>
+              <h1 style={{ marginTop: 12 }}>医薬品・疾患リファレンス</h1>
+              <p>
+                A pixel-faithful web mirror of the Flutter components found in
+                <a href="../../README.md"> the design system</a>. This page composes the kit's primitives into a single
+                phone-form demo to verify that token, type, color, and motion contracts behave together.
+              </p>
+
+              <p style={{ color: "#FFB4AB", fontWeight: 600 }}>
+                This is a component composition demo, not a screen design. The seed's contract forbids inferring a real
+                search/detail/list IA from this kit.
+              </p>
+
+              <div className="lbl">Components composed</div>
+              <ul>
+                <li>
+                  <code>Disclaimer</code> · always-on ribbon (26 dp)
+                </li>
+                <li>
+                  <code>SearchTopChrome</code> · title + <code>SegControl</code> + <code>SearchField</code>
+                </li>
+                <li>
+                  <code>AppliedChipRail</code> · <code>AppliedFilterChip</code>
+                </li>
+                <li>
+                  <code>SearchResultToolbar</code> · sort <code>BottomSheet</code>
+                </li>
+                <li>
+                  <code>DrugCard</code> / <code>DiseaseCard</code> · with <code>Chip</code>
+                </li>
+                <li>
+                  <code>FilterFab</code> + <code>FilterSheet</code> (accordion)
+                </li>
+                <li>
+                  <code>BottomNav</code> · F1/F5 fills
+                </li>
+              </ul>
+
+              <div className="lbl">Sources</div>
+              <ul>
+                <li>
+                  JSX kit: <code>Components.jsx</code>
+                </li>
+                <li>
+                  Tokens: <code>../../colors_and_type.css</code>
+                </li>
+                <li>
+                  Ribbon: <code>../../disclaimer-ribbon.css</code>
+                </li>
+                <li>
+                  SSOT: <code>lib/l10n/app_ja.arb</code>
+                </li>
+              </ul>
+            </aside>
+
+            <div className="frame-col">
+              <div className="device">
+                <DemoApp />
+              </div>
+            </div>
+
+            <aside className="legend">
+              <h2>Try it</h2>
+              <div className="item">
+                <div className="name">
+                  Toggle <code>SegControl</code>
+                </div>
+                <div className="hint">医薬品 ↔ 疾患. The card list and SSOT chip palette switch in lockstep.</div>
+              </div>
+              <div className="item">
+                <div className="name">
+                  Tap the <code>FilterFab</code>
+                </div>
+                <div className="hint">
+                  Opens the accordion <code>FilterSheet</code>. First axis is expanded by default (
+                  <code>regulatory_class</code> for drugs, <code>icd10_chapter</code> for diseases).
+                </div>
+              </div>
+              <div className="item">
+                <div className="name">Tap an applied chip</div>
+                <div className="hint">
+                  Removes that filter via <code>AppliedFilterChip.onRemove</code>.
+                </div>
+              </div>
+              <div className="item">
+                <div className="name">Open the sort sheet</div>
+                <div className="hint">
+                  Bottom sheet uses the iOS-emphasized curve (<code>cubic-bezier(.32,.72,0,1)</code>, 260 ms).
+                </div>
+              </div>
+              <div className="item">
+                <div className="name">
+                  Switch to <code>library</code>
+                </div>
+                <div className="hint">
+                  Bottom-nav fills the icon (<code>FILL=1</code>) and tints with Round6
+                  <code>#007AFF</code>.
+                </div>
+              </div>
+              <h2 style={{ marginTop: 18 }}>Scope</h2>
+              <div className="item">
+                <div className="name">Component-level only</div>
+                <div className="hint">
+                  Per the seed contract: no search/detail/list page, no domain mock data, no IA. Treat the navigation
+                  labels and chip values as illustrative.
+                </div>
+              </div>
+            </aside>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

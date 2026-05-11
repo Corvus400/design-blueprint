@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 14px 16px;
+        background: var(--surface);
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        height: 44px;
+        padding: 0 18px;
+        border-radius: 22px;
+        font: 700 14px/1 var(--font-jp);
+        border: none;
+        cursor: pointer;
+      }
+      .filled {
+        background: #1f5bb5;
+        color: #fff;
+      }
+      .tonal {
+        background: #d8e2ff;
+        color: #001a41;
+      }
+      .outlined {
+        background: transparent;
+        color: #1f5bb5;
+        border: 1px solid #c5c6cd;
+      }
+      .text {
+        background: transparent;
+        color: #007aff;
+        padding: 0 8px;
+        height: 36px;
+        font: 700 14px/1 var(--font-jp);
+        border: none;
+      }
+      .danger {
+        background: #b3261e;
+        color: #fff;
+      }
+      .disabled {
+        background: rgba(26, 27, 32, 0.12);
+        color: rgba(26, 27, 32, 0.38);
+      }
+      .h {
+        font: var(--t-label-s);
+        color: var(--fg-muted);
+        margin: 6px 0;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        flex-basis: 100%;
+      }
+    </style>
+    <title>Component Buttons — Preview</title>
+  </head>
+  <body>
+    <div class="row">
+      <div class="h">M3 buttons · detail surface</div>
+      <button class="btn filled">Primary action</button>
+      <button class="btn tonal">関連を見る</button>
+      <button class="btn outlined">編集</button>
+      <button class="btn text">キャンセル</button>
+      <button class="btn danger">削除</button>
+      <button class="btn disabled">送信</button>
+    </div>
+  </body>
+</html>

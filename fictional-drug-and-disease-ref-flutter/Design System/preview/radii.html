@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 16px;
+        background: var(--bg);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+      .swatch {
+        background: var(--surface);
+        border: 0.5px solid var(--hairline);
+        height: 64px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-end;
+        padding: 6px 8px;
+      }
+      .name {
+        font: 700 11px/1.2 var(--font-jp);
+        color: var(--fg);
+      }
+      .hx {
+        font: var(--t-mono-s);
+        color: var(--fg-muted);
+      }
+    </style>
+    <title>Radii — Preview</title>
+  </head>
+  <body>
+    <div class="grid">
+      <div class="swatch" style="border-radius: 4px">
+        <div class="name">--r-xs</div>
+        <div class="hx">4 px</div>
+      </div>
+      <div class="swatch" style="border-radius: 8px">
+        <div class="name">--r-s</div>
+        <div class="hx">8 px · image</div>
+      </div>
+      <div class="swatch" style="border-radius: 10px">
+        <div class="name">--r-m</div>
+        <div class="hx">10 px · card</div>
+      </div>
+      <div class="swatch" style="border-radius: 12px">
+        <div class="name">--r-l</div>
+        <div class="hx">12 px · sheet</div>
+      </div>
+      <div class="swatch" style="border-radius: 18px">
+        <div class="name">--r-xl</div>
+        <div class="hx">18 px · phone inner</div>
+      </div>
+      <div class="swatch" style="border-radius: 22px">
+        <div class="name">--r-2xl</div>
+        <div class="hx">22 px · M3 button</div>
+      </div>
+      <div class="swatch" style="border-radius: 9999px">
+        <div class="name">--r-pill</div>
+        <div class="hx">∞ · chip / FAB</div>
+      </div>
+      <div class="swatch" style="border-radius: 0">
+        <div class="name">none</div>
+        <div class="hx">0 · drug image</div>
+      </div>
+    </div>
+  </body>
+</html>

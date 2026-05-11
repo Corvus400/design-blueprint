@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 16px;
+        background: var(--surface);
+      }
+      .row {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+        border: 0.5px solid var(--hairline);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .sw {
+        flex: 1;
+        height: 56px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 6px 8px;
+      }
+      .lbl {
+        font: 700 10px/1.1 var(--font-jp);
+      }
+      .hx {
+        font: var(--t-mono-s);
+        opacity: 0.85;
+      }
+      .pair {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .h {
+        font: var(--t-label-s);
+        color: var(--fg-muted);
+        margin: 8px 0 4px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+    </style>
+    <title>Colors Surfaces — Preview</title>
+  </head>
+  <body>
+    <div class="pair">
+      <div class="h">Surfaces · light</div>
+      <div class="row">
+        <div class="sw" style="background: #f2f2f7; color: #1a1c1e">
+          <div class="lbl">bg</div>
+          <div class="hx">#F2F2F7</div>
+        </div>
+        <div class="sw" style="background: #ffffff; color: #1a1c1e">
+          <div class="lbl">surface</div>
+          <div class="hx">#FFFFFF</div>
+        </div>
+        <div class="sw" style="background: #f7f7fa; color: #1a1c1e">
+          <div class="lbl">surface-2</div>
+          <div class="hx">#F7F7FA</div>
+        </div>
+        <div class="sw" style="background: #efeff4; color: #1a1c1e">
+          <div class="lbl">surface-3</div>
+          <div class="hx">#EFEFF4</div>
+        </div>
+        <div class="sw" style="background: #e5e5ea; color: #1a1c1e">
+          <div class="lbl">surface-4</div>
+          <div class="hx">#E5E5EA</div>
+        </div>
+      </div>
+      <div class="h">Surfaces · dark</div>
+      <div class="row">
+        <div class="sw" style="background: #101317; color: #e5e7ec">
+          <div class="lbl">bg</div>
+          <div class="hx">#101317</div>
+        </div>
+        <div class="sw" style="background: #181b20; color: #e5e7ec">
+          <div class="lbl">surface</div>
+          <div class="hx">#181B20</div>
+        </div>
+        <div class="sw" style="background: #1f2329; color: #e5e7ec">
+          <div class="lbl">surface-2</div>
+          <div class="hx">#1F2329</div>
+        </div>
+        <div class="sw" style="background: #272b32; color: #e5e7ec">
+          <div class="lbl">surface-3</div>
+          <div class="hx">#272B32</div>
+        </div>
+        <div class="sw" style="background: #31353d; color: #e5e7ec">
+          <div class="lbl">surface-4</div>
+          <div class="hx">#31353D</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

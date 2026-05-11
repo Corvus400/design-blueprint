@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>Components.jsx — rendered preview</title>
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <link rel="stylesheet" href="../disclaimer-ribbon.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: #0f172a;
+        font-family: var(--font-jp);
+        min-height: 100vh;
+        padding: 24px 20px 40px;
+        color: #1a1c1e;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        max-width: 1080px;
+        margin: 0 auto;
+      }
+      .card {
+        background: #fff;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow:
+          0 1px 3px rgba(0, 0, 0, 0.18),
+          0 8px 24px rgba(0, 0, 0, 0.22);
+        display: flex;
+        flex-direction: column;
+      }
+      .card.full {
+        grid-column: 1 / -1;
+      }
+      .card-h {
+        padding: 10px 14px;
+        border-bottom: 0.5px solid rgba(60, 60, 67, 0.13);
+        font: 700 11px/1 var(--font-jp);
+        letter-spacing: 0.06em;
+        color: #44464e;
+        text-transform: uppercase;
+        background: #fbfbfe;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .card-h .meta {
+        color: #8a8f98;
+        font-weight: 500;
+        letter-spacing: 0;
+        text-transform: none;
+      }
+      .card-b {
+        padding: 16px;
+        background: #f2f2f7;
+      }
+      .card-b.solid-white {
+        background: #fff;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+      }
+      .row + .row {
+        margin-top: 10px;
+      }
+      .group-label {
+        font: 700 11px/1.4 var(--font-jp);
+        color: #6c7177;
+        letter-spacing: 0.04em;
+        margin: 0 0 6px;
+      }
+      .phone-stage {
+        height: 320px;
+        position: relative;
+        background: #f2f2f7;
+        border-radius: 0;
+        overflow: hidden;
+      }
+      .phone-stage.detail {
+        background: #fbfbfe;
+      }
+      .stage-tall {
+        height: 420px;
+      }
+    </style>
+    <script
+      src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+      integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+      integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+      integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel" src="../ui_kits/flutter_app/Components.jsx"></script>
+
+    <script type="text/babel">
+      const { useState } = React;
+
+      function CardFrame({ title, meta, full, solid, children }) {
+        return (
+          <div className={"card" + (full ? " full" : "")}>
+            <div className="card-h">
+              <span>{title}</span>
+              {meta && <span className="meta">{meta}</span>}
+            </div>
+            <div className={"card-b" + (solid ? " solid-white" : "")}>{children}</div>
+          </div>
+        );
+      }
+
+      function ChipsCard() {
+        const drug = [
+          { v: "prescription_required", label: "処方箋医薬品" },
+          { v: "potent", label: "劇薬" },
+          { v: "poison", label: "毒薬" },
+          { v: "narcotic", label: "麻薬" },
+          { v: "psychotropic_2", label: "向精神薬第2種" },
+          { v: "biological", label: "生物由来製品" },
+        ];
+        const form = [
+          { v: "tablet", label: "錠剤" },
+          { v: "capsule", label: "カプセル" },
+          { v: "injection_form", label: "注射剤" },
+          { v: "ointment", label: "軟膏" },
+          { v: "eye_drops", label: "点眼液" },
+        ];
+        const dept = [
+          { v: "internal_medicine", label: "内科" },
+          { v: "cardiology", label: "循環器内科" },
+          { v: "pediatrics", label: "小児科" },
+          { v: "gynecology", label: "婦人科" },
+          { v: "emergency", label: "救急科" },
+          { v: "infectious_disease", label: "感染症科" },
+        ];
+        return (
+          <CardFrame title="Chip" meta="SSOT-aligned palette · 5 % bg, 700/11" solid>
+            <div className="group-label">RegulatoryClass</div>
+            <div className="row">
+              {drug.map((c) => (
+                <window.Chip key={c.v} value={c.v} label={c.label} />
+              ))}
+            </div>
+            <div className="group-label" style={{ marginTop: 12 }}>
+              DosageForm
+            </div>
+            <div className="row">
+              {form.map((c) => (
+                <window.Chip key={c.v} value={c.v} label={c.label} />
+              ))}
+            </div>
+            <div className="group-label" style={{ marginTop: 12 }}>
+              MedicalDepartment
+            </div>
+            <div className="row">
+              {dept.map((c) => (
+                <window.Chip key={c.v} value={c.v} label={c.label} />
+              ))}
+            </div>
+          </CardFrame>
+        );
+      }
+
+      function SearchChromeCard() {
+        const [tab, setTab] = useState("drugs");
+        const [q, setQ] = useState("");
+        return (
+          <CardFrame full title="SearchTopChrome + AppliedChipRail">
+            <div style={{ background: "#F2F2F7", borderRadius: 8, overflow: "hidden" }}>
+              <window.SearchTopChrome
+                tab={tab}
+                onTab={setTab}
+                query={q}
+                onQuery={setQ}
+                onClear={() => setQ("")}
+                onSubmit={() => {}}
+              />
+              <window.AppliedChipRail chips={["処方箋医薬品", "錠剤", "内服"]} onRemoveAt={() => {}} />
+            </div>
+          </CardFrame>
+        );
+      }
+
+      function ToolbarCard() {
+        const [sort, setSort] = useState("-revised_at");
+        return (
+          <CardFrame full title="SearchResultToolbar">
+            <div
+              style={{
+                background: "#F2F2F7",
+                borderRadius: 8,
+                padding: "4px 0",
+                position: "relative",
+                overflow: "hidden",
+                height: 40,
+              }}
+            >
+              <window.SearchResultToolbar count={42} tab="drugs" sort={sort} onChangeSort={setSort} />
+            </div>
+          </CardFrame>
+        );
+      }
+
+      function FabCard() {
+        return (
+          <CardFrame title="FilterFab" meta="r18 · 56 dp · +N badge">
+            <div style={{ position: "relative", height: 96, background: "#F2F2F7", borderRadius: 8 }}>
+              <div style={{ position: "absolute", right: 20, bottom: 20 }}>
+                <button
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: 18,
+                    border: "none",
+                    background: "#1F5BB5",
+                    color: "#fff",
+                    cursor: "pointer",
+                    boxShadow: "0 6px 16px rgba(31,91,181,.32)",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <window.Icon name="tune" size={26} color="#fff" />
+                </button>
+                <span
+                  style={{
+                    position: "absolute",
+                    top: -2,
+                    right: 0,
+                    height: 22,
+                    minWidth: 24,
+                    padding: "0 7px",
+                    borderRadius: 11,
+                    background: "#B3261E",
+                    color: "#fff",
+                    font: "700 11px/22px var(--font-jp)",
+                    textAlign: "center",
+                    boxShadow: "0 0 0 2px #F2F2F7",
+                  }}
+                >
+                  +3
+                </span>
+              </div>
+            </div>
+          </CardFrame>
+        );
+      }
+
+      function NavCard() {
+        const [v, setV] = useState("search");
+        return (
+          <CardFrame title="BottomNav" meta="Round6 #007AFF · selectedIcon (FILL=1)">
+            <div style={{ background: "#F2F2F7", borderRadius: 8, overflow: "hidden" }}>
+              <window.BottomNav value={v} onChange={setV} />
+            </div>
+          </CardFrame>
+        );
+      }
+
+      function FooterCard() {
+        const [b, setB] = useState(false);
+        return (
+          <CardFrame title="DetailFooter" meta="64 dp · M3 Detail tokens">
+            <div style={{ background: "#FBFBFE", borderRadius: 8, overflow: "hidden" }}>
+              <window.DetailFooter
+                bookmarked={b}
+                onToggleBookmark={() => setB((x) => !x)}
+                onDoseCalc={() => {}}
+                showDoseCalc={true}
+              />
+            </div>
+          </CardFrame>
+        );
+      }
+
+      function RibbonCard() {
+        return (
+          <CardFrame title="Disclaimer ribbon" meta="always-on · 26 dp · l10n: detailDisclaimer">
+            <div
+              style={{ position: "relative", height: 60, background: "#F2F2F7", borderRadius: 8, overflow: "hidden" }}
+            >
+              <window.Disclaimer bottom={0} />
+            </div>
+          </CardFrame>
+        );
+      }
+
+      function FilterSheetCard() {
+        const [open, setOpen] = useState(true);
+        const [chips, setChips] = useState([]);
+        return (
+          <CardFrame full title="FilterSheet" meta="accordion · drug 4 axes (regulatory expanded)">
+            <div className="phone-stage stage-tall">
+              <window.FilterSheet
+                open={open}
+                onClose={() => setOpen(false)}
+                tab="drugs"
+                applied={chips}
+                onClearAll={() => setChips([])}
+                onAddSample={(c) => setChips((cs) => (cs.includes(c) ? cs.filter((x) => x !== c) : [...cs, c]))}
+              />
+            </div>
+          </CardFrame>
+        );
+      }
+
+      function App() {
+        return (
+          <div className="grid">
+            <ChipsCard />
+            <SearchChromeCard />
+            <ToolbarCard />
+            <FabCard />
+            <NavCard />
+            <FooterCard />
+            <RibbonCard />
+            <FilterSheetCard />
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

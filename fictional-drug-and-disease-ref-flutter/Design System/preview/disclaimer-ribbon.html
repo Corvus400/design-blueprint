@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 16px;
+        background: var(--bg);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .lbl {
+        font: 600 11px/1 var(--font-jp);
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .lbl .pass {
+        margin-left: 8px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #dff6e4;
+        color: #0f5132;
+        letter-spacing: 0.02em;
+        font: 700 10px/1 var(--font-jp);
+        text-transform: none;
+      }
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      /* === RIBBON — values mirror disclaimer-ribbon.css =========================
+     Light : bg #1A1C1E / fg #FFFFFF (18.0:1) / accent #FFB4AB (10.6:1)
+     Dark  : bg #0D0E13 / fg #FFFFFF (19.5:1) / accent #FFB4AB (11.5:1)
+     Both pass WCAG AA 4.5:1 for normal text and AAA 7:1; the 4 px dots
+     are non-text UI components (1.4.11 → 3:1) and exceed that floor.
+     ========================================================================== */
+      .ribbon {
+        height: 26px;
+        background: #1a1c1e;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 0 12px;
+        user-select: none;
+        white-space: nowrap;
+        font: 700 11px/1 var(--font-jp);
+        letter-spacing: 0.04em;
+      }
+      .ribbon .accent {
+        color: #ffb4ab;
+      }
+      .ribbon .dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #ffb4ab;
+        flex: 0 0 auto;
+      }
+      .ribbon-dark {
+        background: #0d0e13;
+      }
+
+      /* Full-screen contexts the ribbon overlays. The ribbon owns its own
+     opaque bg so contrast does NOT depend on the page beneath it. */
+      .full {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 0.5px solid var(--hairline);
+        height: 84px;
+        position: relative;
+      }
+      .full .body {
+        position: absolute;
+        inset: 0 0 26px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .full .ribbon-pos {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+      .full.lit {
+        background: #fbfbfe;
+        color: #1a1b20;
+      }
+      .full.lit .body::after {
+        content: "架空のアプリ画面（明）";
+        font: 600 12px/1 var(--font-jp);
+        color: #6c7177;
+      }
+      .full.dark {
+        background: #121318;
+        color: #e3e2e9;
+      }
+      .full.dark .body::after {
+        content: "架空のアプリ画面（暗）";
+        font: 600 12px/1 var(--font-jp);
+        color: #9ca1aa;
+      }
+
+      .meta {
+        font: var(--t-mono-s);
+        color: var(--fg-muted);
+      }
+    </style>
+    <title>Disclaimer Ribbon — Preview</title>
+  </head>
+  <body>
+    <div class="stack">
+      <div class="lbl">
+        Light theme · bg #1A1C1E
+        <span class="pass">FG 18.0:1 · ACCENT 10.6:1 · AA + AAA</span>
+      </div>
+      <div class="full lit">
+        <div class="body"></div>
+        <div class="ribbon-pos">
+          <div class="ribbon">
+            <span class="dot"></span>
+            <span class="accent">FICTIONAL DATA - NOT FOR MEDICAL USE</span>
+            <span class="dot"></span>
+            <span>架空データ・医療判断には使用不可</span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      </div>
+      <div class="meta">FG #FFFFFF on #1A1C1E · ACCENT #FFB4AB on #1A1C1E · DOT (UI 3:1) ✓</div>
+    </div>
+
+    <div class="stack">
+      <div class="lbl">
+        Dark theme · bg #0D0E13
+        <span class="pass">FG 19.5:1 · ACCENT 11.5:1 · AA + AAA</span>
+      </div>
+      <div class="full dark">
+        <div class="body"></div>
+        <div class="ribbon-pos">
+          <div class="ribbon ribbon-dark">
+            <span class="dot"></span>
+            <span class="accent">FICTIONAL DATA - NOT FOR MEDICAL USE</span>
+            <span class="dot"></span>
+            <span>架空データ・医療判断には使用不可</span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      </div>
+      <div class="meta">FG #FFFFFF on #0D0E13 · ACCENT #FFB4AB on #0D0E13 · DOT (UI 3:1) ✓</div>
+    </div>
+  </body>
+</html>

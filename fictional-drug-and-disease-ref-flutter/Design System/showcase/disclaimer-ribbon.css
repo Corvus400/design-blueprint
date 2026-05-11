@@ -1,0 +1,45 @@
+/* ============================================================
+   Disclaimer ribbon — always-on, sits above the bottom safe-area
+   inset on every screen. Inserted by MaterialApp.builder so it
+   participates in the app overlay and stays on top of modal
+   bottom sheets and dialogs.
+
+   - Height 26 dp (24-28 dp range)
+   - Light: bg #1A1C1E / fg #FFFFFF / accent #FFB4AB
+   - Dark : bg #0D0E13 / fg #FFFFFF / accent #FFB4AB
+   - Text: bound to l10n key `detailDisclaimer`
+   - Semantics: "免責: 架空データ・医療判断には使用しないでください"
+   - liveRegion: false · non-tappable · pointer-events:none
+   ============================================================ */
+.disclaimer-ribbon {
+  position: absolute;
+  left: 0; right: 0;
+  height: 26px;
+  background: #1A1C1E;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 12px;
+  user-select: none;
+  pointer-events: none;
+  font: 700 11px/1 "NotoSansJP", system-ui, sans-serif;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  z-index: 100;
+}
+:root[data-theme="dark"] .disclaimer-ribbon,
+.theme-dark .disclaimer-ribbon { background: #0D0E13; }
+
+.disclaimer-ribbon .accent { color: #FFB4AB; }
+.disclaimer-ribbon .dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: #FFB4AB; flex: 0 0 auto;
+}
+
+/* Layering rules */
+.disclaimer-ribbon[data-layer="above-bottom-nav"] { bottom: 80px; }
+.disclaimer-ribbon[data-layer="above-detail-footer"] { bottom: 64px; }
+.disclaimer-ribbon[data-layer="bottom-safe-area"] { bottom: 0; }
+.disclaimer-ribbon[data-layer="above-modal"] { bottom: 0; }

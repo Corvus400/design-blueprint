@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../colors_and_type.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 16px;
+        background: var(--surface);
+        color: var(--fg);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .swatch {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .sw {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        border: 0.5px solid var(--hairline);
+        flex: 0 0 auto;
+      }
+      .name {
+        font: 700 12px/1.2 var(--font-jp);
+        color: var(--fg);
+      }
+      .hex {
+        font: var(--t-mono-s);
+        color: var(--fg-muted);
+      }
+      .row {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+      }
+    </style>
+    <title>Colors App Dark — Preview</title>
+  </head>
+  <body>
+    <div class="grid">
+      <div>
+        <div class="swatch">
+          <div class="sw" style="background: #9ecaff"></div>
+          <div class="row">
+            <div class="name">primary</div>
+            <div class="hex">#9ECAFF</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="swatch">
+          <div
+            class="sw"
+            style="background: rgba(158, 202, 255, 0.14); border: 0.5px solid rgba(158, 202, 255, 0.45)"
+          ></div>
+          <div class="row">
+            <div class="name">primary-soft</div>
+            <div class="hex">rgba(158,202,255,.14)</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="swatch">
+          <div class="sw" style="background: #e5e7ec"></div>
+          <div class="row">
+            <div class="name">ink</div>
+            <div class="hex">#E5E7EC</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="swatch">
+          <div class="sw" style="background: #c2c6cd"></div>
+          <div class="row">
+            <div class="name">ink-2</div>
+            <div class="hex">#C2C6CD</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="swatch">
+          <div class="sw" style="background: #9ca1aa"></div>
+          <div class="row">
+            <div class="name">muted</div>
+            <div class="hex">#9CA1AA</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="swatch">
+          <div class="sw" style="background: #7a7f88"></div>
+          <div class="row">
+            <div class="name">muted-2</div>
+            <div class="hex">#7A7F88</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="swatch">
+          <div class="sw" style="background: #ffb4ab"></div>
+          <div class="row">
+            <div class="name">danger</div>
+            <div class="hex">#FFB4AB</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="swatch">
+          <div class="sw" style="background: #5c1612"></div>
+          <div class="row">
+            <div class="name">danger-cont</div>
+            <div class="hex">#5C1612</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
