@@ -13,9 +13,15 @@ This repository stores HTML designs and gates every commit and push with VRT. As
 1. Read `<project>/spec.md` first.
 2. Make the HTML change.
 3. Stage the changed HTML.
-4. Commit so the pre-commit hook runs lint and VRT.
+4. Commit so the pre-commit hook runs lint, matching HTML audit rules, and VRT.
 5. If VRT reports an INITIAL BASELINE, that PNG is staged and committed together with the HTML. Initial captures are explicitly considered untrusted; review the rendered baseline against `spec.md`.
 6. If VRT reports a DIFF, switch to visual reviewer mode.
+
+## HTML Audit Rules
+
+- `scripts/html-audit.mjs` reads `scripts/html-audit-rules/*.json` and performs DOM-based structural checks for matching HTML files.
+- Use audit rules for repo-specific invariants that htmlhint cannot know, such as forbidden stale selectors, required parent-child placement, TOC/section alignment, or data-shape constraints from an implementation repo.
+- When repeated manual checks are needed during a large HTML repair, add a narrow audit rule and run `npm run html:audit` before VRT.
 
 ## Visual Reviewer Mode
 
@@ -58,4 +64,5 @@ The hook auto-stages the first capture as the baseline. The user explicitly acce
 
 - `node scripts/vrt-hook.mjs --all`
 - `node scripts/lint-hook.mjs --all`
+- `npm run html:audit`
 - `jq '.summary' .vrt-output/report/results.json`

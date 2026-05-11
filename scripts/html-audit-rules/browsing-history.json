@@ -1,0 +1,111 @@
+{
+  "file": "fictional-drug-and-disease-ref-flutter/閲覧履歴/browsing-history.html",
+  "description": "Browsing history structural guardrails for Flutter-compatible design specs.",
+  "tocSections": {
+    "tocSelector": "aside.toc a[href^=\"#sec-\"]",
+    "sectionSelector": "main section.block[id^=\"sec-\"]",
+    "requiredAnchors": ["sec-09-5"]
+  },
+  "forbiddenSelectors": [
+    {
+      "selector": ".chiprow",
+      "message": "Legacy chiprow markup must not return; history cards use Result-card style row badges."
+    },
+    {
+      "selector": ".sortbar",
+      "message": "Sort/filter bars are not part of the browsing-history screen contract."
+    },
+    {
+      "selector": ".row-check",
+      "message": "Selection check affordances are not part of history cards."
+    },
+    {
+      "selector": ".pane-right-preview",
+      "message": "Preview panes are forbidden; the Flutter data model has no preview panel for this screen."
+    },
+    {
+      "selector": ".material-symbols-outlined",
+      "message": "External Material Symbols font usage is forbidden in this HTML design repository."
+    },
+    {
+      "selector": ".pane-left .empty-wrap",
+      "message": "iPad empty state belongs in the content pane, not the tab/filter pane."
+    },
+    {
+      "selector": ".frame.f-iphone-compact > .device > .scroll > .tabbar",
+      "message": "iPhone compact tabs must stay fixed outside the scroll area."
+    },
+    {
+      "selector": ".frame.f-iphone-landscape > .device > .scroll > .tabbar",
+      "message": "iPhone landscape tabs must stay fixed outside the scroll area."
+    }
+  ],
+  "forbiddenText": [
+    "この履歴を削除",
+    "23 件の履歴項目",
+    "23件の履歴項目",
+    "確認中",
+    "API failure",
+    "再試行",
+    "pane-right-list",
+    "row-level retry"
+  ],
+  "requiredSelectors": [
+    {
+      "selector": "#sec-09-5",
+      "min": 1,
+      "message": "The forbidden-patterns section must remain documented."
+    },
+    {
+      "selector": ".frame[data-frame-label]",
+      "min": 1
+    },
+    {
+      "selector": ".frame.f-iphone-compact .scroll > .empty-wrap",
+      "min": 1,
+      "message": "Phone empty state must be inside the scrollable content area, not replacing fixed tabs."
+    },
+    {
+      "selector": ".frame.f-ipad-portrait .pane:not(.pane-left) > .empty-wrap",
+      "min": 1,
+      "message": "iPad portrait empty state must render in the right/content pane."
+    },
+    {
+      "selector": ".frame.f-ipad-landscape .pane:not(.pane-left) > .empty-wrap",
+      "min": 1,
+      "message": "iPad landscape empty state must render in the right/content pane."
+    }
+  ],
+  "forbiddenDescendants": [
+    {
+      "ancestor": ".hrow[data-row-type=\"disease\"]",
+      "descendant": ".row-img",
+      "message": "Disease history rows must mirror Result cards and must not render an image tile."
+    }
+  ],
+  "requiredDirectParent": [
+    {
+      "selector": ".fab",
+      "parent": ".device",
+      "message": "Bulk-delete FAB must be positioned consistently relative to the device, not nested in scroll panes."
+    }
+  ],
+  "countEquals": [
+    {
+      "name": "retained frame chrome",
+      "selectors": [
+        ".frame[data-frame-label]",
+        ".frame[data-frame-label] > .device",
+        ".frame[data-frame-label] > .device > .status",
+        ".frame[data-frame-label] > .device > .appbar",
+        ".frame[data-frame-label] > .device > .footer",
+        ".frame[data-frame-label] > .device > .footer .disclaimer",
+        ".frame[data-frame-label] > .device > .footer .navbar"
+      ]
+    },
+    {
+      "name": "history row brand structure",
+      "selectors": [".frame[data-frame-label] .hrow", ".frame[data-frame-label] .hrow .row-body .row-head .row-brand"]
+    }
+  ]
+}

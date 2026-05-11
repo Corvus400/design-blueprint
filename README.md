@@ -23,8 +23,14 @@ The `prepare` script in `package.json` runs `husky`, which wires Git hooks. With
 
 1. Edit HTML inside `<project>/`.
 2. Stage the changed HTML.
-3. Commit. The pre-commit hook runs prettier, htmlhint, and VRT on staged projects.
-4. Push. The pre-push hook re-runs lint and VRT across all projects.
+3. Commit. The pre-commit hook runs prettier, htmlhint, any matching HTML audit rules, and VRT on staged projects.
+4. Push. The pre-push hook re-runs lint, HTML audit rules, and VRT across all projects.
+
+## HTML Audit Rules
+
+Use `npm run html:audit` for DOM-based structural checks that are too repo-specific for htmlhint or VRT. Rule files live in `scripts/html-audit-rules/*.json` and can forbid stale selectors/text, require parent-child structure, and keep TOC anchors aligned with sections.
+
+When editing a large spec HTML, prefer adding or updating an audit rule over relying on repeated manual `rg` checks. Keep rules page-specific and focused on invariants that would otherwise cause implementation hallucinations.
 
 ## First-Time Commit For A New Project
 

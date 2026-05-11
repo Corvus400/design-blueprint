@@ -6,7 +6,8 @@ Codex acts on files via `apply_patch`. The same invariants and review loop as `C
 
 - The implementation repo for each design is named identically to the directory under this repo root.
 - Always read `<project>/spec.md` before patching `<project>/index.html`.
-- After patching, stage the changed HTML and commit. Pre-commit runs lint and VRT on staged projects only.
+- After patching, stage the changed HTML and commit. Pre-commit runs lint, matching HTML audit rules, and VRT on staged projects only.
+- For large or fragile HTML specs, add or update `scripts/html-audit-rules/*.json` instead of relying only on manual search. Use DOM-based audit rules for stale selectors/text, parent-child placement, TOC/section alignment, and implementation-backed invariants.
 
 ## When VRT Fails
 

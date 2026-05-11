@@ -11,6 +11,8 @@
     "prepare": "husky",
     "lint": "node scripts/lint-hook.mjs --all",
     "lint:fix": "prettier --write \"**/*.html\" \"!**/snapshots/**\" \"!.vrt-output/**\" \"!node_modules/**\"",
+    "html:audit": "node scripts/html-audit.mjs --all",
+    "html:audit:selftest": "node scripts/html-audit-selftest.mjs",
     "vrt": "node scripts/vrt-hook.mjs --all",
     "vrt:approve": "node scripts/vrt-approve.mjs",
     "vrt:report": "node scripts/vrt-report.mjs"

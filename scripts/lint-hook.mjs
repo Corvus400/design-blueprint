@@ -58,6 +58,11 @@ async function main() {
     console.error("[lint-hook] htmlhint failed. See output above and fix rule violations.");
     process.exit(1);
   }
+  const auditStatus = runCmd("node", ["scripts/html-audit.mjs", `--${mode}`], []);
+  if (auditStatus !== 0) {
+    console.error("[lint-hook] html-audit failed. See structural audit output above.");
+    process.exit(1);
+  }
   console.log("[lint-hook] OK");
 }
 
