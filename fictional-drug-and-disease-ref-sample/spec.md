@@ -4,9 +4,9 @@ This page is the canary for the VRT pipeline. Treat any change to colors, font s
 
 ## Layout
 
-- Page background: `#f6f7fb`
+- Page background: `#1c1f26`
 - Two stacked sections: header + action area, with a footer divider on top
-- Body font: system sans-serif
+- Body font: system sans-serif, with default body text color `#f4f7fb`
 
 ## Header
 
