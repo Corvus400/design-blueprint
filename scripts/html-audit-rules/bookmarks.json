@@ -1,0 +1,289 @@
+{
+  "file": "fictional-drug-and-disease-ref-flutter/ブックマーク画面/bookmarks.html",
+  "description": "Bookmarks structural guardrails for Flutter-compatible design SSOT aligned with browsing-history chrome.",
+  "tocSections": {
+    "tocSelector": "aside.toc a[href^=\"#sec-\"]",
+    "sectionSelector": "main section.block[id^=\"sec-\"]",
+    "requiredAnchors": [
+      "sec-01",
+      "sec-02",
+      "sec-03",
+      "sec-04",
+      "sec-05",
+      "sec-06",
+      "sec-07",
+      "sec-08",
+      "sec-09",
+      "sec-09-5",
+      "sec-10"
+    ]
+  },
+  "forbiddenSelectors": [
+    {
+      "selector": ".fab",
+      "message": "Bookmarks must not inherit browsing-history retry/bulk-delete FAB behavior."
+    },
+    {
+      "selector": ".row-retry",
+      "message": "Bookmarks render saved snapshots directly; row-level recovery controls are forbidden."
+    },
+    {
+      "selector": ".material-symbols-outlined",
+      "message": "External Material Symbols font usage is forbidden in this HTML design repository."
+    },
+    {
+      "selector": ".hrow[data-row-type=\"disease\"] .row-img",
+      "message": "Disease bookmark rows must mirror disease result cards and must not render an image tile."
+    },
+    {
+      "selector": ".brow",
+      "message": "Legacy bookmark-only row markup must not return; use shared .hrow result-card markup."
+    },
+    {
+      "selector": ".top-panel",
+      "message": "Legacy bookmark top-panel chrome must not return; use browsing-history fixed tab/search chrome."
+    },
+    {
+      "selector": ".appbar .count",
+      "message": "Counts do not belong in the shared AppTabHeader appbar."
+    },
+    {
+      "selector": ".appbar .loading",
+      "message": "Loading state does not belong in the shared AppTabHeader appbar."
+    },
+    {
+      "selector": ".badge.type-drug",
+      "message": "Do not render id-prefix type badges as visible card badges."
+    },
+    {
+      "selector": ".badge.type-disease",
+      "message": "Do not render id-prefix type badges as visible card badges."
+    },
+    {
+      "selector": ".nav-dest .ico",
+      "message": "Bottom navigation must use the same SVG icon treatment as browsing-history."
+    },
+    {
+      "selector": ".pane-right-preview",
+      "message": "Preview panes are not part of the bookmarks screen contract."
+    },
+    {
+      "selector": ".sortbar",
+      "message": "Bookmarks are always ordered by bookmarkedAt DESC and do not expose a sort bar."
+    },
+    {
+      "selector": ".scroll .tabbar",
+      "message": "Tabs must be fixed outside the scroll area."
+    },
+    {
+      "selector": ".scroll .bookmark-search",
+      "message": "Keyword search must be fixed outside the scroll area."
+    }
+  ],
+  "forbiddenText": [
+    "名前取得失敗",
+    "名前を再取得",
+    "全履歴",
+    "一括削除",
+    "row-level retry",
+    "material-symbols-outlined",
+    "https://fonts.googleapis.com",
+    "https://unpkg.com",
+    "タイプバッジ",
+    "type badge",
+    "bookmarkedAt DESC / client prefix search",
+    "client prefix search",
+    "読み込み中",
+    "星アイコン"
+  ],
+  "requiredSelectors": [
+    {
+      "selector": "#sec-09-5",
+      "min": 1,
+      "message": "The forbidden-patterns section must remain documented."
+    },
+    {
+      "selector": ".frame[data-frame-label]",
+      "min": 54,
+      "message": "Bookmarks SSOT must include the retained device/theme/state frame matrix."
+    },
+    {
+      "selector": ".frame.f-iphone-compact[data-frame-label]",
+      "min": 14,
+      "message": "iPhone compact frames must cover all retained states plus Dynamic Type."
+    },
+    {
+      "selector": ".frame.f-iphone-landscape[data-frame-label]",
+      "min": 12,
+      "message": "iPhone landscape light/dark evidence is required for retained states."
+    },
+    {
+      "selector": ".frame.f-ipad-portrait[data-frame-label]",
+      "min": 12,
+      "message": "iPad portrait light/dark evidence is required for retained states."
+    },
+    {
+      "selector": ".frame.f-ipad-landscape[data-frame-label]",
+      "min": 12,
+      "message": "iPad landscape light/dark evidence is required for retained states."
+    },
+    {
+      "selector": ".frame.f-tablet-splitview[data-frame-label]",
+      "min": 4,
+      "message": "iPad Split 50:50 evidence must include normal and search-zero in both themes."
+    },
+    {
+      "selector": ".frame.dark[data-frame-label]",
+      "min": 27,
+      "message": "Every retained frame state must have dark-mode evidence."
+    },
+    {
+      "selector": ".frame.large-text[data-frame-label]",
+      "min": 2,
+      "message": "Dynamic Type 200% evidence must include light and dark frames."
+    },
+    {
+      "selector": ".empty-wrap[data-state=\"empty\"]",
+      "min": 1,
+      "message": "Empty state must be represented."
+    },
+    {
+      "selector": ".empty-wrap[data-state=\"search\"]",
+      "min": 1,
+      "message": "Search zero-result state must be represented."
+    },
+    {
+      "selector": ".empty-wrap[data-state=\"error\"]",
+      "min": 1,
+      "message": "Saved-data read/decode error state must be represented."
+    },
+    {
+      "selector": ".skel-row[data-state=\"loading\"]",
+      "min": 10,
+      "message": "Initial loading skeleton rows must be represented as shimmer rows."
+    },
+    {
+      "selector": ".hrow.swiping .swipe-action",
+      "min": 1,
+      "message": "Swipe delete reveal must be represented using browsing-history style."
+    },
+    {
+      "selector": ".hrow[data-id^=\"drug_\"][data-row-type=\"drug\"][data-bookmarked-at][data-snapshot-kind=\"DrugSummary\"]",
+      "min": 1,
+      "message": "Drug bookmark rows must carry id prefix, type, timestamp, and snapshot kind."
+    },
+    {
+      "selector": ".hrow[data-id^=\"disease_\"][data-row-type=\"disease\"][data-bookmarked-at][data-snapshot-kind=\"DiseaseSummary\"]",
+      "min": 1,
+      "message": "Disease bookmark rows must carry id prefix, type, timestamp, and snapshot kind."
+    },
+    {
+      "selector": ".frame.f-iphone-compact > .device > .tabbar",
+      "min": 1,
+      "message": "Phone portrait must keep tabs fixed outside scroll."
+    },
+    {
+      "selector": ".frame.f-iphone-compact > .device > .bookmark-search",
+      "min": 1,
+      "message": "Phone portrait must keep keyword search fixed outside scroll."
+    },
+    {
+      "selector": ".frame.f-iphone-compact > .device > .scroll",
+      "min": 1,
+      "message": "Phone portrait must keep only content in the scrollable area."
+    },
+    {
+      "selector": ".frame.f-iphone-landscape > .device > .body-pane2 > .pane-left > .bookmark-search",
+      "min": 1,
+      "message": "iPhone landscape pane layout must place keyword search above vertical tabs."
+    },
+    {
+      "selector": ".frame.f-iphone-landscape > .device > .body-pane2 > .pane-left > .tabbar",
+      "min": 1,
+      "message": "iPhone landscape pane layout must keep vertical tabs in the left pane."
+    },
+    {
+      "selector": ".frame.f-ipad-portrait > .device > .body-pane2 > .pane-left > .bookmark-search",
+      "min": 1,
+      "message": "iPad portrait pane layout must place keyword search above vertical tabs."
+    },
+    {
+      "selector": ".frame.f-ipad-portrait > .device > .body-pane2 > .pane-left > .tabbar",
+      "min": 1,
+      "message": "iPad portrait pane layout must keep vertical tabs in the left pane."
+    },
+    {
+      "selector": ".frame.f-ipad-landscape > .device > .body-pane2 > .pane-left > .bookmark-search",
+      "min": 1,
+      "message": "iPad landscape pane layout must place keyword search above vertical tabs."
+    },
+    {
+      "selector": ".frame.f-ipad-landscape > .device > .body-pane2 > .pane-left > .tabbar",
+      "min": 1,
+      "message": "iPad landscape pane layout must keep vertical tabs in the left pane."
+    },
+    {
+      "selector": ".frame.f-tablet-splitview > .device > .body-pane2 > .pane-left > .bookmark-search",
+      "min": 1,
+      "message": "Split-view pane layout must place keyword search above vertical tabs."
+    },
+    {
+      "selector": ".frame.f-tablet-splitview > .device > .body-pane2 > .pane-left > .tabbar",
+      "min": 1,
+      "message": "Split-view pane layout must keep vertical tabs in the left pane."
+    },
+    {
+      "selector": ".footer .disclaimer",
+      "min": 54,
+      "message": "Disclaimer ribbon must be present in every retained frame."
+    },
+    {
+      "selector": ".footer .navbar .nav-dest.on .icon-svg",
+      "min": 54,
+      "message": "Bottom navigation selected destination must use the shared icon + selected pill treatment."
+    }
+  ],
+  "forbiddenDescendants": [
+    {
+      "ancestor": ".hrow[data-row-type=\"disease\"]",
+      "descendant": ".row-img",
+      "message": "Disease bookmark rows must not render drug-style image tiles."
+    }
+  ],
+  "countEquals": [
+    {
+      "name": "frame shell chrome",
+      "selectors": [
+        ".frame[data-frame-label]",
+        ".frame[data-frame-label] > .device",
+        ".frame[data-frame-label] > .device > .status",
+        ".frame[data-frame-label] > .device > .appbar",
+        ".frame[data-frame-label] > .device > .footer",
+        ".frame[data-frame-label] > .device > .footer .disclaimer",
+        ".frame[data-frame-label] > .device > .footer .navbar"
+      ]
+    }
+  ],
+  "selectorCounts": [
+    {
+      "selector": ".frame[data-frame-label]",
+      "equals": 54
+    },
+    {
+      "selector": ".frame.large-text[data-frame-label]",
+      "equals": 2
+    },
+    {
+      "selector": ".appbar .title",
+      "equals": 54
+    },
+    {
+      "selector": ".bookmark-search",
+      "min": 54
+    },
+    {
+      "selector": ".tabbar[role=\"tablist\"]",
+      "min": 54
+    }
+  ]
+}

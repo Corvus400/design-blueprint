@@ -215,6 +215,14 @@
       "deviceScaleFactor": 1,
       "threshold": 0.1,
       "mask": []
+    },
+    {
+      "name": "bookmarks",
+      "file": "ブックマーク画面/bookmarks.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
     }
   ]
 }
