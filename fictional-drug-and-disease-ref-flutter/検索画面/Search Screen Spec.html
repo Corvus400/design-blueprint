@@ -1953,7 +1953,7 @@
         position: absolute;
         left: 0;
         right: 0;
-        bottom: 56px;
+        bottom: 64px;
         height: 26px;
         background: var(--rib-bg-light);
         color: var(--rib-fg);
@@ -1991,7 +1991,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        height: 56px;
+        height: 64px;
         background: var(--surface);
         border-top: 1px solid var(--hairline);
         display: flex;
@@ -2586,10 +2586,10 @@
                 bottom-nav をやめ、左端に icon-only の navigation rail を立てる
               </strong>
               — 検索 / ブックマーク / 閲覧履歴 / 計算ツール 4 アイテム、ラベルなし、active = 検索。iPhone landscape は
-              Bookmark 画面と同じ
+              既存の Bookmark / History の横 rail 実装と同系統の
               <strong>left-rail</strong>
-              パターン (railWidth 240) で nav-rail の右隣にコンパクト検索 + 縦並び seg-tabs + 履歴 / 絞り込み / 並び替え
-              (intra-rail スクロール) を積む。iPad の 2 つの landscape クラスは
+              パターン (検索画面専用 railWidth 240) で nav-rail の右隣にコンパクト検索 + 縦並び seg-tabs + 履歴 /
+              絞り込み / 並び替え (intra-rail スクロール) を積む。iPad の 2 つの landscape クラスは
               <code>.toolbar</code>
               を維持しつつ nav-rail の右に master-pane + utility-pane の 2-pane を並べる。右パネル / 内側 rail
               は詳細プレビューでも CTA でもなく、フィルタを観察しながら結果を反復するための作業領域。intra-rail
@@ -2598,7 +2598,8 @@
               ページにまとめ、verification table が最下部で PASS/FAIL を集約する。
             </p>
             <div class="ssot">
-              single source of truth — all screen states for all devices and themes live in this one page
+              single source of truth — representative search screen states for all devices and themes live in this one
+              page; SearchTab-specific contracts are listed separately
             </div>
             <div class="grid">
               <div>
@@ -2731,8 +2732,9 @@
             全
             <strong id="matrix-total">…</strong>
             フレーム。iPhone portrait は 9 states × 2 themes = 18、4 つの utility-pane / left-rail device class は 7
-            states × 2 themes × 4 = 56、合計 74。 iPhone portrait は single-pane で idle 状態にインライン履歴を常駐 +
-            bottom-sheet 絞り込み / 並び替え。iPhone landscape は
+            states × 2 themes × 4 = 56、合計 74。74 フレームは device × theme × state の代表行列であり、SearchTab
+            (医薬品 / 疾患) 軸は component spec の Target contracts と verification で別途固定する。 iPhone portrait は
+            single-pane で idle 状態にインライン履歴を常駐 + bottom-sheet 絞り込み / 並び替え。iPhone landscape は
             <strong>left-rail</strong>
             2-pane (rail に検索 + 縦タブ + utility-pane 常駐 / master-pane が結果)。iPad 3 クラスは
             <code>.toolbar</code>
@@ -2751,6 +2753,61 @@
             SearchField / Segmented / Sort button (iPhone portrait only) / Filter FAB (iPhone portrait only) / Result
             cards / History row / Bottom nav / app-shell Nav rail / Utility pane (history + filter + sort).
           </p>
+          <div
+            class="card"
+            id="search-target-contracts"
+            data-frame-axis-policy="74-representative-device-theme-state"
+            data-search-tab-axis="drug|disease"
+            data-drug-sort-wire="-revised_at|brand_name_kana|atc_code|therapeutic_category_name"
+            data-disease-sort-wire="-revised_at|name_kana|icd10_chapter"
+          >
+            <h4 style="margin: 0 0 10px; font: 700 13px var(--jp)">Target contracts — SearchTab axis</h4>
+            <p style="margin: 0 0 10px; font: 12.5px/1.7 var(--jp); color: var(--page-muted)">
+              74 フレームは device × theme × state の代表行列。医薬品 / 疾患のタブ差分は、この契約表と filter / sort の
+              wire value で固定する。
+            </p>
+            <table class="a11y-table">
+              <thead>
+                <tr>
+                  <th>Target</th>
+                  <th>Search hint</th>
+                  <th>Filter axes</th>
+                  <th>Sort wire values</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-target-contract="drug">
+                  <td>医薬品</td>
+                  <td>医薬品名・YJ・ATC コード</td>
+                  <td>規制区分 / 剤形 / 投与経路 / ATC 第 1 階層 / 薬効分類 / 副作用キーワード / 患者背景</td>
+                  <td>
+                    <code>-revised_at</code>
+                    /
+                    <code>brand_name_kana</code>
+                    /
+                    <code>atc_code</code>
+                    /
+                    <code>therapeutic_category_name</code>
+                  </td>
+                </tr>
+                <tr data-target-contract="disease">
+                  <td>疾患</td>
+                  <td>疾患名・症状・ICD-10</td>
+                  <td>
+                    ICD-10 章 / 診療科 / 慢性度 / 感染性 / 症状キーワード / 発症パターン / 検査区分 / 薬物治療あり /
+                    重症度評価あり
+                  </td>
+                  <td>
+                    <code>-revised_at</code>
+                    /
+                    <code>name_kana</code>
+                    /
+                    <code>icd10_chapter</code>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <div class="atom-grid" id="atom-root"></div>
         </section>
 
@@ -2771,7 +2828,7 @@
         <section class="block" id="sec-verify">
           <h2 class="section-title">
             08 — Verification report
-            <span class="tag">VR-01..VR-26</span>
+            <span class="tag">VR-01..VR-27</span>
           </h2>
           <p class="section-sub">
             Computed by inline JS on load. Every row must read PASS for the deliverable to ship.
@@ -2788,12 +2845,17 @@
             data-phone-history="inline"
             data-nav-rail-scope="app-shell-all-tabs"
             data-utility-pane-role="history-filter-sort"
+            data-target-axis-policy="representative-frames-plus-contract"
+            data-drug-sort-wire="-revised_at|brand_name_kana|atc_code|therapeutic_category_name"
+            data-disease-sort-wire="-revised_at|name_kana|icd10_chapter"
+            data-bottom-nav-height="64"
           >
             <span data-required="history-inline"></span>
             <span data-required="bottom-nav-phone"></span>
             <span data-required="nav-rail-landscape"></span>
             <span data-required="utility-pane"></span>
             <span data-required="left-rail"></span>
+            <span data-required="target-contracts"></span>
           </div>
         </section>
       </main>
@@ -2950,7 +3012,7 @@
             meta: "5 値・複数選択 OR",
           },
           { id: "has-pharma", name: "薬物治療あり", values: [], meta: "bool" },
-          { id: "has-severity", name: "重症度区分あり", values: [], meta: "bool" },
+          { id: "has-severity", name: "重症度評価あり", values: [], meta: "bool" },
         ];
 
         var SORT_DRUG = [
@@ -2961,7 +3023,7 @@
         ];
         var SORT_DISEASE = [
           { id: "revised_at", name: "改訂日", on: true },
-          { id: "name", name: "名称" },
+          { id: "name_kana", name: "名称" },
           { id: "icd10_chapter", name: "ICD-10" },
         ];
 
@@ -3360,8 +3422,8 @@
             body =
               '<div class="utility-history-empty" role="status" aria-live="polite">' +
               '<span class="ico">history</span>' +
-              '<div class="head">検索履歴がありません</div>' +
-              '<div class="sub">検索を実行すると、ここに直近 5 件まで自動で記録されます。</div>' +
+              '<div class="head">検索履歴はまだありません</div>' +
+              '<div class="sub">検索すると履歴が最大 5 件まで残ります。履歴は端末内にのみ保存されます。</div>' +
               "</div>";
           } else {
             var rows = HISTORY_ROWS.slice(0, 5)
@@ -3388,8 +3450,8 @@
             body = '<ul class="utility-history-list">' + rows + "</ul>";
           }
           var clearBtn = emptyMode
-            ? '<button class="utility-history-clear" type="button" disabled style="opacity:.4;cursor:not-allowed">履歴をクリア</button>'
-            : '<button class="utility-history-clear" type="button">履歴をクリア</button>';
+            ? '<button class="utility-history-clear" type="button" disabled style="opacity:.4;cursor:not-allowed">すべて消す</button>'
+            : '<button class="utility-history-clear" type="button">すべて消す</button>';
           return (
             '<section class="utility-history" aria-labelledby="utility-history-h"' +
             (emptyMode ? ' data-history-empty="true"' : "") +
@@ -3627,11 +3689,13 @@
         // iPhone landscape uses .body.split-rail — a left rail that stacks
         // compact search + vertical seg-tabs + utility-pane, with the result
         // master-pane filling the rest of the body height. No top toolbar.
-        // Matches the Bookmark-screen rail (bookmarks_view.dart railWidth 220).
+        // Follows the same compact side-rail family as Bookmarks/History, with
+        // a search-specific 240px rail so history/filter/sort fit without
+        // covering results.
         // The utility-pane scrolls *inside* the rail, so filter / sort / history
         // content never occludes the result list to its right.
         function leftRailSearch(tab) {
-          var ph = tab === "drug" ? "医薬品名・YJ・ATC コード" : "病名・ICD-10 コード";
+          var ph = tab === "drug" ? "医薬品名・YJ・ATC コード" : "疾患名・症状・ICD-10";
           return (
             '<div class="left-rail-search">' +
             '<div class="search-field">' +
@@ -3684,16 +3748,16 @@
           var card;
           if (emptyMode) {
             // ZERO HISTORY — no recent searches yet (first launch, after
-            // "全件クリア", or anonymous-mode wipe). The same .history-inline
+            // "すべて消す", or anonymous-mode wipe). The same .history-inline
             // card stays in place so the visual anchor for "recent searches"
             // doesn't move once entries do exist; only its content swaps.
             card =
               '<div class="history-inline" data-history-empty="true">' +
-              '<div class="hd-head"><span>最近の検索</span><span style="opacity:.4">全件クリア</span></div>' +
+              '<div class="hd-head"><span>最近の検索</span><span style="opacity:.4">すべて消す</span></div>' +
               '<div class="history-inline-empty" role="status" aria-live="polite">' +
               '<span class="ico">history</span>' +
-              '<div class="head">検索履歴がありません</div>' +
-              '<div class="sub">検索を実行すると、ここに直近 5 件まで自動で記録されます。フィルタや並び替えも一緒に保存。</div>' +
+              '<div class="head">検索履歴はまだありません</div>' +
+              '<div class="sub">検索すると履歴が最大 5 件まで残ります。履歴は端末内にのみ保存されます。</div>' +
               '<div class="hint"><span class="ico">search</span>上の検索バーから始める</div>' +
               "</div>" +
               "</div>";
@@ -3718,7 +3782,7 @@
             }).join("");
             card =
               '<div class="history-inline">' +
-              '<div class="hd-head"><span>最近の検索</span><span>全件クリア</span></div>' +
+              '<div class="hd-head"><span>最近の検索</span><span>すべて消す</span></div>' +
               rows +
               "</div>";
           }
@@ -4112,9 +4176,9 @@
           },
           {
             id: "idle-empty-history",
-            desc: "履歴 0 件（初回起動 / 全件クリア直後）。.history-inline の中身を「履歴がありません」プレースホルダに差し替え、カードの位置・余白は idle と同一。「全件クリア」リンクは disabled、絞り込み / 並び替えは通常どおり利用可。",
+            desc: "履歴 0 件（初回起動 / すべて消す直後）。.history-inline の中身を「検索履歴はまだありません」プレースホルダに差し替え、カードの位置・余白は idle と同一。「すべて消す」リンクは disabled、絞り込み / 並び替えは通常どおり利用可。",
           },
-          { id: "loading", desc: "初回フェッチ。skeleton card × 4 行。" },
+          { id: "loading", desc: "初回フェッチ。skeleton card × 5 行。" },
           { id: "results", desc: "結果リスト充填。" },
           { id: "loading-more", desc: "infinite scroll 追加読込。下部にスピナー行。" },
           { id: "empty", desc: "結果 0 件。適用中フィルタチップ + 条件クリア CTA。" },
@@ -4126,9 +4190,9 @@
           { id: "idle", desc: "master-pane = 検索ヒント。utility-pane = 履歴 / 絞り込み / 並び替え 常駐。" },
           {
             id: "idle-empty-history",
-            desc: "履歴 0 件。utility-pane 上段の「最近の検索」セクションを「履歴がありません」プレースホルダに差し替え（クリアボタン disabled）。フィルタ / 並び替えは通常表示。master-pane も検索ヒント文を「履歴はまだありません」版に変更。",
+            desc: "履歴 0 件。utility-pane 上段の「最近の検索」セクションを「検索履歴はまだありません」プレースホルダに差し替え（すべて消す disabled）。フィルタ / 並び替えは通常表示。master-pane も検索ヒント文を「履歴はまだありません」版に変更。",
           },
-          { id: "loading", desc: "master-pane = skeleton × 4。utility-pane は変わらず。" },
+          { id: "loading", desc: "master-pane = skeleton × 5。utility-pane は変わらず。" },
           { id: "results", desc: "master-pane = 適用フィルタチップ + 結果リスト。utility-pane は変わらず。" },
           { id: "loading-more", desc: "master-pane = 結果 + 下部スピナー行。utility-pane は変わらず。" },
           { id: "empty", desc: "master-pane = 0 件 + 「右で絞り込みを調整」。utility-pane は変わらず。" },
@@ -4693,7 +4757,7 @@
           html +=
             '<div class="atom-card"><h4>History row anatomy</h4>' +
             '<div class="arow"><span class="label">5 most-recent</span><div class="demo"><div class="history-dropdown" style="position:relative;left:auto;right:auto;top:auto">' +
-            '<div class="hd-head"><span>最近の検索</span><span>全件クリア</span></div>' +
+            '<div class="hd-head"><span>最近の検索</span><span>すべて消す</span></div>' +
             HISTORY_ROWS.map(function (h) {
               return (
                 '<div class="hd-row"><span class="when">' +
@@ -4793,7 +4857,7 @@
             "<h4 style='margin:0 0 10px;font:700 13px var(--jp)'>Dynamic Type ladder</h4>" +
             "<p style='font:12.5px var(--jp);color:var(--page-muted);margin:0 0 8px'>iOS / Android で xSmall → AX5 まで線形スケール。本仕様はリスト行が3行構成のため AX5 で2倍化しても overflow しない。</p>" +
             "<h4 style='margin:18px 0 10px;font:700 13px var(--jp)'>Hit targets</h4>" +
-            "<p style='font:12.5px var(--jp);color:var(--page-muted);margin:0 0 8px'>すべてのタップ可能要素は 44×44 dp 以上。Bottom-nav は 56dp 高さで各タブ ≥ 88dp 幅を確保。</p>" +
+            "<p style='font:12.5px var(--jp);color:var(--page-muted);margin:0 0 8px'>すべてのタップ可能要素は 44×44 dp 以上。Bottom-nav は 64dp 高さで各タブ ≥ 88dp 幅を確保。</p>" +
             "<h4 style='margin:18px 0 10px;font:700 13px var(--jp)'>Semantics labels</h4>" +
             "<p style='font:12.5px var(--jp);color:var(--page-muted);margin:0 0 8px'>" +
             "bottom-nav: <code>role=&quot;navigation&quot;</code> + 各タブ <code>aria-label=&quot;検索|ブックマーク|閲覧履歴|計算ツール&quot;</code>, active タブに <code>aria-current=&quot;page&quot;</code>. " +
@@ -5067,7 +5131,7 @@
             "発症パターン",
             "検査区分",
             "薬物治療あり",
-            "重症度区分あり",
+            "重症度評価あり",
           ];
           var disUtilFrames = root.querySelectorAll(
             '.frame.tablet[data-tab="disease"], .frame.iphone-landscape[data-tab="disease"]',
@@ -5328,8 +5392,14 @@
           };
 
           // VR-13 — cover contains literal sentence
-          var literal = "single source of truth — all screen states for all devices and themes live in this one page";
-          var coverHas = document.querySelector("#sec-cover").textContent.indexOf(literal) >= 0;
+          var literal =
+            "single source of truth representative search screen states for all devices and themes live in this one page SearchTab-specific contracts are listed separately";
+          var coverText = document
+            .querySelector("#sec-cover")
+            .textContent.replace(/[—;·]/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+          var coverHas = coverText.indexOf(literal) >= 0;
           var vr13 = {
             id: "VR-13",
             method: "S",
@@ -5624,9 +5694,11 @@
           // so axis names that happen to contain a forbidden substring (e.g. the
           // drug "副作用キーワード" axis, the disease "薬物治療あり" axis) do not
           // trigger this rule.
-          scanRoot.querySelectorAll(".filter-sheet, .scrim-layer, .utility-filter").forEach(function (el) {
-            el.remove();
-          });
+          scanRoot
+            .querySelectorAll("#search-target-contracts, .filter-sheet, .scrim-layer, .utility-filter")
+            .forEach(function (el) {
+              el.remove();
+            });
           var scanHtml = scanRoot.innerHTML;
           var leakedTokens = [];
           forbiddenTokens.forEach(function (tok) {
@@ -5909,6 +5981,42 @@
                   (vr26Bad.length > 12 ? " …" + (vr26Bad.length - 12) + " more" : "")),
           };
 
+          var targetContract = document.querySelector("#search-target-contracts");
+          var auditContract = document.querySelector("#search-spec-audit-contract");
+          var targetBad = [];
+          if (!targetContract) {
+            targetBad.push("missing #search-target-contracts");
+          } else {
+            if (
+              (targetContract.getAttribute("data-frame-axis-policy") || "") !== "74-representative-device-theme-state"
+            )
+              targetBad.push("frame axis policy");
+            if ((targetContract.getAttribute("data-search-tab-axis") || "") !== "drug|disease")
+              targetBad.push("search tab axis");
+            if (
+              (targetContract.getAttribute("data-drug-sort-wire") || "") !==
+              "-revised_at|brand_name_kana|atc_code|therapeutic_category_name"
+            )
+              targetBad.push("drug sort wire");
+            if ((targetContract.getAttribute("data-disease-sort-wire") || "") !== "-revised_at|name_kana|icd10_chapter")
+              targetBad.push("disease sort wire");
+            if (!targetContract.querySelector('[data-target-contract="drug"]')) targetBad.push("drug row");
+            if (!targetContract.querySelector('[data-target-contract="disease"]')) targetBad.push("disease row");
+          }
+          if (
+            !auditContract ||
+            auditContract.getAttribute("data-target-axis-policy") !== "representative-frames-plus-contract"
+          )
+            targetBad.push("audit target-axis policy");
+          var vr27 = {
+            id: "VR-27",
+            method: "C",
+            pass: targetBad.length === 0,
+            evidence:
+              "SearchTab axis is explicit: 74 representative frames plus drug/disease target contracts and wire values. Bad: " +
+              (targetBad.length === 0 ? "none" : targetBad.join(", ")),
+          };
+
           var rows_ = [
             vr01,
             vr02,
@@ -5938,6 +6046,7 @@
             vr24,
             vr25,
             vr26,
+            vr27,
           ];
 
           // VR-14 — aggregate
@@ -5956,7 +6065,7 @@
             method: "C",
             pass: !anyFail,
             evidence:
-              "Aggregate of VR-01..VR-13, VR-15..VR-26. " +
+              "Aggregate of VR-01..VR-13, VR-15..VR-27. " +
               failRowIds.length +
               " FAIL row(s)" +
               (failRowIds.length ? " [" + failRowIds.join(", ") + "]" : "") +
@@ -5991,6 +6100,7 @@
             vr24,
             vr25,
             vr26,
+            vr27,
           ];
 
           // Render banner

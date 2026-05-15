@@ -45,7 +45,14 @@
     "合計 64",
     "utility-pane devices → 6 states",
     "直近 10 件",
-    "ドロップダウン履歴 + bottom-sheet"
+    "ドロップダウン履歴 + bottom-sheet",
+    "single source of truth — all screen states for all devices and themes live in this one page",
+    "病名・ICD-10 コード",
+    "重症度区分あり",
+    "skeleton × 4",
+    "skeleton card × 4",
+    "履歴をクリア",
+    "全件クリア"
   ],
   "requiredSelectors": [
     {
@@ -92,6 +99,41 @@
       "selector": "#search-spec-audit-contract [data-required=\"left-rail\"]",
       "min": 1,
       "message": "iPhone landscape must keep the compact left-rail search workspace."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-target-axis-policy=\"representative-frames-plus-contract\"] [data-required=\"target-contracts\"]",
+      "min": 1,
+      "message": "SearchTab axis must be represented by explicit target contracts while the VRT matrix stays at 74 frames."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-drug-sort-wire=\"-revised_at|brand_name_kana|atc_code|therapeutic_category_name\"]",
+      "min": 1,
+      "message": "Drug sort wire values must stay aligned with Flutter DrugSort."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-disease-sort-wire=\"-revised_at|name_kana|icd10_chapter\"]",
+      "min": 1,
+      "message": "Disease sort wire values must stay aligned with Flutter DiseaseSort."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-bottom-nav-height=\"64\"]",
+      "min": 1,
+      "message": "Bottom navigation height must stay aligned with Flutter NavigationBarThemeData.height."
+    },
+    {
+      "selector": "#search-target-contracts[data-frame-axis-policy=\"74-representative-device-theme-state\"][data-search-tab-axis=\"drug|disease\"]",
+      "min": 1,
+      "message": "Visible target contract table must clarify that 74 frames are representative and SearchTab is a separate axis."
+    },
+    {
+      "selector": "#search-target-contracts [data-target-contract=\"drug\"]",
+      "min": 1,
+      "message": "Target contract table must include the drug tab contract."
+    },
+    {
+      "selector": "#search-target-contracts [data-target-contract=\"disease\"]",
+      "min": 1,
+      "message": "Target contract table must include the disease tab contract."
     }
   ]
 }
