@@ -9,6 +9,14 @@ Codex acts on files via `apply_patch`. The same invariants and review loop as `C
 - After patching, stage the changed HTML and commit. Pre-commit runs lint, matching HTML audit rules, and VRT on staged projects only.
 - For large or fragile HTML specs, add or update `scripts/html-audit-rules/*.json` instead of relying only on manual search. Use DOM-based audit rules for stale selectors/text, parent-child placement, TOC/section alignment, and implementation-backed invariants.
 
+## Design Conflict Recovery
+
+- If the user reports that a design is broken, unchanged, visually wrong, or needs recurrence prevention, stop adding speculative fixes. First inspect `git diff`, the affected page HTML, `pages.json`, the matching audit rule, and the VRT actual/comparison output.
+- Separate changes into `revert mistaken change`, `keep intended change`, and `add guardrail`. Restore the previous design contract before adding new behavior when the issue was introduced by the current session.
+- Do not change a page's device classes, frame count, state matrix, or responsive mode from inference alone. Record the current contract, source evidence, intended contract, and impact before editing.
+- For visual design conflicts, DOM audit and VRT are not enough by themselves. Capture or inspect a rendered screenshot/crop of the affected frame before approving a VRT diff or claiming the layout is fixed.
+- Encode the corrected invariant in `scripts/html-audit-rules/*.json` or an inline verification row so the same broken state cannot pass again.
+
 ## When VRT Fails
 
 Use the paths in `.vrt-output/report/results.json`:

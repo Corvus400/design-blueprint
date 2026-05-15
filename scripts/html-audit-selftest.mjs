@@ -66,6 +66,7 @@ try {
           requiredAnchors: ["sec-01"],
         },
         forbiddenSelectors: [".chiprow", ".pane-left .empty-wrap"],
+        requiredText: ["Delete all", { pattern: 'data-row-type="disease"' }],
         forbiddenDescendants: [
           {
             ancestor: '.hrow[data-row-type="disease"]',
@@ -94,6 +95,7 @@ try {
           requiredAnchors: ["sec-01"],
         },
         forbiddenSelectors: [".chiprow", ".pane-left .empty-wrap"],
+        requiredText: ["Delete selected", { pattern: 'data-row-type="drug"' }],
         forbiddenDescendants: [
           {
             ancestor: '.hrow[data-row-type="disease"]',
@@ -119,6 +121,7 @@ try {
   const bad = await auditFiles({ files: [badHtml], rulesDir });
   assert.equal(bad.audited, 1);
   assert.ok(bad.failures.some((failure) => failure.check === "forbiddenSelectors"));
+  assert.ok(bad.failures.some((failure) => failure.check === "requiredText"));
   assert.ok(bad.failures.some((failure) => failure.check === "forbiddenDescendants"));
   assert.ok(bad.failures.some((failure) => failure.check === "requiredDirectParent"));
   assert.ok(bad.failures.some((failure) => failure.check === "tocSections"));

@@ -23,6 +23,14 @@ This repository stores HTML designs and gates every commit and push with VRT. As
 - Use audit rules for repo-specific invariants that htmlhint cannot know, such as forbidden stale selectors, required parent-child placement, TOC/section alignment, or data-shape constraints from an implementation repo.
 - When repeated manual checks are needed during a large HTML repair, add a narrow audit rule and run `npm run html:audit` before VRT.
 
+## Design Conflict Recovery
+
+- If the user says a rendered design is broken, unchanged, or repeatedly regressing, stop speculative patching and first read `git diff`, the affected HTML, `pages.json`, the matching audit rule, and VRT actual/comparison output.
+- Split the fix into three buckets: mistaken current-session changes to revert, intended changes to keep, and guardrails to add. Do not keep a new contract merely because the updated verification was made to pass.
+- Treat device classes, frame totals, state matrices, breakpoints, and responsive modes as locked contracts. Any change to them needs explicit source evidence from the page contract or implementation repo and must be reflected in audit rules.
+- DOM audit and VRT are necessary but not sufficient for UI judgement. Inspect a rendered screenshot/crop of the affected state before approving a VRT diff or reporting that a visual conflict is resolved.
+- The final corrected constraint must become deterministic: add a page-specific audit rule or inline verification row so the same broken state cannot pass on the next session.
+
 ## Visual Reviewer Mode
 
 When pre-commit or pre-push fails with a VRT diff:

@@ -421,6 +421,18 @@ function evaluateHtmlAudit({ html, file, rule }) {
     if (hits > 0) fail("forbiddenText", messageFor(item, `${pattern} found ${hits} time(s)`));
   }
 
+  for (const item of rule.requiredText ?? []) {
+    const pattern = typeof item === "string" ? item : item.pattern;
+    const flags = typeof item === "string" ? "" : (item.flags ?? "");
+    const hits =
+      typeof item === "string"
+        ? html.includes(pattern)
+          ? 1
+          : 0
+        : [...html.matchAll(new RegExp(pattern, flags.includes("g") ? flags : `${flags}g`))].length;
+    if (hits === 0) fail("requiredText", messageFor(item, `${pattern} not found`));
+  }
+
   if (rule.tocSections) {
     const tocSelector = rule.tocSections.tocSelector ?? '.toc a[href^="#"]';
     const sectionSelector = rule.tocSections.sectionSelector ?? "section[id]";

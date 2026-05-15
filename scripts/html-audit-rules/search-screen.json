@@ -61,6 +61,14 @@
     "data-split-view-mode=\"compact-single-pane\"",
     "iPad Split View 50/50 は 597"
   ],
+  "requiredText": [
+    "id: \"VR-28\"",
+    "iPad portrait and iPad Split View stay utility-pane two-pane with no phone modal states",
+    "Split View representative frame is 960×700 with nav-rail, no bottom-nav, and utility-pane width >= 300px",
+    "else if (device === \"iPad Split View\") cls += \" tablet splitview\"",
+    "return device === \"iPhone landscape\" || device === \"iPad landscape\" || device === \"iPad Split View\"",
+    "var statesForDevice = D.id === \"iPhone\" ? STATES_FULL : STATES_UTIL"
+  ],
   "requiredSelectors": [
     {
       "selector": "#sec-verify",
