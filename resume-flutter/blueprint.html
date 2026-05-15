@@ -1,0 +1,3505 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>resume-flutter — Design Blueprint</title>
+    <style>
+      /* ============================================================
+     TOKENS  (Flutter implementation should mirror these exactly)
+     ============================================================ */
+      :root {
+        /* ---- Color: Surface & Ink ---- */
+        --bg: #f6f3ee; /* page background, warm ivory */
+        --surface: #ffffff; /* card surface */
+        --surface-alt: #efe7da; /* chip / subtle fill (warm sand) */
+        --surface-sunk: #f0e9dd; /* timeline rail, code blocks */
+        --line-soft: #e8e0d1;
+        --line: #d9cfbc;
+        --line-strong: #c3b79f;
+        --ink-900: #1e1611; /* primary text */
+        --ink-700: #3a2e22; /* heading on surface */
+        --ink-500: #524337; /* secondary body */
+        --ink-300: #877767; /* meta */
+        --ink-100: #b5a993; /* disabled / decorative */
+
+        /* ---- Color: Brand ---- */
+        --primary: #9f4014; /* deep burnt copper — complement to icon blue */
+        --primary-hover: #823310;
+        --primary-press: #66270b;
+        --primary-container: #f2d9c5;
+        --on-primary: #ffffff;
+        --accent: #2e4e73; /* deep navy, echoes the icon */
+        --accent-soft: #dce4ee;
+        --error: #8c2a2a;
+
+        /* ---- Typography ---- */
+        --ff-jp:
+          "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+        --ff-latin: "Noto Sans JP", "Inter", system-ui, sans-serif;
+
+        /* ---- Spacing scale (4-base) ---- */
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 20px;
+        --s6: 24px;
+        --s8: 32px;
+        --s10: 40px;
+        --s12: 48px;
+        --s16: 64px;
+        --s20: 80px;
+        --s24: 96px;
+
+        /* ---- Radius ---- */
+        --r-xs: 4px;
+        --r-sm: 8px;
+        --r-md: 12px;
+        --r-lg: 20px;
+        --r-full: 999px;
+
+        /* ---- Elevation ---- */
+        --e1: 0 1px 2px rgba(30, 22, 17, 0.06), 0 1px 1px rgba(30, 22, 17, 0.04);
+        --e2: 0 4px 10px rgba(30, 22, 17, 0.06), 0 1px 2px rgba(30, 22, 17, 0.04);
+        --e3: 0 12px 28px rgba(30, 22, 17, 0.1), 0 2px 6px rgba(30, 22, 17, 0.06);
+      }
+
+      /* ============================================================
+     PAGE CHROME
+     ============================================================ */
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--ink-900);
+        font-family: var(--ff-jp);
+        font-feature-settings:
+          "palt" 1,
+          "tnum" 1;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      .page {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: var(--s10) var(--s8) var(--s24);
+      }
+      .blueprint-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: var(--s8);
+        margin-bottom: var(--s16);
+        gap: var(--s10);
+        flex-wrap: wrap;
+      }
+      .blueprint-head h1 {
+        font-size: 32px;
+        line-height: 40px;
+        font-weight: 700;
+        letter-spacing: -0.005em;
+        margin: 0;
+      }
+      .blueprint-head .eyebrow {
+        display: block;
+        margin-bottom: var(--s2);
+      }
+      .blueprint-head p {
+        max-width: 56ch;
+        margin: 0;
+        color: var(--ink-500);
+        font-size: 14px;
+        line-height: 24px;
+      }
+      .blueprint-head dl {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 2px var(--s4);
+        font-size: 12px;
+        margin: 0;
+        align-self: center;
+      }
+      .blueprint-head dt {
+        color: var(--ink-300);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .blueprint-head dd {
+        margin: 0;
+        color: var(--ink-700);
+      }
+
+      .eyebrow {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        line-height: 16px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink-300);
+      }
+
+      /* Section header */
+      .section {
+        margin-top: var(--s20);
+      }
+      .section-head {
+        display: flex;
+        align-items: baseline;
+        gap: var(--s5);
+        margin-bottom: var(--s6);
+      }
+      .section-num {
+        font-family: var(--ff-latin);
+        font-variant-numeric: tabular-nums;
+        font-size: 12px;
+        color: var(--ink-300);
+        letter-spacing: 0.14em;
+      }
+      .section-title {
+        font-size: 22px;
+        line-height: 30px;
+        font-weight: 700;
+        margin: 0;
+      }
+      .section-jp {
+        color: var(--ink-500);
+        font-size: 14px;
+      }
+      .section-note {
+        color: var(--ink-500);
+        font-size: 13px;
+        line-height: 22px;
+        max-width: 64ch;
+        margin: 0 0 var(--s6);
+      }
+
+      /* Frame chrome ------------------------------------------------ */
+      .frames {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s10);
+      }
+      .frame {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s3);
+      }
+      .frame-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-300);
+      }
+      .frame-label .dims {
+        color: var(--ink-100);
+        font-variant-numeric: tabular-nums;
+      }
+      .frame-body {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        overflow: hidden;
+        box-shadow: var(--e1);
+      }
+      .frame-desktop .frame-body {
+        width: 1200px;
+        max-width: 100%;
+      }
+      .frame-mobile .frame-body {
+        width: 375px;
+      }
+
+      /* ============================================================
+     TOKENS REFERENCE CARDS
+     ============================================================ */
+      .tokens-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: var(--s4);
+      }
+      .token-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: var(--s5);
+      }
+      .token-card h3 {
+        font-size: 13px;
+        margin: 0 0 var(--s4);
+        color: var(--ink-700);
+        display: flex;
+        align-items: center;
+        gap: var(--s2);
+      }
+      .token-card h3::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: var(--primary);
+        display: inline-block;
+      }
+      .span-3 {
+        grid-column: span 3;
+      }
+      .span-4 {
+        grid-column: span 4;
+      }
+      .span-6 {
+        grid-column: span 6;
+      }
+      .span-8 {
+        grid-column: span 8;
+      }
+      .span-12 {
+        grid-column: span 12;
+      }
+
+      /* color swatches */
+      .swatch-row {
+        display: grid;
+        grid-template-columns: 28px 1fr auto auto;
+        gap: var(--s3);
+        align-items: center;
+        padding: var(--s2) 0;
+        border-bottom: 1px solid var(--line-soft);
+        font-size: 12px;
+        line-height: 18px;
+      }
+      .swatch-row:last-child {
+        border-bottom: 0;
+      }
+      .swatch {
+        width: 28px;
+        height: 20px;
+        border-radius: var(--r-xs);
+        border: 1px solid rgba(30, 22, 17, 0.08);
+      }
+      .swatch-row .name {
+        color: var(--ink-900);
+        font-weight: 500;
+      }
+      .swatch-row .hex,
+      .swatch-row .flutter {
+        font-family: var(--ff-latin);
+        font-variant-numeric: tabular-nums;
+        color: var(--ink-500);
+        font-size: 11px;
+      }
+
+      /* type scale rows */
+      .type-row {
+        display: grid;
+        grid-template-columns: 130px 1fr;
+        gap: var(--s4);
+        align-items: baseline;
+        padding: var(--s4) 0;
+        border-bottom: 1px solid var(--line-soft);
+      }
+      .type-row:last-child {
+        border-bottom: 0;
+      }
+      .type-row .meta {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-300);
+        letter-spacing: 0.04em;
+      }
+      .type-row .meta b {
+        display: block;
+        color: var(--ink-700);
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+
+      /* spacing scale */
+      .scale-row {
+        display: grid;
+        grid-template-columns: 56px 64px 1fr;
+        gap: var(--s3);
+        align-items: center;
+        padding: var(--s2) 0;
+        border-bottom: 1px solid var(--line-soft);
+        font-size: 12px;
+      }
+      .scale-row:last-child {
+        border-bottom: 0;
+      }
+      .scale-row .token {
+        font-family: var(--ff-latin);
+        color: var(--ink-700);
+        font-weight: 600;
+      }
+      .scale-row .px {
+        font-family: var(--ff-latin);
+        color: var(--ink-500);
+        font-variant-numeric: tabular-nums;
+      }
+      .scale-bar {
+        height: 8px;
+        background: var(--primary);
+        border-radius: 2px;
+        max-width: 100%;
+      }
+
+      /* radius row */
+      .radius-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: var(--s4);
+      }
+      .radius-cell {
+        text-align: center;
+      }
+      .radius-shape {
+        height: 56px;
+        background: var(--surface-alt);
+        border: 1px solid var(--line);
+        margin-bottom: var(--s2);
+      }
+      .radius-cell .lbl {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-700);
+        font-weight: 600;
+      }
+      .radius-cell .px {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-300);
+      }
+
+      /* elevation row */
+      .elev-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--s4);
+      }
+      .elev-cell {
+        background: var(--surface);
+        height: 80px;
+        border-radius: var(--r-sm);
+        border: 1px solid var(--line-soft);
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        padding: var(--s3);
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-500);
+      }
+      .elev-cell.e1 {
+        box-shadow: var(--e1);
+      }
+      .elev-cell.e2 {
+        box-shadow: var(--e2);
+      }
+      .elev-cell.e3 {
+        box-shadow: var(--e3);
+      }
+
+      /* ============================================================
+     SHARED SCREEN PRIMITIVES (all namespaced under .scr)
+     ============================================================ */
+      .scr {
+        font-family: var(--ff-jp);
+        color: var(--ink-900);
+        background: var(--bg);
+      }
+      .scr a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      /* App bar */
+      .scr .appbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 48px;
+        border-bottom: 1px solid var(--line);
+        background: var(--bg);
+        position: relative;
+      }
+      .scr .appbar .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .scr .appbar .brand-mark {
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: var(--accent) url("avatar.png") center/cover no-repeat;
+        box-shadow: 0 0 0 1px rgba(30, 22, 17, 0.08);
+      }
+      .scr .appbar nav {
+        display: flex;
+        gap: 28px;
+        font-size: 13px;
+        color: var(--ink-700);
+      }
+      .scr .appbar nav .active {
+        color: var(--ink-900);
+        position: relative;
+      }
+      .scr .appbar nav .active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -22px;
+        height: 2px;
+        background: var(--primary);
+      }
+      .scr .appbar .lang {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-500);
+        letter-spacing: 0.14em;
+      }
+
+      /* mobile appbar */
+      .scr.mob .appbar {
+        padding: 16px 20px;
+      }
+      .scr.mob .appbar nav {
+        display: none;
+      }
+      .scr.mob .appbar .hamburger {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+      }
+      .scr.mob .appbar .hamburger span {
+        display: block;
+        height: 1.5px;
+        background: var(--ink-900);
+      }
+      .scr.mob .appbar .hamburger span:nth-child(2) {
+        width: 60%;
+        align-self: flex-end;
+      }
+
+      /* footer */
+      .scr footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 48px;
+        border-top: 1px solid var(--line);
+        color: var(--ink-300);
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .scr.mob footer {
+        padding: 20px;
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+      }
+
+      /* generic chips */
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: var(--r-full);
+        background: var(--surface-alt);
+        color: var(--ink-700);
+        font-size: 12px;
+        line-height: 18px;
+        border: 1px solid transparent;
+      }
+      .chip.outline {
+        background: transparent;
+        border-color: var(--line);
+      }
+      .chip.brass {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+      .chip.green {
+        background: var(--primary-container);
+        color: var(--primary-press);
+      }
+
+      /* buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 22px;
+        border-radius: var(--r-full);
+        background: var(--primary);
+        color: var(--on-primary);
+        font-size: 14px;
+        font-weight: 600;
+        border: 1px solid var(--primary);
+        cursor: pointer;
+      }
+      .btn.ghost {
+        background: transparent;
+        color: var(--ink-900);
+        border-color: var(--line-strong);
+      }
+      .btn .arrow {
+        font-family: var(--ff-latin);
+      }
+
+      /* ============================================================
+     SCREEN 01 — HERO
+     ============================================================ */
+      .scr-hero .stage {
+        padding: 80px 48px 96px;
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 64px;
+        align-items: start;
+      }
+      .scr-hero .label-line {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+      .scr-hero .label-line .rule {
+        width: 40px;
+        height: 1px;
+        background: var(--ink-300);
+      }
+      .scr-hero h1.display {
+        font-size: 84px;
+        line-height: 1.02;
+        font-weight: 700;
+        letter-spacing: -0.012em;
+        margin: 0;
+      }
+      .scr-hero .display .accent {
+        color: var(--primary);
+      }
+      .scr-hero .role {
+        margin-top: 28px;
+        font-size: 18px;
+        line-height: 30px;
+        color: var(--ink-700);
+        font-weight: 500;
+      }
+      .scr-hero .lede {
+        margin-top: 20px;
+        font-size: 15px;
+        line-height: 28px;
+        color: var(--ink-500);
+        max-width: 52ch;
+      }
+      .scr-hero .meta-row {
+        display: flex;
+        gap: 28px;
+        margin-top: 32px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        font-size: 12px;
+        color: var(--ink-500);
+      }
+      .scr-hero .meta-row b {
+        color: var(--ink-900);
+        font-weight: 600;
+      }
+      .scr-hero .ctas {
+        display: flex;
+        gap: 12px;
+        margin-top: 36px;
+      }
+
+      .scr-hero .side {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: 28px;
+      }
+      .scr-hero .portrait {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: 999px;
+        background: var(--accent) url("avatar.png") center/cover no-repeat;
+        box-shadow:
+          0 0 0 1px rgba(30, 22, 17, 0.06),
+          var(--e2);
+        margin-bottom: 24px;
+      }
+      .scr-hero .portrait-caption {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-top: -8px;
+        margin-bottom: 22px;
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-300);
+      }
+      .scr-hero .portrait-caption b {
+        color: var(--ink-700);
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: none;
+      }
+      .scr-hero .side h3 {
+        font-size: 12px;
+        color: var(--ink-300);
+        margin: 0 0 18px;
+        font-family: var(--ff-latin);
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      .scr-hero .stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px 20px;
+      }
+      .scr-hero .stat .num {
+        font-size: 36px;
+        line-height: 1;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        color: var(--primary);
+        letter-spacing: -0.01em;
+      }
+      .scr-hero .stat .lab {
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--ink-500);
+      }
+      .scr-hero .links {
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line-soft);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .scr-hero .links a {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: var(--ink-700);
+      }
+      .scr-hero .links a .ext {
+        font-family: var(--ff-latin);
+        color: var(--ink-300);
+      }
+
+      /* mobile hero */
+      .scr-hero.mob .stage {
+        padding: 32px 20px 48px;
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .scr-hero.mob h1.display {
+        font-size: 44px;
+        letter-spacing: -0.01em;
+      }
+      .scr-hero.mob .role {
+        font-size: 16px;
+        margin-top: 20px;
+      }
+      .scr-hero.mob .lede {
+        font-size: 14px;
+        margin-top: 16px;
+      }
+      .scr-hero.mob .meta-row {
+        flex-direction: column;
+        gap: 6px;
+      }
+      .scr-hero.mob .ctas {
+        flex-direction: column;
+      }
+      .scr-hero.mob .ctas .btn {
+        justify-content: center;
+      }
+      .scr-hero.mob .side {
+        padding: 20px;
+      }
+      .scr-hero.mob .portrait {
+        width: 160px;
+        margin: 0 auto 20px;
+      }
+      .scr-hero.mob .portrait-caption {
+        justify-content: center;
+        gap: 12px;
+      }
+      .scr-hero.mob .stat .num {
+        font-size: 28px;
+      }
+
+      /* ============================================================
+     SCREEN 02 — WORK EXPERIENCE LIST
+     ============================================================ */
+      .scr-list .stage {
+        padding: 64px 48px 96px;
+      }
+      .scr-list .page-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 24px;
+        margin-bottom: 40px;
+      }
+      .scr-list .page-head h1 {
+        font-size: 40px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.005em;
+      }
+      .scr-list .page-head .total {
+        font-family: var(--ff-latin);
+        color: var(--ink-300);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+      }
+      .scr-list .filters {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+      }
+      .scr-list .filters .chip.active {
+        background: var(--ink-900);
+        color: #fff;
+        border-color: var(--ink-900);
+      }
+
+      .work-item {
+        display: grid;
+        grid-template-columns: 120px 1fr auto;
+        gap: 32px;
+        align-items: start;
+        padding: 28px 0;
+        border-top: 1px solid var(--line);
+        cursor: pointer;
+        position: relative;
+      }
+      .work-item:last-child {
+        border-bottom: 1px solid var(--line);
+      }
+      .work-item .year {
+        font-family: var(--ff-latin);
+        font-variant-numeric: tabular-nums;
+        font-size: 13px;
+        color: var(--ink-300);
+        letter-spacing: 0.04em;
+        padding-top: 4px;
+      }
+      .work-item .year b {
+        color: var(--ink-900);
+        display: block;
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .work-item .body h3 {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 0 6px;
+        letter-spacing: -0.005em;
+      }
+      .work-item .body .role {
+        font-size: 14px;
+        color: var(--ink-500);
+        margin-bottom: 14px;
+      }
+      .work-item .body .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .work-item .arrow-link {
+        align-self: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 999px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--ff-latin);
+        color: var(--ink-700);
+      }
+      .work-item:hover .arrow-link {
+        background: var(--primary);
+        color: var(--on-primary);
+        border-color: var(--primary);
+      }
+
+      .scr-list.mob .stage {
+        padding: 24px 20px 48px;
+      }
+      .scr-list.mob .page-head h1 {
+        font-size: 28px;
+      }
+      .scr-list.mob .filters {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+      }
+      .scr-list.mob .work-item {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 20px 0;
+      }
+      .scr-list.mob .work-item .arrow-link {
+        display: none;
+      }
+      .scr-list.mob .work-item .year {
+        padding-top: 0;
+      }
+      .scr-list.mob .work-item .year b {
+        display: inline;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .scr-list.mob .work-item .body h3 {
+        font-size: 17px;
+      }
+
+      /* ============================================================
+     SCREEN 03 — WORK EXPERIENCE DETAIL
+     ============================================================ */
+      .scr-detail .stage {
+        padding: 48px 48px 96px;
+      }
+      .scr-detail .breadcrumb {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        color: var(--ink-300);
+        text-transform: uppercase;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 28px;
+      }
+      .scr-detail .breadcrumb a {
+        color: var(--ink-500);
+      }
+      .scr-detail .breadcrumb .sep {
+        color: var(--ink-100);
+      }
+      .scr-detail .head {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 32px;
+        margin-bottom: 40px;
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 64px;
+        align-items: end;
+      }
+      .scr-detail h1 {
+        font-size: 44px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.008em;
+      }
+      .scr-detail .role-meta {
+        font-size: 16px;
+        color: var(--ink-700);
+        margin-top: 14px;
+        font-weight: 500;
+      }
+      .scr-detail .meta-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px 12px;
+      }
+      .scr-detail .meta-card dt {
+        font-family: var(--ff-latin);
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-300);
+        margin: 0;
+      }
+      .scr-detail .meta-card dd {
+        margin: 2px 0 0;
+        font-size: 13px;
+        color: var(--ink-900);
+        font-weight: 500;
+      }
+      .scr-detail .body {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 64px;
+      }
+      .scr-detail .body section + section {
+        margin-top: 40px;
+      }
+      .scr-detail .body h2 {
+        font-size: 13px;
+        color: var(--ink-300);
+        margin: 0 0 18px;
+        font-family: var(--ff-latin);
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--line-soft);
+      }
+      .scr-detail .body p {
+        font-size: 15px;
+        line-height: 30px;
+        color: var(--ink-700);
+        margin: 0;
+      }
+      .scr-detail .body ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .scr-detail .body li {
+        display: grid;
+        grid-template-columns: 32px 1fr;
+        font-size: 14px;
+        line-height: 26px;
+        color: var(--ink-700);
+      }
+      .scr-detail .body li::before {
+        content: "→";
+        color: var(--primary);
+        font-family: var(--ff-latin);
+      }
+      .scr-detail .tagset {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .subproject {
+        border-top: 1px solid var(--line-soft);
+        padding: 20px 0;
+        display: grid;
+        grid-template-columns: 60px 1fr;
+        gap: 24px;
+      }
+      .subproject:last-child {
+        border-bottom: 1px solid var(--line-soft);
+      }
+      .subproject .num {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-300);
+        letter-spacing: 0.14em;
+        font-variant-numeric: tabular-nums;
+      }
+      .subproject h4 {
+        margin: 0 0 6px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .subproject p {
+        margin: 0;
+        font-size: 13px;
+        color: var(--ink-500);
+        line-height: 22px;
+      }
+
+      .scr-detail .side .side-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: 24px;
+      }
+      .scr-detail .side h3 {
+        font-size: 11px;
+        margin: 0 0 14px;
+        font-family: var(--ff-latin);
+        color: var(--ink-300);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+      .scr-detail .side-card + .side-card {
+        margin-top: 16px;
+      }
+
+      .scr-detail.mob .stage {
+        padding: 24px 20px 48px;
+      }
+      .scr-detail.mob .head,
+      .scr-detail.mob .body {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .scr-detail.mob h1 {
+        font-size: 28px;
+      }
+      .scr-detail.mob .meta-card {
+        grid-template-columns: 1fr 1fr;
+      }
+      .scr-detail.mob .subproject {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      /* ============================================================
+     SCREEN 04 — PERSONAL PROJECTS
+     ============================================================ */
+      .scr-proj .stage {
+        padding: 64px 48px 96px;
+      }
+      .scr-proj .page-head {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 24px;
+        margin-bottom: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .scr-proj .page-head h1 {
+        font-size: 40px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.005em;
+      }
+      .scr-proj .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      .proj-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .proj-card .cover {
+        height: 200px;
+        position: relative;
+        background:
+          repeating-linear-gradient(135deg, rgba(30, 22, 17, 0.06) 0 1px, transparent 1px 14px), var(--surface-alt);
+        border-bottom: 1px solid var(--line-soft);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-300);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .proj-card.green-cover .cover {
+        background:
+          repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 14px), var(--primary);
+        color: rgba(255, 255, 255, 0.7);
+        border-bottom-color: transparent;
+      }
+      .proj-card .body {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        flex: 1;
+      }
+      .proj-card .body .row1 {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .proj-card h3 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .proj-card .type {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        color: var(--ink-300);
+        text-transform: uppercase;
+        margin-top: 4px;
+      }
+      .proj-card p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 24px;
+        color: var(--ink-500);
+      }
+      .proj-card .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 4px;
+      }
+      .proj-card .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 24px;
+        border-top: 1px solid var(--line-soft);
+        font-size: 12px;
+        color: var(--ink-500);
+      }
+      .proj-card .footer a {
+        font-family: var(--ff-latin);
+        color: var(--ink-700);
+        font-weight: 600;
+      }
+
+      .scr-proj.mob .stage {
+        padding: 24px 20px 48px;
+      }
+      .scr-proj.mob .page-head h1 {
+        font-size: 28px;
+      }
+      .scr-proj.mob .grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .scr-proj.mob .proj-card .cover {
+        height: 140px;
+      }
+      .scr-proj.mob .proj-card .body {
+        padding: 18px;
+      }
+      .scr-proj.mob .proj-card h3 {
+        font-size: 17px;
+      }
+
+      /* ============================================================
+     SCREEN 05 — OUTSIDE ACTIVITIES
+     ============================================================ */
+      .scr-act .stage {
+        padding: 64px 48px 96px;
+      }
+      .scr-act .page-head {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 24px;
+        margin-bottom: 40px;
+      }
+      .scr-act .page-head h1 {
+        font-size: 40px;
+        font-weight: 700;
+        margin: 0 0 8px;
+        letter-spacing: -0.005em;
+      }
+      .scr-act .page-head p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--ink-500);
+        max-width: 60ch;
+        line-height: 24px;
+      }
+
+      .act-group {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 40px;
+        padding: 32px 0;
+        border-top: 1px solid var(--line);
+      }
+      .act-group:last-child {
+        border-bottom: 1px solid var(--line);
+      }
+      .act-group .label {
+        position: sticky;
+        top: 0;
+      }
+      .act-group .label .eyebrow {
+        display: block;
+        margin-bottom: 6px;
+      }
+      .act-group .label h3 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+      }
+      .act-group .label .count {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--ink-500);
+        font-family: var(--ff-latin);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .act-item {
+        display: grid;
+        grid-template-columns: 80px 1fr auto;
+        gap: 24px;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--line-soft);
+        align-items: start;
+      }
+      .act-item:last-child {
+        border-bottom: 0;
+      }
+      .act-item .when {
+        font-family: var(--ff-latin);
+        font-variant-numeric: tabular-nums;
+        font-size: 12px;
+        color: var(--ink-500);
+        padding-top: 3px;
+      }
+      .act-item h4 {
+        margin: 0 0 4px;
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .act-item .where {
+        font-size: 13px;
+        color: var(--ink-500);
+      }
+      .act-item .ext {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-300);
+        letter-spacing: 0.14em;
+      }
+
+      .scr-act.mob .stage {
+        padding: 24px 20px 48px;
+      }
+      .scr-act.mob .page-head h1 {
+        font-size: 28px;
+      }
+      .scr-act.mob .act-group {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 24px 0;
+      }
+      .scr-act.mob .act-item {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+      .scr-act.mob .act-item .when {
+        font-size: 11px;
+      }
+      .scr-act.mob .act-item .ext {
+        display: none;
+      }
+
+      /* ============================================================
+     SCREEN 06 — SKILLS
+     ============================================================ */
+      .scr-skills .stage {
+        padding: 64px 48px 96px;
+      }
+      .scr-skills .page-head {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 24px;
+        margin-bottom: 40px;
+      }
+      .scr-skills .page-head h1 {
+        font-size: 40px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.005em;
+      }
+      .scr-skills .legend {
+        margin-top: 24px;
+        display: flex;
+        gap: 28px;
+        font-size: 12px;
+        color: var(--ink-500);
+        align-items: center;
+      }
+      .scr-skills .legend .key {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .scr-skills .legend .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--primary);
+      }
+      .scr-skills .legend .dot.b {
+        background: var(--primary-container);
+      }
+
+      .skill-block {
+        padding: 32px 0;
+        border-top: 1px solid var(--line);
+      }
+      .skill-block:last-child {
+        border-bottom: 1px solid var(--line);
+      }
+      .skill-block .head {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 40px;
+        align-items: baseline;
+      }
+      .skill-block .head h3 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+      }
+      .skill-block .head .desc {
+        font-size: 13px;
+        color: var(--ink-500);
+        line-height: 22px;
+      }
+      .skill-rows {
+        margin-top: 24px;
+        display: grid;
+        gap: 14px;
+      }
+      .skill-row {
+        display: grid;
+        grid-template-columns: 200px 1fr 80px 60px;
+        gap: 20px;
+        align-items: center;
+        font-size: 14px;
+      }
+      .skill-row .name {
+        font-weight: 500;
+      }
+      .skill-row .bar-track {
+        background: var(--surface-alt);
+        height: 8px;
+        border-radius: var(--r-full);
+        overflow: hidden;
+        position: relative;
+      }
+      .skill-row .bar-fill {
+        height: 100%;
+        background: var(--primary);
+        border-radius: var(--r-full);
+      }
+      .skill-row .years {
+        font-family: var(--ff-latin);
+        font-variant-numeric: tabular-nums;
+        color: var(--ink-500);
+        font-size: 12px;
+      }
+      .skill-row .level {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        color: var(--ink-700);
+        text-transform: uppercase;
+        text-align: right;
+      }
+
+      .scr-skills.mob .stage {
+        padding: 24px 20px 48px;
+      }
+      .scr-skills.mob .page-head h1 {
+        font-size: 28px;
+      }
+      .scr-skills.mob .skill-block .head {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .scr-skills.mob .skill-block .head h3 {
+        font-size: 18px;
+      }
+      .scr-skills.mob .skill-row {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+          "name level"
+          "bar bar"
+          "years years";
+        gap: 6px;
+      }
+      .scr-skills.mob .skill-row .name {
+        grid-area: name;
+      }
+      .scr-skills.mob .skill-row .level {
+        grid-area: level;
+      }
+      .scr-skills.mob .skill-row .bar-track {
+        grid-area: bar;
+      }
+      .scr-skills.mob .skill-row .years {
+        grid-area: years;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <!-- ====================================================== -->
+      <!-- BLUEPRINT HEAD                                         -->
+      <!-- ====================================================== -->
+      <header class="blueprint-head">
+        <div>
+          <span class="eyebrow">Design Blueprint · v1</span>
+          <h1>resume-flutter — 設計ブループリント</h1>
+          <p style="margin-top: 10px">
+            Flutter Web 用ポートフォリオの単一情報源。下記のトークンは
+            <code>lib/theme</code>
+            にそのまま転写されます。
+          </p>
+        </div>
+        <dl>
+          <dt>LOCALE</dt>
+          <dd>ja</dd>
+          <dt>PLATFORM</dt>
+          <dd>Flutter Web (WASM, CanvasKit fallback)</dd>
+          <dt>DEPLOY</dt>
+          <dd>GitHub Pages · /resume-flutter/ · hash routing</dd>
+          <dt>BREAKPOINT</dt>
+          <dd>600 px</dd>
+          <dt>FONT</dt>
+          <dd>Noto Sans JP</dd>
+          <dt>SEED</dt>
+          <dd>#9F4014 (deep burnt copper)</dd>
+        </dl>
+      </header>
+
+      <!-- ====================================================== -->
+      <!-- TOKENS                                                  -->
+      <!-- ====================================================== -->
+      <section class="section" id="tokens">
+        <div class="section-head">
+          <span class="section-num">00 / 06</span>
+          <h2 class="section-title">TOKENS</h2>
+          <span class="section-jp">/ デザイントークン</span>
+        </div>
+        <p class="section-note">
+          Flutter 実装は
+          <code>ThemeData.colorScheme</code>
+          、
+          <code>TextTheme</code>
+          、独自
+          <code>Spacing</code>
+          ・
+          <code>Radii</code>
+          ・
+          <code>Elevations</code>
+          拡張に下記の値をそのまま反映します。コントラスト比は本文に対して WCAG AA 以上を満たします。
+        </p>
+
+        <div class="tokens-grid">
+          <!-- Color: Surface & Ink -->
+          <div class="token-card span-6">
+            <h3>Surface &amp; Ink</h3>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #f6f3ee"></span>
+              <span class="name">bg</span>
+              <span class="hex">#F6F3EE</span>
+              <span class="flutter">0xFFF6F3EE</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #ffffff"></span>
+              <span class="name">surface</span>
+              <span class="hex">#FFFFFF</span>
+              <span class="flutter">0xFFFFFFFF</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #efe7da"></span>
+              <span class="name">surface.alt</span>
+              <span class="hex">#EFE7DA</span>
+              <span class="flutter">0xFFEFE7DA</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #f0e9dd"></span>
+              <span class="name">surface.sunk</span>
+              <span class="hex">#F0E9DD</span>
+              <span class="flutter">0xFFF0E9DD</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #e8e0d1"></span>
+              <span class="name">line.soft</span>
+              <span class="hex">#E8E0D1</span>
+              <span class="flutter">0xFFE8E0D1</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #d9cfbc"></span>
+              <span class="name">line</span>
+              <span class="hex">#D9CFBC</span>
+              <span class="flutter">0xFFD9CFBC</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #c3b79f"></span>
+              <span class="name">line.strong</span>
+              <span class="hex">#C3B79F</span>
+              <span class="flutter">0xFFC3B79F</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #1e1611"></span>
+              <span class="name">ink.900 / text</span>
+              <span class="hex">#1E1611</span>
+              <span class="flutter">0xFF1E1611</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #3a2e22"></span>
+              <span class="name">ink.700</span>
+              <span class="hex">#3A2E22</span>
+              <span class="flutter">0xFF3A2E22</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #524337"></span>
+              <span class="name">ink.500</span>
+              <span class="hex">#524337</span>
+              <span class="flutter">0xFF524337</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #877767"></span>
+              <span class="name">ink.300</span>
+              <span class="hex">#877767</span>
+              <span class="flutter">0xFF877767</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #b5a993"></span>
+              <span class="name">ink.100</span>
+              <span class="hex">#B5A993</span>
+              <span class="flutter">0xFFB5A993</span>
+            </div>
+          </div>
+
+          <!-- Color: Brand -->
+          <div class="token-card span-6">
+            <h3>Brand</h3>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #9f4014"></span>
+              <span class="name">primary (seed)</span>
+              <span class="hex">#9F4014</span>
+              <span class="flutter">0xFF9F4014</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #823310"></span>
+              <span class="name">primary.hover</span>
+              <span class="hex">#823310</span>
+              <span class="flutter">0xFF823310</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #66270b"></span>
+              <span class="name">primary.press</span>
+              <span class="hex">#66270B</span>
+              <span class="flutter">0xFF66270B</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #f2d9c5"></span>
+              <span class="name">primary.container</span>
+              <span class="hex">#F2D9C5</span>
+              <span class="flutter">0xFFF2D9C5</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #ffffff"></span>
+              <span class="name">on.primary</span>
+              <span class="hex">#FFFFFF</span>
+              <span class="flutter">0xFFFFFFFF</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #2e4e73"></span>
+              <span class="name">accent (navy)</span>
+              <span class="hex">#2E4E73</span>
+              <span class="flutter">0xFF2E4E73</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #dce4ee"></span>
+              <span class="name">accent.soft</span>
+              <span class="hex">#DCE4EE</span>
+              <span class="flutter">0xFFDCE4EE</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #8c2a2a"></span>
+              <span class="name">error</span>
+              <span class="hex">#8C2A2A</span>
+              <span class="flutter">0xFF8C2A2A</span>
+            </div>
+            <h3 style="margin-top: 18px">Contrast (AA body ≥ 4.5)</h3>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #1e1611; border-color: transparent"></span>
+              <span class="name">ink.900 on bg</span>
+              <span class="hex" style="color: #9f4014; font-weight: 600">16.4 : 1 ✓</span>
+              <span class="flutter">AAA</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #524337"></span>
+              <span class="name">ink.500 on bg</span>
+              <span class="hex" style="color: #9f4014; font-weight: 600">7.3 : 1 ✓</span>
+              <span class="flutter">AAA</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #9f4014"></span>
+              <span class="name">primary on surface</span>
+              <span class="hex" style="color: #9f4014; font-weight: 600">6.4 : 1 ✓</span>
+              <span class="flutter">AA</span>
+            </div>
+            <div class="swatch-row">
+              <span class="swatch" style="background: #ffffff"></span>
+              <span class="name">on.primary on primary</span>
+              <span class="hex" style="color: #9f4014; font-weight: 600">6.4 : 1 ✓</span>
+              <span class="flutter">AA</span>
+            </div>
+          </div>
+
+          <!-- Typography -->
+          <div class="token-card span-8">
+            <h3>Typography — Noto Sans JP</h3>
+            <div class="type-row">
+              <div class="meta">
+                <b>display.lg</b>
+                56 / 64 · 700 · −0.012em
+              </div>
+              <div style="font-size: 56px; line-height: 1.02; font-weight: 700; letter-spacing: -0.012em">
+                とだやま.ℝ(Todayama_R)
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="meta">
+                <b>display.md</b>
+                40 / 48 · 700
+              </div>
+              <div style="font-size: 40px; line-height: 48px; font-weight: 700">職務経歴</div>
+            </div>
+            <div class="type-row">
+              <div class="meta">
+                <b>title.lg</b>
+                22 / 30 · 700
+              </div>
+              <div style="font-size: 22px; line-height: 30px; font-weight: 700">オイシックス・ラ・大地株式会社</div>
+            </div>
+            <div class="type-row">
+              <div class="meta">
+                <b>title.md</b>
+                18 / 26 · 600
+              </div>
+              <div style="font-size: 18px; line-height: 26px; font-weight: 600">Android アプリ開発・技術基盤改善</div>
+            </div>
+            <div class="type-row">
+              <div class="meta">
+                <b>body.lg</b>
+                16 / 28 · 400
+              </div>
+              <div style="font-size: 16px; line-height: 28px">
+                Android Mobile 8年、Kotlin 7年を軸に、Flutter Web ポートフォリオを構築しています。
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="meta">
+                <b>body.md</b>
+                14 / 24 · 400
+              </div>
+              <div style="font-size: 14px; line-height: 24px; color: var(--ink-500)">
+                本文の基準サイズ。リスト・カード内・詳細記述に用います。
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="meta">
+                <b>label.md</b>
+                13 / 20 · 500
+              </div>
+              <div style="font-size: 13px; line-height: 20px; font-weight: 500">タグ・メタ情報</div>
+            </div>
+            <div class="type-row">
+              <div class="meta">
+                <b>eyebrow</b>
+                11 / 16 · 600 · 0.18em · UPPER
+              </div>
+              <div class="eyebrow">RESUME · 2026</div>
+            </div>
+          </div>
+
+          <!-- Spacing -->
+          <div class="token-card span-4">
+            <h3>Spacing — 4 px base</h3>
+            <div class="scale-row">
+              <span class="token">s1</span>
+              <span class="px">4 px</span>
+              <span class="scale-bar" style="width: 4px"></span>
+            </div>
+            <div class="scale-row">
+              <span class="token">s2</span>
+              <span class="px">8 px</span>
+              <span class="scale-bar" style="width: 8px"></span>
+            </div>
+            <div class="scale-row">
+              <span class="token">s3</span>
+              <span class="px">12 px</span>
+              <span class="scale-bar" style="width: 12px"></span>
+            </div>
+            <div class="scale-row">
+              <span class="token">s4</span>
+              <span class="px">16 px</span>
+              <span class="scale-bar" style="width: 16px"></span>
+            </div>
+            <div class="scale-row">
+              <span class="token">s5</span>
+              <span class="px">20 px</span>
+              <span class="scale-bar" style="width: 20px"></span>
+            </div>
+            <div class="scale-row">
+              <span class="token">s6</span>
+              <span class="px">24 px</span>
+              <span class="scale-bar" style="width: 24px"></span>
+            </div>
+            <div class="scale-row">
+              <span class="token">s8</span>
+              <span class="px">32 px</span>
+              <span class="scale-bar" style="width: 32px"></span>
+            </div>
+            <div class="scale-row">
+              <span class="token">s10</span>
+              <span class="px">40 px</span>
+              <span class="scale-bar" style="width: 40px"></span>
+            </div>
+            <div class="scale-row">
+              <span class="token">s12</span>
+              <span class="px">48 px</span>
+              <span class="scale-bar" style="width: 48px"></span>
+            </div>
+            <div class="scale-row">
+              <span class="token">s16</span>
+              <span class="px">64 px</span>
+              <span class="scale-bar" style="width: 64px"></span>
+            </div>
+            <div class="scale-row">
+              <span class="token">s20</span>
+              <span class="px">80 px</span>
+              <span class="scale-bar" style="width: 80px"></span>
+            </div>
+            <div class="scale-row">
+              <span class="token">s24</span>
+              <span class="px">96 px</span>
+              <span class="scale-bar" style="width: 96px"></span>
+            </div>
+          </div>
+
+          <!-- Radius -->
+          <div class="token-card span-6">
+            <h3>Radius</h3>
+            <div class="radius-grid">
+              <div class="radius-cell">
+                <div class="radius-shape" style="border-radius: 4px"></div>
+                <div class="lbl">r.xs</div>
+                <div class="px">4 px</div>
+              </div>
+              <div class="radius-cell">
+                <div class="radius-shape" style="border-radius: 8px"></div>
+                <div class="lbl">r.sm</div>
+                <div class="px">8 px</div>
+              </div>
+              <div class="radius-cell">
+                <div class="radius-shape" style="border-radius: 12px"></div>
+                <div class="lbl">r.md · cards</div>
+                <div class="px">12 px</div>
+              </div>
+              <div class="radius-cell">
+                <div class="radius-shape" style="border-radius: 20px"></div>
+                <div class="lbl">r.lg</div>
+                <div class="px">20 px</div>
+              </div>
+              <div class="radius-cell">
+                <div class="radius-shape" style="border-radius: 999px"></div>
+                <div class="lbl">r.full · pill</div>
+                <div class="px">999 px</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Elevation -->
+          <div class="token-card span-6">
+            <h3>Elevation</h3>
+            <div class="elev-grid">
+              <div class="elev-cell">
+                <span>e0</span>
+                <span>none</span>
+              </div>
+              <div class="elev-cell e1">
+                <span>e1</span>
+                <span>1·2·6%</span>
+              </div>
+              <div class="elev-cell e2">
+                <span>e2</span>
+                <span>4·10·6%</span>
+              </div>
+              <div class="elev-cell e3">
+                <span>e3</span>
+                <span>12·28·10%</span>
+              </div>
+            </div>
+            <p style="margin: 16px 0 0; font-size: 12px; color: var(--ink-500); line-height: 20px">
+              MD3 surfaceTintColor は使用せず、純粋な
+              <code>BoxShadow</code>
+              で再現します。 カードは既定
+              <b>e1</b>
+              、ホバー時
+              <b>e2</b>
+              。モーダル・浮遊ボタンは
+              <b>e3</b>
+              。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================== -->
+      <!-- 01 — HERO                                              -->
+      <!-- ====================================================== -->
+      <section class="section">
+        <div class="section-head">
+          <span class="section-num">01 / 06</span>
+          <h2 class="section-title">HERO</h2>
+          <span class="section-jp">/ ホーム · `/`</span>
+        </div>
+        <p class="section-note">
+          最初の接点。氏名・職能・連絡導線を一画面で示し、主要画面（職務経歴）へ送り出します。`Scaffold` 直下の
+          `CustomScrollView` で 1 セクション構成。
+        </p>
+
+        <div class="frames">
+          <!-- Desktop Hero -->
+          <div class="frame frame-desktop">
+            <div class="frame-label">
+              <span>Desktop · ≥ 600 px</span>
+              <span class="dims">1200 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-hero">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>とだやま.ℝ(Todayama_R)</span>
+                  </div>
+                  <nav>
+                    <a class="active">トップ</a>
+                    <a>職務経歴</a>
+                    <a>個人開発</a>
+                    <a>その他活動</a>
+                    <a>スキル</a>
+                  </nav>
+                  <span class="lang">JA</span>
+                </div>
+                <div class="stage">
+                  <div class="lead">
+                    <div class="label-line">
+                      <span class="rule"></span>
+                      <span class="eyebrow">Resume · 2026</span>
+                    </div>
+                    <h1 class="display">
+                      Android と
+                      <br />
+                      <span class="accent">Flutter Web で</span>
+                      <br />
+                      実装を見せる。
+                    </h1>
+                    <p class="role">とだやま.ℝ(Todayama_R) — Android / Flutter ソフトウェアエンジニア</p>
+                    <p class="lede">
+                      Android Mobile 8年、Kotlin 7年を軸に、Flutter Web
+                      と設計・テスト基盤まで含めて実装できることを示すポートフォリオです。
+                    </p>
+                    <div class="meta-row">
+                      <span>
+                        <b>日本</b>
+                        · 拠点
+                      </span>
+                      <span>
+                        <b>8 年</b>
+                        · モバイル経験
+                      </span>
+                      <span>
+                        <b>日本語</b>
+                        · 母語
+                      </span>
+                    </div>
+                    <div class="ctas">
+                      <button class="btn">
+                        職務経歴を見る
+                        <span class="arrow">→</span>
+                      </button>
+                      <button class="btn ghost">
+                        連絡先
+                        <span class="arrow">↗</span>
+                      </button>
+                    </div>
+                  </div>
+                  <aside class="side">
+                    <div class="portrait" role="img" aria-label="とだやま.ℝ(Todayama_R) アバター"></div>
+                    <div class="portrait-caption">
+                      <b>とだやま.ℝ(Todayama_R)</b>
+                      <span>2026</span>
+                    </div>
+                    <h3>at a glance</h3>
+                    <div class="stats">
+                      <div class="stat">
+                        <div class="num">8</div>
+                        <div class="lab">主な経験領域</div>
+                      </div>
+                      <div class="stat">
+                        <div class="num">24</div>
+                        <div class="lab">職務経歴</div>
+                      </div>
+                      <div class="stat">
+                        <div class="num">67</div>
+                        <div class="lab">DroidKaigi PR</div>
+                      </div>
+                      <div class="stat">
+                        <div class="num">5</div>
+                        <div class="lab">業務外活動</div>
+                      </div>
+                    </div>
+                    <div class="links">
+                      <a>
+                        <span>GitHub</span>
+                        <span class="ext">@Corvus400 ↗</span>
+                      </a>
+                      <a>
+                        <span>X (旧 Twitter)</span>
+                        <span class="ext">@Todayama_R ↗</span>
+                      </a>
+                      <a>
+                        <span>Resume</span>
+                        <span class="ext">resume repository ↗</span>
+                      </a>
+                    </div>
+                  </aside>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Built with Flutter Web · Hash routing</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile Hero -->
+          <div class="frame frame-mobile">
+            <div class="frame-label">
+              <span>Mobile · &lt; 600 px</span>
+              <span class="dims">375 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-hero mob">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>とだやま.ℝ(Todayama_R)</span>
+                  </div>
+                  <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+                <div class="stage">
+                  <div class="lead">
+                    <div class="label-line">
+                      <span class="rule"></span>
+                      <span class="eyebrow">Resume · 2026</span>
+                    </div>
+                    <h1 class="display">
+                      Android と
+                      <br />
+                      <span class="accent">Flutter Web で</span>
+                      <br />
+                      実装を見せる。
+                    </h1>
+                    <p class="role">
+                      とだやま.ℝ(Todayama_R)
+                      <br />
+                      Android / Flutter エンジニア
+                    </p>
+                    <p class="lede">Android Mobile 8 年、Kotlin 7 年を軸に、Flutter Web ポートフォリオを構築。</p>
+                    <div class="meta-row">
+                      <span>
+                        <b>日本</b>
+                        拠点
+                      </span>
+                      <span>
+                        <b>8 年</b>
+                        モバイル経験
+                      </span>
+                      <span>
+                        <b>日本語</b>
+                      </span>
+                    </div>
+                    <div class="ctas">
+                      <button class="btn">
+                        職務経歴を見る
+                        <span class="arrow">→</span>
+                      </button>
+                      <button class="btn ghost">
+                        連絡先
+                        <span class="arrow">↗</span>
+                      </button>
+                    </div>
+                  </div>
+                  <aside class="side">
+                    <div class="portrait" role="img" aria-label="とだやま.ℝ(Todayama_R) アバター"></div>
+                    <div class="portrait-caption">
+                      <b>とだやま.ℝ(Todayama_R)</b>
+                      <span>2026</span>
+                    </div>
+                    <h3>at a glance</h3>
+                    <div class="stats">
+                      <div class="stat">
+                        <div class="num">8</div>
+                        <div class="lab">主な経験領域</div>
+                      </div>
+                      <div class="stat">
+                        <div class="num">24</div>
+                        <div class="lab">職務経歴</div>
+                      </div>
+                      <div class="stat">
+                        <div class="num">67</div>
+                        <div class="lab">OSS PR</div>
+                      </div>
+                      <div class="stat">
+                        <div class="num">5</div>
+                        <div class="lab">登壇</div>
+                      </div>
+                    </div>
+                    <div class="links">
+                      <a>
+                        <span>GitHub</span>
+                        <span class="ext">↗</span>
+                      </a>
+                      <a>
+                        <span>X</span>
+                        <span class="ext">↗</span>
+                      </a>
+                      <a>
+                        <span>Resume</span>
+                        <span class="ext">↗</span>
+                      </a>
+                    </div>
+                  </aside>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Flutter Web · Hash routing</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================== -->
+      <!-- 02 — WORK EXPERIENCE LIST                              -->
+      <!-- ====================================================== -->
+      <section class="section">
+        <div class="section-head">
+          <span class="section-num">02 / 06</span>
+          <h2 class="section-title">WORK EXPERIENCE — LIST</h2>
+          <span class="section-jp">/ 職務経歴一覧 · `/#/experience`</span>
+        </div>
+        <p class="section-note">
+          時系列で全勤務先を並べ、各行から詳細画面 (`/#/experience/:id`)
+          に遷移します。フィルタは雇用形態・技術スタックで `FilterChip` を再利用。
+        </p>
+
+        <div class="frames">
+          <div class="frame frame-desktop">
+            <div class="frame-label">
+              <span>Desktop</span>
+              <span class="dims">1200 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-list">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>とだやま.ℝ(Todayama_R)</span>
+                  </div>
+                  <nav>
+                    <a>トップ</a>
+                    <a class="active">職務経歴</a>
+                    <a>個人開発</a>
+                    <a>その他活動</a>
+                    <a>スキル</a>
+                  </nav>
+                  <span class="lang">JA</span>
+                </div>
+                <div class="stage">
+                  <div class="page-head">
+                    <div>
+                      <span class="eyebrow">02 — Work Experience</span>
+                      <h1>職務経歴</h1>
+                    </div>
+                    <span class="total">合計 4 社 · 9 年 6 ヶ月</span>
+                  </div>
+                  <div class="filters">
+                    <span class="chip active">すべて</span>
+                    <span class="chip outline">正社員</span>
+                    <span class="chip outline">業務委託</span>
+                    <span class="chip outline">Flutter</span>
+                    <span class="chip outline">iOS</span>
+                    <span class="chip outline">Android</span>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      2025.09 – 2026.03
+                      <b>7 ヶ月</b>
+                    </div>
+                    <div class="body">
+                      <h3>オイシックス・ラ・大地株式会社</h3>
+                      <div class="role">Android アプリ開発・技術基盤改善 / モバイルプラットフォームチーム</div>
+                      <div class="tags">
+                        <span class="chip">Flutter</span>
+                        <span class="chip">Dart</span>
+                        <span class="chip">Riverpod</span>
+                        <span class="chip">go_router</span>
+                        <span class="chip">Firebase</span>
+                      </div>
+                    </div>
+                    <div class="arrow-link">→</div>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      2019.07 – 2022.03
+                      <b>2 年 8 ヶ月</b>
+                    </div>
+                    <div class="body">
+                      <h3>株式会社 newmo株式会社</h3>
+                      <div class="role">Flutter エンジニア / プロダクト開発部</div>
+                      <div class="tags">
+                        <span class="chip">Flutter</span>
+                        <span class="chip">Bloc</span>
+                        <span class="chip">gRPC</span>
+                        <span class="chip">GitHub Actions</span>
+                      </div>
+                    </div>
+                    <div class="arrow-link">→</div>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      2017.04 – 2019.06
+                      <b>2 年 3 ヶ月</b>
+                    </div>
+                    <div class="body">
+                      <h3>株式会社 株式会社ドワンゴ（KADOKAWAグループ）</h3>
+                      <div class="role">iOS エンジニア / 受託開発本部</div>
+                      <div class="tags">
+                        <span class="chip">Swift</span>
+                        <span class="chip">UIKit</span>
+                        <span class="chip">Objective-C</span>
+                        <span class="chip">RxSwift</span>
+                      </div>
+                    </div>
+                    <div class="arrow-link">→</div>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      2016.10 – 2017.03
+                      <b>6 ヶ月</b>
+                    </div>
+                    <div class="body">
+                      <h3>フリーランス</h3>
+                      <div class="role">受託開発 / モバイル UI 実装</div>
+                      <div class="tags">
+                        <span class="chip">Swift</span>
+                        <span class="chip">Kotlin</span>
+                        <span class="chip">Figma</span>
+                      </div>
+                    </div>
+                    <div class="arrow-link">→</div>
+                  </div>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Built with Flutter Web · Hash routing</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+
+          <div class="frame frame-mobile">
+            <div class="frame-label">
+              <span>Mobile</span>
+              <span class="dims">375 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-list mob">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>職務経歴</span>
+                  </div>
+                  <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+                <div class="stage">
+                  <div class="page-head">
+                    <div>
+                      <span class="eyebrow">02 — Work</span>
+                      <h1>職務経歴</h1>
+                    </div>
+                    <span class="total">4 社 · 9 年 6 ヶ月</span>
+                  </div>
+                  <div class="filters">
+                    <span class="chip active">すべて</span>
+                    <span class="chip outline">正社員</span>
+                    <span class="chip outline">業務委託</span>
+                    <span class="chip outline">Flutter</span>
+                    <span class="chip outline">iOS</span>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      <b>2025.09 – 2026.03</b>
+                      · 7 ヶ月
+                    </div>
+                    <div class="body">
+                      <h3>オイシックス・ラ・大地株式会社</h3>
+                      <div class="role">Android アプリ開発・技術基盤改善</div>
+                      <div class="tags">
+                        <span class="chip">Flutter</span>
+                        <span class="chip">Riverpod</span>
+                        <span class="chip">Firebase</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      <b>2019.07 – 2022.03</b>
+                      · 2 年 8 ヶ月
+                    </div>
+                    <div class="body">
+                      <h3>株式会社 newmo株式会社</h3>
+                      <div class="role">Flutter エンジニア</div>
+                      <div class="tags">
+                        <span class="chip">Flutter</span>
+                        <span class="chip">Bloc</span>
+                        <span class="chip">gRPC</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      <b>2017.04 – 2019.06</b>
+                      · 2 年 3 ヶ月
+                    </div>
+                    <div class="body">
+                      <h3>株式会社 株式会社ドワンゴ（KADOKAWAグループ）</h3>
+                      <div class="role">iOS エンジニア</div>
+                      <div class="tags">
+                        <span class="chip">Swift</span>
+                        <span class="chip">UIKit</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      <b>2016.10 – 2017.03</b>
+                      · 6 ヶ月
+                    </div>
+                    <div class="body">
+                      <h3>フリーランス</h3>
+                      <div class="role">受託開発 / UI 実装</div>
+                      <div class="tags">
+                        <span class="chip">Swift</span>
+                        <span class="chip">Kotlin</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Flutter Web</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================== -->
+      <!-- 03 — WORK EXPERIENCE DETAIL                            -->
+      <!-- ====================================================== -->
+      <section class="section">
+        <div class="section-head">
+          <span class="section-num">03 / 06</span>
+          <h2 class="section-title">WORK EXPERIENCE — DETAIL</h2>
+          <span class="section-jp">/ 職務経歴詳細 · `/#/experience/:id`</span>
+        </div>
+        <p class="section-note">
+          在籍企業 1 社に対する責任範囲・実績・関連プロジェクトを縦長に展開。リスト画面からの `Hero`
+          連携で会社名タイトルを共有します。
+        </p>
+
+        <div class="frames">
+          <div class="frame frame-desktop">
+            <div class="frame-label">
+              <span>Desktop</span>
+              <span class="dims">1200 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-detail">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>とだやま.ℝ(Todayama_R)</span>
+                  </div>
+                  <nav>
+                    <a>トップ</a>
+                    <a class="active">職務経歴</a>
+                    <a>個人開発</a>
+                    <a>その他活動</a>
+                    <a>スキル</a>
+                  </nav>
+                  <span class="lang">JA</span>
+                </div>
+                <div class="stage">
+                  <div class="breadcrumb">
+                    <a>← 職務経歴</a>
+                    <span class="sep">/</span>
+                    <span>オイシックス・ラ・大地株式会社</span>
+                  </div>
+                  <div class="head">
+                    <div>
+                      <span class="eyebrow">2025.09 – 2026.03</span>
+                      <h1 style="margin-top: 8px">オイシックス・ラ・大地株式会社</h1>
+                      <div class="role-meta">Android アプリ開発・技術基盤改善 · モバイルプラットフォームチーム</div>
+                    </div>
+                    <dl class="meta-card">
+                      <div>
+                        <dt>在籍期間</dt>
+                        <dd>7 ヶ月</dd>
+                      </div>
+                      <div>
+                        <dt>チーム規模</dt>
+                        <dd>約10名</dd>
+                      </div>
+                      <div>
+                        <dt>勤務地</dt>
+                        <dd>日本 / リモート併用</dd>
+                      </div>
+                      <div>
+                        <dt>業種</dt>
+                        <dd>EC定期便サービス</dd>
+                      </div>
+                    </dl>
+                  </div>
+
+                  <div class="body">
+                    <div>
+                      <section>
+                        <h2>概要</h2>
+                        <p>
+                          会員数360万人超のEC定期便サービス「Oisix」のAndroid/iOSアプリ開発に従事。Androidアプリの機能開発・保守、および技術基盤改善を担当しました。設計レビュー、採用面接、アクセシビリティ監査を担当しています。
+                        </p>
+                      </section>
+                      <section>
+                        <h2>担当領域 · 実績</h2>
+                        <ul>
+                          <li>
+                            ネイティブ実装 (Swift / Kotlin) から Flutter への段階的移行を 14
+                            ヶ月で完遂。クラッシュフリー率を 99.2% → 99.86% に改善。
+                          </li>
+                          <li>
+                            Riverpod 2.x + Freezed を採用した状態管理レイヤーを設計、ドメインモデル 47
+                            種を型生成で整備。
+                          </li>
+                          <li>
+                            VoiceOver / TalkBack
+                            に対応したアクセシビリティガイドラインを社内策定し、新規画面の必須レビュー項目化。
+                          </li>
+                          <li>
+                            GitHub Actions による Web (Pages) + 内部配布 (TestFlight, Firebase App Distribution) の
+                            CI/CD を構築。
+                          </li>
+                          <li>新卒 3 名・中途 2 名のオンボーディングを実施。設計レビューを週次で運用。</li>
+                        </ul>
+                      </section>
+                      <section>
+                        <h2>関連プロジェクト</h2>
+                        <div class="subproject">
+                          <div class="num">01</div>
+                          <div>
+                            <h4>あおぞらモニター v3 — Flutter 完全移行</h4>
+                            <p>
+                              家庭向け空気質モニタリングアプリの基盤刷新。ネイティブ実装からの段階的移行を主導し、CI/CD・状態管理・テスト戦略を整備しました。
+                            </p>
+                          </div>
+                        </div>
+                        <div class="subproject">
+                          <div class="num">02</div>
+                          <div>
+                            <h4>Web ダッシュボード — Flutter Web</h4>
+                            <p>
+                              業務担当者向けの監視ダッシュボードを Flutter Web (WASM)
+                              でリリース。プラットフォーム特化のキーボード操作・テキストスケール対応を実装。
+                            </p>
+                          </div>
+                        </div>
+                        <div class="subproject">
+                          <div class="num">03</div>
+                          <div>
+                            <h4>アクセシビリティ監査基盤</h4>
+                            <p>
+                              `flutter_test` ベースのアクセシビリティ走査 (semantics tree 検証) を組み込み、PR
+                              ごとに自動レポート生成。
+                            </p>
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+
+                    <aside class="side">
+                      <div class="side-card">
+                        <h3>使用技術</h3>
+                        <div class="tagset">
+                          <span class="chip">Flutter 3.27</span>
+                          <span class="chip">Dart 3.6</span>
+                          <span class="chip">Riverpod 2</span>
+                          <span class="chip">Freezed</span>
+                          <span class="chip">go_router</span>
+                          <span class="chip">Drift</span>
+                          <span class="chip">Firebase</span>
+                          <span class="chip">GitHub Actions</span>
+                          <span class="chip">Swift</span>
+                          <span class="chip">Kotlin</span>
+                        </div>
+                      </div>
+                      <div class="side-card">
+                        <h3>主な成果</h3>
+                        <dl style="margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 18px">
+                          <div>
+                            <dt
+                              style="
+                                font-family: var(--ff-latin);
+                                font-size: 10px;
+                                letter-spacing: 0.14em;
+                                text-transform: uppercase;
+                                color: var(--ink-300);
+                              "
+                            >
+                              移行期間
+                            </dt>
+                            <dd style="margin: 4px 0 0; font-size: 24px; font-weight: 700; color: var(--primary)">
+                              14 ヶ月
+                            </dd>
+                          </div>
+                          <div>
+                            <dt
+                              style="
+                                font-family: var(--ff-latin);
+                                font-size: 10px;
+                                letter-spacing: 0.14em;
+                                text-transform: uppercase;
+                                color: var(--ink-300);
+                              "
+                            >
+                              クラッシュフリー
+                            </dt>
+                            <dd style="margin: 4px 0 0; font-size: 24px; font-weight: 700; color: var(--primary)">
+                              99.86 %
+                            </dd>
+                          </div>
+                          <div>
+                            <dt
+                              style="
+                                font-family: var(--ff-latin);
+                                font-size: 10px;
+                                letter-spacing: 0.14em;
+                                text-transform: uppercase;
+                                color: var(--ink-300);
+                              "
+                            >
+                              対応 PF
+                            </dt>
+                            <dd style="margin: 4px 0 0; font-size: 24px; font-weight: 700; color: var(--primary)">3</dd>
+                          </div>
+                          <div>
+                            <dt
+                              style="
+                                font-family: var(--ff-latin);
+                                font-size: 10px;
+                                letter-spacing: 0.14em;
+                                text-transform: uppercase;
+                                color: var(--ink-300);
+                              "
+                            >
+                              A11y 監査
+                            </dt>
+                            <dd style="margin: 4px 0 0; font-size: 24px; font-weight: 700; color: var(--primary)">
+                              週次
+                            </dd>
+                          </div>
+                        </dl>
+                      </div>
+                    </aside>
+                  </div>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Built with Flutter Web · Hash routing</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+
+          <div class="frame frame-mobile">
+            <div class="frame-label">
+              <span>Mobile</span>
+              <span class="dims">375 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-detail mob">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>職務経歴</span>
+                  </div>
+                  <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+                <div class="stage">
+                  <div class="breadcrumb">
+                    <a>← 職務経歴</a>
+                  </div>
+                  <div class="head">
+                    <div>
+                      <span class="eyebrow">2025.09 – 2026.03</span>
+                      <h1 style="margin-top: 8px">オイシックス・ラ・大地株式会社</h1>
+                      <div class="role-meta" style="font-size: 14px">Android アプリ開発・技術基盤改善</div>
+                    </div>
+                    <dl class="meta-card">
+                      <div>
+                        <dt>期間</dt>
+                        <dd>7 ヶ月</dd>
+                      </div>
+                      <div>
+                        <dt>チーム</dt>
+                        <dd>約10名</dd>
+                      </div>
+                      <div>
+                        <dt>勤務地</dt>
+                        <dd>日本 / リモート</dd>
+                      </div>
+                      <div>
+                        <dt>業種</dt>
+                        <dd>EC定期便サービス</dd>
+                      </div>
+                    </dl>
+                  </div>
+                  <div class="body">
+                    <div>
+                      <section>
+                        <h2>概要</h2>
+                        <p style="font-size: 14px; line-height: 26px">
+                          会員数360万人超のEC定期便サービス「Oisix」のAndroid/iOSアプリ開発に従事。Androidアプリの機能開発・保守、および技術基盤改善を担当しました。
+                        </p>
+                      </section>
+                      <section>
+                        <h2>担当領域</h2>
+                        <ul>
+                          <li>
+                            Ktorを用いたMockServerを構築し、曜日依存や前提条件の難しいテストを容易に実行可能にしました。
+                          </li>
+                          <li>KMP対応の基盤整備、SwiftExport導入検討、ADR策定、命名規則統一を実施しました。</li>
+                          <li>VoiceOver / TalkBack 対応の社内ガイドライン策定。</li>
+                          <li>GitHub Actions による CI/CD 構築。</li>
+                        </ul>
+                      </section>
+                      <section>
+                        <h2>使用技術</h2>
+                        <div class="tagset">
+                          <span class="chip">Flutter 3.27</span>
+                          <span class="chip">Riverpod 2</span>
+                          <span class="chip">Freezed</span>
+                          <span class="chip">go_router</span>
+                          <span class="chip">Drift</span>
+                          <span class="chip">Firebase</span>
+                        </div>
+                      </section>
+                    </div>
+                  </div>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Flutter Web</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================== -->
+      <!-- 04 — PERSONAL PROJECT LIST                             -->
+      <!-- ====================================================== -->
+      <section class="section">
+        <div class="section-head">
+          <span class="section-num">04 / 06</span>
+          <h2 class="section-title">PERSONAL PROJECTS</h2>
+          <span class="section-jp">/ 個人開発 · `/#/projects`</span>
+        </div>
+        <p class="section-note">
+          2 カラムのカードグリッド。ヒーロー領域はストライプの SVG
+          プレースホルダで「アプリスクリーンショット差し替え」を明示。実画像は
+          <code>assets/images/</code>
+          に投入。
+        </p>
+
+        <div class="frames">
+          <div class="frame frame-desktop">
+            <div class="frame-label">
+              <span>Desktop</span>
+              <span class="dims">1200 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-proj">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>とだやま.ℝ(Todayama_R)</span>
+                  </div>
+                  <nav>
+                    <a>トップ</a>
+                    <a>職務経歴</a>
+                    <a class="active">個人開発</a>
+                    <a>その他活動</a>
+                    <a>スキル</a>
+                  </nav>
+                  <span class="lang">JA</span>
+                </div>
+                <div class="stage">
+                  <div class="page-head">
+                    <div>
+                      <span class="eyebrow">04 — Personal Projects</span>
+                      <h1 style="margin-top: 8px">個人開発</h1>
+                    </div>
+                    <span
+                      class="total"
+                      style="
+                        font-family: var(--ff-latin);
+                        font-size: 12px;
+                        letter-spacing: 0.14em;
+                        color: var(--ink-300);
+                      "
+                    >
+                      公開 4 / 試作含む 12
+                    </span>
+                  </div>
+
+                  <div class="grid">
+                    <div class="proj-card green-cover">
+                      <div class="cover">App Screenshot — fictional-drug-and-disease-ref(メディマスタ)</div>
+                      <div class="body">
+                        <div class="row1">
+                          <div>
+                            <h3>fictional-drug-and-disease-ref(メディマスタ)</h3>
+                            <div class="type">Note App · iOS / Android / Web</div>
+                          </div>
+                          <span class="chip brass">公開中</span>
+                        </div>
+                        <p>余白を活かしたメモアプリ。書き味とアクセシビリティを両立、iCloud / Drive 同期に対応。</p>
+                        <div class="tags">
+                          <span class="chip">Flutter</span>
+                          <span class="chip">Drift</span>
+                          <span class="chip">KMP / Swift連携</span>
+                        </div>
+                      </div>
+                      <div class="footer">
+                        <span>v2.4 · 2025.11 更新</span>
+                        <a>App Store ↗</a>
+                      </div>
+                    </div>
+
+                    <div class="proj-card">
+                      <div class="cover">App Screenshot — resume-flutter</div>
+                      <div class="body">
+                        <div class="row1">
+                          <div>
+                            <h3>resume-flutter</h3>
+                            <div class="type">Weather · iOS / Android</div>
+                          </div>
+                          <span class="chip green">v1.0</span>
+                        </div>
+                        <p>登山口近辺の天気と日射を可視化する軽量天気アプリ。Open-Meteo を直接呼び出し、無料運用。</p>
+                        <div class="tags">
+                          <span class="chip">Flutter</span>
+                          <span class="chip">Open-Meteo</span>
+                          <span class="chip">Riverpod</span>
+                        </div>
+                      </div>
+                      <div class="footer">
+                        <span>v1.0 · 2024.06 公開</span>
+                        <a>GitHub ↗</a>
+                      </div>
+                    </div>
+
+                    <div class="proj-card">
+                      <div class="cover">App Screenshot — mock-server / design-blueprint workflow</div>
+                      <div class="body">
+                        <div class="row1">
+                          <div>
+                            <h3>mock-server / design-blueprint workflow</h3>
+                            <div class="type">Flashcards · iOS / Web</div>
+                          </div>
+                          <span class="chip outline">β 公開</span>
+                        </div>
+                        <p>SRS (間隔反復) を採用した語学学習用フラッシュカード。Web 版はオフライン優先で構成。</p>
+                        <div class="tags">
+                          <span class="chip">Flutter</span>
+                          <span class="chip">sqlite</span>
+                          <span class="chip">PWA</span>
+                        </div>
+                      </div>
+                      <div class="footer">
+                        <span>β · 2025.02 公開</span>
+                        <a>cardlingo.app ↗</a>
+                      </div>
+                    </div>
+
+                    <div class="proj-card">
+                      <div class="cover">App Screenshot — Claude / Codex automation skills</div>
+                      <div class="body">
+                        <div class="row1">
+                          <div>
+                            <h3>Claude / Codex automation skills</h3>
+                            <div class="type">Podcast Player · iOS</div>
+                          </div>
+                          <span class="chip outline">休止中</span>
+                        </div>
+                        <p>
+                          カラーパレットを音源から自動抽出するポッドキャストプレイヤー。色彩設計の研究としてリリース。
+                        </p>
+                        <div class="tags">
+                          <span class="chip">Swift</span>
+                          <span class="chip">Core Image</span>
+                          <span class="chip">CloudKit</span>
+                        </div>
+                      </div>
+                      <div class="footer">
+                        <span>v1.2 · 2022.09 更新</span>
+                        <a>GitHub ↗</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Built with Flutter Web · Hash routing</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+
+          <div class="frame frame-mobile">
+            <div class="frame-label">
+              <span>Mobile</span>
+              <span class="dims">375 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-proj mob">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>個人開発</span>
+                  </div>
+                  <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+                <div class="stage">
+                  <div class="page-head">
+                    <div>
+                      <span class="eyebrow">04 — Projects</span>
+                      <h1 style="margin-top: 8px">個人開発</h1>
+                    </div>
+                  </div>
+
+                  <div class="grid">
+                    <div class="proj-card green-cover">
+                      <div class="cover">fictional-drug-and-disease-ref(メディマスタ)</div>
+                      <div class="body">
+                        <div class="row1">
+                          <div>
+                            <h3>fictional-drug-and-disease-ref(メディマスタ)</h3>
+                            <div class="type">Note · iOS / Android / Web</div>
+                          </div>
+                          <span class="chip brass">公開中</span>
+                        </div>
+                        <p>余白を活かしたメモアプリ。iCloud / Drive 同期に対応。</p>
+                        <div class="tags">
+                          <span class="chip">Flutter</span>
+                          <span class="chip">Drift</span>
+                        </div>
+                      </div>
+                      <div class="footer">
+                        <span>v2.4 · 2025.11</span>
+                        <a>App Store ↗</a>
+                      </div>
+                    </div>
+
+                    <div class="proj-card">
+                      <div class="cover">resume-flutter</div>
+                      <div class="body">
+                        <div class="row1">
+                          <div>
+                            <h3>resume-flutter</h3>
+                            <div class="type">Weather · iOS / Android</div>
+                          </div>
+                          <span class="chip green">v1.0</span>
+                        </div>
+                        <p>登山口近辺の天気と日射を可視化。Open-Meteo を利用。</p>
+                        <div class="tags">
+                          <span class="chip">Flutter</span>
+                          <span class="chip">Open-Meteo</span>
+                        </div>
+                      </div>
+                      <div class="footer">
+                        <span>v1.0 · 2024.06</span>
+                        <a>GitHub ↗</a>
+                      </div>
+                    </div>
+
+                    <div class="proj-card">
+                      <div class="cover">mock-server / design-blueprint workflow</div>
+                      <div class="body">
+                        <div class="row1">
+                          <div>
+                            <h3>mock-server / design-blueprint workflow</h3>
+                            <div class="type">Flashcards · iOS / Web</div>
+                          </div>
+                          <span class="chip outline">β</span>
+                        </div>
+                        <p>間隔反復学習のフラッシュカード。Web 版は PWA。</p>
+                        <div class="tags">
+                          <span class="chip">Flutter</span>
+                          <span class="chip">PWA</span>
+                        </div>
+                      </div>
+                      <div class="footer">
+                        <span>β · 2025.02</span>
+                        <a>cardlingo.app ↗</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Flutter Web</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================== -->
+      <!-- 05 — OUTSIDE ACTIVITIES                                -->
+      <!-- ====================================================== -->
+      <section class="section">
+        <div class="section-head">
+          <span class="section-num">05 / 06</span>
+          <h2 class="section-title">OUTSIDE ACTIVITIES</h2>
+          <span class="section-jp">/ その他活動 · `/#/activities`</span>
+        </div>
+        <p class="section-note">
+          登壇・OSS 貢献・執筆・コミュニティの 4
+          種をスティッキーラベル付きのセクションで時系列に表示。`SliverPersistentHeader`
+          で左ラベルを縦長スクロール上に固定。
+        </p>
+
+        <div class="frames">
+          <div class="frame frame-desktop">
+            <div class="frame-label">
+              <span>Desktop</span>
+              <span class="dims">1200 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-act">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>とだやま.ℝ(Todayama_R)</span>
+                  </div>
+                  <nav>
+                    <a>トップ</a>
+                    <a>職務経歴</a>
+                    <a>個人開発</a>
+                    <a class="active">その他活動</a>
+                    <a>スキル</a>
+                  </nav>
+                  <span class="lang">JA</span>
+                </div>
+                <div class="stage">
+                  <div class="page-head">
+                    <span class="eyebrow">05 — Outside Activities</span>
+                    <h1 style="margin-top: 8px">その他活動</h1>
+                    <p>
+                      登壇・OSS
+                      貢献・執筆・コミュニティ運営など、業務外で関わった活動の記録。プラットフォームを超えた一次情報の発信を意識しています。
+                    </p>
+                  </div>
+
+                  <div class="act-group">
+                    <div class="label">
+                      <span class="eyebrow">talks</span>
+                      <h3>登壇</h3>
+                      <div class="count">5 件</div>
+                    </div>
+                    <div>
+                      <div class="act-item">
+                        <div class="when">2024.11</div>
+                        <div>
+                          <h4>DroidKaigi2025 コントリビュート</h4>
+                          <div class="where">日本ミッドタウン · 35 分セッション</div>
+                        </div>
+                        <div class="ext">VIDEO ↗</div>
+                      </div>
+                      <div class="act-item">
+                        <div class="when">2024.04</div>
+                        <div>
+                          <h4>DroidKaigi2024 コントリビュート</h4>
+                          <div class="where">渋谷 · 20 分 LT</div>
+                        </div>
+                        <div class="ext">SLIDES ↗</div>
+                      </div>
+                      <div class="act-item">
+                        <div class="when">2023.10</div>
+                        <div>
+                          <h4>DroidKaigi2023 コントリビュート</h4>
+                          <div class="where">早稲田大学 · 30 分セッション</div>
+                        </div>
+                        <div class="ext">VIDEO ↗</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="act-group">
+                    <div class="label">
+                      <span class="eyebrow">open source</span>
+                      <h3>OSS 貢献</h3>
+                      <div class="count">67 PR · 12 リポジトリ</div>
+                    </div>
+                    <div>
+                      <div class="act-item">
+                        <div class="when">継続</div>
+                        <div>
+                          <h4>DroidKaigi conference-app contributions</h4>
+                          <div class="where">アクセシビリティ関連 PR 9 件 · ドキュメント整備</div>
+                        </div>
+                        <div class="ext">GITHUB ↗</div>
+                      </div>
+                      <div class="act-item">
+                        <div class="when">継続</div>
+                        <div>
+                          <h4>fictional-drug-and-disease-ref(メディマスタ) repositories</h4>
+                          <div class="where">ハッシュ戦略・型安全ルートのバグ修正</div>
+                        </div>
+                        <div class="ext">GITHUB ↗</div>
+                      </div>
+                      <div class="act-item">
+                        <div class="when">2023.07</div>
+                        <div>
+                          <h4>HTML Design Blueprint + VRT workflow</h4>
+                          <div class="where">riverpod_generator のドキュメント翻訳 (英 → 日)</div>
+                        </div>
+                        <div class="ext">GITHUB ↗</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="act-group">
+                    <div class="label">
+                      <span class="eyebrow">writing</span>
+                      <h3>執筆</h3>
+                      <div class="count">22 記事</div>
+                    </div>
+                    <div>
+                      <div class="act-item">
+                        <div class="when">2025.06</div>
+                        <div>
+                          <h4>Zenn: DroidKaigi contribution write-ups</h4>
+                          <div class="where">全 6 章 · 累計 12,300 view</div>
+                        </div>
+                        <div class="ext">ZENN ↗</div>
+                      </div>
+                      <div class="act-item">
+                        <div class="when">2024.12</div>
+                        <div>
+                          <h4>Android Developers 翻訳動画</h4>
+                          <div class="where">技術評論社 · 16 頁</div>
+                        </div>
+                        <div class="ext">PRINT ↗</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="act-group">
+                    <div class="label">
+                      <span class="eyebrow">community</span>
+                      <h3>コミュニティ</h3>
+                      <div class="count">2 団体 · スタッフ</div>
+                    </div>
+                    <div>
+                      <div class="act-item">
+                        <div class="when">2022 – 現在</div>
+                        <div>
+                          <h4>DroidKaigi community contribution</h4>
+                          <div class="where">隔月開催の運営 · 登壇者調整</div>
+                        </div>
+                        <div class="ext">CONNPASS ↗</div>
+                      </div>
+                      <div class="act-item">
+                        <div class="when">2023 – 2024</div>
+                        <div>
+                          <h4>Welcome Talk recognition</h4>
+                          <div class="where">CFP レビュー · トラック編成</div>
+                        </div>
+                        <div class="ext">FLUTTERKAIGI ↗</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Built with Flutter Web · Hash routing</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+
+          <div class="frame frame-mobile">
+            <div class="frame-label">
+              <span>Mobile</span>
+              <span class="dims">375 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-act mob">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>その他活動</span>
+                  </div>
+                  <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+                <div class="stage">
+                  <div class="page-head">
+                    <span class="eyebrow">05 — Activities</span>
+                    <h1 style="margin-top: 8px">その他活動</h1>
+                    <p style="font-size: 13px">登壇・OSS 貢献・執筆・コミュニティ運営の記録。</p>
+                  </div>
+
+                  <div class="act-group">
+                    <div class="label">
+                      <span class="eyebrow">talks</span>
+                      <h3>登壇</h3>
+                    </div>
+                    <div>
+                      <div class="act-item">
+                        <div class="when">2024.11</div>
+                        <div>
+                          <h4>DroidKaigi2025 コントリビュート</h4>
+                          <div class="where">日本ミッドタウン · 35 分</div>
+                        </div>
+                      </div>
+                      <div class="act-item">
+                        <div class="when">2024.04</div>
+                        <div>
+                          <h4>DroidKaigi2024 コントリビュート</h4>
+                          <div class="where">渋谷 · 20 分 LT</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="act-group">
+                    <div class="label">
+                      <span class="eyebrow">open source</span>
+                      <h3>OSS 貢献</h3>
+                    </div>
+                    <div>
+                      <div class="act-item">
+                        <div class="when">継続</div>
+                        <div>
+                          <h4>DroidKaigi conference-app contributions</h4>
+                          <div class="where">アクセシビリティ関連 PR 9 件</div>
+                        </div>
+                      </div>
+                      <div class="act-item">
+                        <div class="when">継続</div>
+                        <div>
+                          <h4>fictional-drug-and-disease-ref(メディマスタ) repositories</h4>
+                          <div class="where">ハッシュ戦略のバグ修正</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="act-group">
+                    <div class="label">
+                      <span class="eyebrow">writing</span>
+                      <h3>執筆</h3>
+                    </div>
+                    <div>
+                      <div class="act-item">
+                        <div class="when">2025.06</div>
+                        <div>
+                          <h4>Zenn: DroidKaigi contribution write-ups</h4>
+                          <div class="where">全 6 章 · 12,300 view</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Flutter Web</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================== -->
+      <!-- 06 — SKILLS                                            -->
+      <!-- ====================================================== -->
+      <section class="section">
+        <div class="section-head">
+          <span class="section-num">06 / 06</span>
+          <h2 class="section-title">SKILLS</h2>
+          <span class="section-jp">/ スキル · `/#/skills`</span>
+        </div>
+        <p class="section-note">
+          言語・フレームワーク・ツール・その他の 4 ブロック。バー表現は経験量 (年数)
+          を可視化するもので、自己評価のレベル文言を併記して二重表現にすることでスクリーンリーダー利用者へも情報を届けます。
+        </p>
+
+        <div class="frames">
+          <div class="frame frame-desktop">
+            <div class="frame-label">
+              <span>Desktop</span>
+              <span class="dims">1200 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-skills">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>とだやま.ℝ(Todayama_R)</span>
+                  </div>
+                  <nav>
+                    <a>トップ</a>
+                    <a>職務経歴</a>
+                    <a>個人開発</a>
+                    <a>その他活動</a>
+                    <a class="active">スキル</a>
+                  </nav>
+                  <span class="lang">JA</span>
+                </div>
+                <div class="stage">
+                  <div class="page-head">
+                    <span class="eyebrow">06 — Skills</span>
+                    <h1 style="margin-top: 8px">スキル</h1>
+                    <div class="legend">
+                      <span class="key">
+                        <span class="dot"></span>
+                        業務経験
+                      </span>
+                      <span class="key">
+                        <span class="dot b"></span>
+                        個人 / 学習
+                      </span>
+                      <span class="key">経験月数・使用実績を表示</span>
+                    </div>
+                  </div>
+
+                  <div class="skill-block">
+                    <div class="head">
+                      <h3>言語</h3>
+                      <div class="desc">README の経験歴テーブルを元に、言語ごとの経験期間を表示します。</div>
+                    </div>
+                    <div class="skill-rows">
+                      <div class="skill-row">
+                        <div class="name">Dart</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 92%"></div></div>
+                        <div class="years">4ヶ月</div>
+                        <div class="level">README</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">Swift</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 78%"></div></div>
+                        <div class="years">8ヶ月</div>
+                        <div class="level">README</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">Kotlin</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 60%"></div></div>
+                        <div class="years">7年(86ヶ月)</div>
+                        <div class="level">README</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">JavaScript</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 50%"></div></div>
+                        <div class="years">6ヶ月相当</div>
+                        <div class="level">README</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">Objective-C</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 35%"></div></div>
+                        <div class="years">1ヶ月相当</div>
+                        <div class="level">README</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="skill-block">
+                    <div class="head">
+                      <h3>フレームワーク</h3>
+                      <div class="desc">
+                        README のプラットフォーム・フレームワーク経験と職務経歴上の使用技術を表示します。
+                      </div>
+                    </div>
+                    <div class="skill-rows">
+                      <div class="skill-row">
+                        <div class="name">Flutter</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 95%"></div></div>
+                        <div class="years">4ヶ月</div>
+                        <div class="level">README</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">Swift</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 65%"></div></div>
+                        <div class="years">8ヶ月</div>
+                        <div class="level">README</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">Jetpack Compose</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 45%"></div></div>
+                        <div class="years">実務使用</div>
+                        <div class="level">職務経歴</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">Android TV</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 70%"></div></div>
+                        <div class="years">6ヶ月</div>
+                        <div class="level">README</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="skill-block">
+                    <div class="head">
+                      <h3>ツール</h3>
+                      <div class="desc">職務経歴と個人開発で使用している開発・検証ツールを表示します。</div>
+                    </div>
+                    <div class="skill-rows">
+                      <div class="skill-row">
+                        <div class="name">Android Studio / Xcode</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 85%"></div></div>
+                        <div class="years">実務使用</div>
+                        <div class="level">職務経歴</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">Figma</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 60%"></div></div>
+                        <div class="years">実務使用</div>
+                        <div class="level">職務経歴</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">GitHub Actions</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 70%"></div></div>
+                        <div class="years">実務使用</div>
+                        <div class="level">職務経歴</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">Firebase</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 55%"></div></div>
+                        <div class="years">実務使用</div>
+                        <div class="level">職務経歴</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="skill-block">
+                    <div class="head">
+                      <h3>その他</h3>
+                      <div class="desc">個人開発、VRT、AI活用、品質ゲートなどの実践領域を表示します。</div>
+                    </div>
+                    <div class="skill-rows">
+                      <div class="skill-row">
+                        <div class="name">Design Blueprint / VRT</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 80%"></div></div>
+                        <div class="years">個人開発</div>
+                        <div class="level">README</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">Golden / Widget Test</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 75%"></div></div>
+                        <div class="years">個人開発</div>
+                        <div class="level">README</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">AI活用</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 60%"></div></div>
+                        <div class="years">Claude Code 9ヶ月</div>
+                        <div class="level">README</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Built with Flutter Web · Hash routing</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+
+          <div class="frame frame-mobile">
+            <div class="frame-label">
+              <span>Mobile</span>
+              <span class="dims">375 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-skills mob">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>スキル</span>
+                  </div>
+                  <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+                <div class="stage">
+                  <div class="page-head">
+                    <span class="eyebrow">06 — Skills</span>
+                    <h1 style="margin-top: 8px">スキル</h1>
+                    <div class="legend" style="flex-wrap: wrap; gap: 10px; margin-top: 14px; font-size: 11px">
+                      <span class="key">
+                        <span class="dot"></span>
+                        業務
+                      </span>
+                      <span class="key">
+                        <span class="dot b"></span>
+                        学習
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="skill-block">
+                    <div class="head"><h3>言語</h3></div>
+                    <div class="skill-rows">
+                      <div class="skill-row">
+                        <div class="name">Kotlin</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 92%"></div></div>
+                        <div class="years">7年(86ヶ月)</div>
+                        <div class="level">README</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">Dart</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 35%"></div></div>
+                        <div class="years">4ヶ月</div>
+                        <div class="level">README</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">Swift</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 45%"></div></div>
+                        <div class="years">8ヶ月</div>
+                        <div class="level">README</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="skill-block">
+                    <div class="head"><h3>プラットフォーム / ツール</h3></div>
+                    <div class="skill-rows">
+                      <div class="skill-row">
+                        <div class="name">Android Mobile</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 96%"></div></div>
+                        <div class="years">8年(96ヶ月)</div>
+                        <div class="level">README</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">Flutter</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 35%"></div></div>
+                        <div class="years">4ヶ月</div>
+                        <div class="level">README</div>
+                      </div>
+                      <div class="skill-row">
+                        <div class="name">GitHub Actions</div>
+                        <div class="bar-track"><div class="bar-fill" style="width: 70%"></div></div>
+                        <div class="years">実務使用</div>
+                        <div class="level">職務経歴</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Flutter Web</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer
+        style="
+          margin-top: var(--s20);
+          padding-top: var(--s8);
+          border-top: 1px solid var(--line);
+          display: flex;
+          justify-content: space-between;
+          color: var(--ink-300);
+          font-family: var(--ff-latin);
+          font-size: 11px;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        "
+      >
+        <span>resume-flutter / blueprint v1</span>
+        <span>generated 2026-05-16</span>
+      </footer>
+    </div>
+  </body>
+</html>

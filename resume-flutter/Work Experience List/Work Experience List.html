@@ -1,0 +1,1708 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>work-experience-list</title>
+    <style>
+      /* ============================================================
+     TOKENS  (Flutter implementation should mirror these exactly)
+     ============================================================ */
+      :root {
+        /* ---- Color: Surface & Ink ---- */
+        --bg: #f6f3ee; /* page background, warm ivory */
+        --surface: #ffffff; /* card surface */
+        --surface-alt: #efe7da; /* chip / subtle fill (warm sand) */
+        --surface-sunk: #f0e9dd; /* timeline rail, code blocks */
+        --line-soft: #e8e0d1;
+        --line: #d9cfbc;
+        --line-strong: #c3b79f;
+        --ink-900: #1e1611; /* primary text */
+        --ink-700: #3a2e22; /* heading on surface */
+        --ink-500: #524337; /* secondary body */
+        --ink-300: #877767; /* meta */
+        --ink-100: #b5a993; /* disabled / decorative */
+
+        /* ---- Color: Brand ---- */
+        --primary: #9f4014; /* deep burnt copper — complement to icon blue */
+        --primary-hover: #823310;
+        --primary-press: #66270b;
+        --primary-container: #f2d9c5;
+        --on-primary: #ffffff;
+        --accent: #2e4e73; /* deep navy, echoes the icon */
+        --accent-soft: #dce4ee;
+        --error: #8c2a2a;
+
+        /* ---- Typography ---- */
+        --ff-jp:
+          "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", system-ui, sans-serif;
+        --ff-latin: "Noto Sans JP", "Inter", system-ui, sans-serif;
+
+        /* ---- Spacing scale (4-base) ---- */
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 20px;
+        --s6: 24px;
+        --s8: 32px;
+        --s10: 40px;
+        --s12: 48px;
+        --s16: 64px;
+        --s20: 80px;
+        --s24: 96px;
+
+        /* ---- Radius ---- */
+        --r-xs: 4px;
+        --r-sm: 8px;
+        --r-md: 12px;
+        --r-lg: 20px;
+        --r-full: 999px;
+
+        /* ---- Elevation ---- */
+        --e1: 0 1px 2px rgba(30, 22, 17, 0.06), 0 1px 1px rgba(30, 22, 17, 0.04);
+        --e2: 0 4px 10px rgba(30, 22, 17, 0.06), 0 1px 2px rgba(30, 22, 17, 0.04);
+        --e3: 0 12px 28px rgba(30, 22, 17, 0.1), 0 2px 6px rgba(30, 22, 17, 0.06);
+      }
+
+      /* ============================================================
+     PAGE CHROME
+     ============================================================ */
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--ink-900);
+        font-family: var(--ff-jp);
+        font-feature-settings:
+          "palt" 1,
+          "tnum" 1;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      .page {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: var(--s10) var(--s8) var(--s24);
+      }
+      .blueprint-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: var(--s8);
+        margin-bottom: var(--s16);
+        gap: var(--s10);
+        flex-wrap: wrap;
+      }
+      .blueprint-head h1 {
+        font-size: 32px;
+        line-height: 40px;
+        font-weight: 700;
+        letter-spacing: -0.005em;
+        margin: 0;
+      }
+      .blueprint-head .eyebrow {
+        display: block;
+        margin-bottom: var(--s2);
+      }
+      .blueprint-head p {
+        max-width: 56ch;
+        margin: 0;
+        color: var(--ink-500);
+        font-size: 14px;
+        line-height: 24px;
+      }
+      .blueprint-head dl {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 2px var(--s4);
+        font-size: 12px;
+        margin: 0;
+        align-self: center;
+      }
+      .blueprint-head dt {
+        color: var(--ink-300);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .blueprint-head dd {
+        margin: 0;
+        color: var(--ink-700);
+      }
+
+      .eyebrow {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        line-height: 16px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink-300);
+      }
+
+      /* Section header */
+      .section {
+        margin-top: var(--s20);
+      }
+      .section-head {
+        display: flex;
+        align-items: baseline;
+        gap: var(--s5);
+        margin-bottom: var(--s6);
+      }
+      .section-num {
+        font-family: var(--ff-latin);
+        font-variant-numeric: tabular-nums;
+        font-size: 12px;
+        color: var(--ink-300);
+        letter-spacing: 0.14em;
+      }
+      .section-title {
+        font-size: 22px;
+        line-height: 30px;
+        font-weight: 700;
+        margin: 0;
+      }
+      .section-jp {
+        color: var(--ink-500);
+        font-size: 14px;
+      }
+      .section-note {
+        color: var(--ink-500);
+        font-size: 13px;
+        line-height: 22px;
+        max-width: 64ch;
+        margin: 0 0 var(--s6);
+      }
+
+      /* Frame chrome ------------------------------------------------ */
+      .frames {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s10);
+      }
+      .frame {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s3);
+      }
+      .frame-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-300);
+      }
+      .frame-label .dims {
+        color: var(--ink-100);
+        font-variant-numeric: tabular-nums;
+      }
+      .frame-body {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        overflow: hidden;
+        box-shadow: var(--e1);
+      }
+      .frame-desktop .frame-body {
+        width: 1200px;
+        max-width: 100%;
+      }
+      .frame-mobile .frame-body {
+        width: 375px;
+      }
+
+      /* ============================================================
+     TOKENS REFERENCE CARDS
+     ============================================================ */
+      .tokens-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: var(--s4);
+      }
+      .token-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: var(--s5);
+      }
+      .token-card h3 {
+        font-size: 13px;
+        margin: 0 0 var(--s4);
+        color: var(--ink-700);
+        display: flex;
+        align-items: center;
+        gap: var(--s2);
+      }
+      .token-card h3::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: var(--primary);
+        display: inline-block;
+      }
+      .span-3 {
+        grid-column: span 3;
+      }
+      .span-4 {
+        grid-column: span 4;
+      }
+      .span-6 {
+        grid-column: span 6;
+      }
+      .span-8 {
+        grid-column: span 8;
+      }
+      .span-12 {
+        grid-column: span 12;
+      }
+
+      /* color swatches */
+      .swatch-row {
+        display: grid;
+        grid-template-columns: 28px 1fr auto auto;
+        gap: var(--s3);
+        align-items: center;
+        padding: var(--s2) 0;
+        border-bottom: 1px solid var(--line-soft);
+        font-size: 12px;
+        line-height: 18px;
+      }
+      .swatch-row:last-child {
+        border-bottom: 0;
+      }
+      .swatch {
+        width: 28px;
+        height: 20px;
+        border-radius: var(--r-xs);
+        border: 1px solid rgba(30, 22, 17, 0.08);
+      }
+      .swatch-row .name {
+        color: var(--ink-900);
+        font-weight: 500;
+      }
+      .swatch-row .hex,
+      .swatch-row .flutter {
+        font-family: var(--ff-latin);
+        font-variant-numeric: tabular-nums;
+        color: var(--ink-500);
+        font-size: 11px;
+      }
+
+      /* type scale rows */
+      .type-row {
+        display: grid;
+        grid-template-columns: 130px 1fr;
+        gap: var(--s4);
+        align-items: baseline;
+        padding: var(--s4) 0;
+        border-bottom: 1px solid var(--line-soft);
+      }
+      .type-row:last-child {
+        border-bottom: 0;
+      }
+      .type-row .meta {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-300);
+        letter-spacing: 0.04em;
+      }
+      .type-row .meta b {
+        display: block;
+        color: var(--ink-700);
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+
+      /* spacing scale */
+      .scale-row {
+        display: grid;
+        grid-template-columns: 56px 64px 1fr;
+        gap: var(--s3);
+        align-items: center;
+        padding: var(--s2) 0;
+        border-bottom: 1px solid var(--line-soft);
+        font-size: 12px;
+      }
+      .scale-row:last-child {
+        border-bottom: 0;
+      }
+      .scale-row .token {
+        font-family: var(--ff-latin);
+        color: var(--ink-700);
+        font-weight: 600;
+      }
+      .scale-row .px {
+        font-family: var(--ff-latin);
+        color: var(--ink-500);
+        font-variant-numeric: tabular-nums;
+      }
+      .scale-bar {
+        height: 8px;
+        background: var(--primary);
+        border-radius: 2px;
+        max-width: 100%;
+      }
+
+      /* radius row */
+      .radius-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: var(--s4);
+      }
+      .radius-cell {
+        text-align: center;
+      }
+      .radius-shape {
+        height: 56px;
+        background: var(--surface-alt);
+        border: 1px solid var(--line);
+        margin-bottom: var(--s2);
+      }
+      .radius-cell .lbl {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-700);
+        font-weight: 600;
+      }
+      .radius-cell .px {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-300);
+      }
+
+      /* elevation row */
+      .elev-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--s4);
+      }
+      .elev-cell {
+        background: var(--surface);
+        height: 80px;
+        border-radius: var(--r-sm);
+        border: 1px solid var(--line-soft);
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        padding: var(--s3);
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-500);
+      }
+      .elev-cell.e1 {
+        box-shadow: var(--e1);
+      }
+      .elev-cell.e2 {
+        box-shadow: var(--e2);
+      }
+      .elev-cell.e3 {
+        box-shadow: var(--e3);
+      }
+
+      /* ============================================================
+     SHARED SCREEN PRIMITIVES (all namespaced under .scr)
+     ============================================================ */
+      .scr {
+        font-family: var(--ff-jp);
+        color: var(--ink-900);
+        background: var(--bg);
+      }
+      .scr a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      /* App bar */
+      .scr .appbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 48px;
+        border-bottom: 1px solid var(--line);
+        background: var(--bg);
+        position: relative;
+      }
+      .scr .appbar .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .scr .appbar .brand-mark {
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: var(--accent) url("../avatar.png") center/cover no-repeat;
+        box-shadow: 0 0 0 1px rgba(30, 22, 17, 0.08);
+      }
+      .scr .appbar nav {
+        display: flex;
+        gap: 28px;
+        font-size: 13px;
+        color: var(--ink-700);
+      }
+      .scr .appbar nav .active {
+        color: var(--ink-900);
+        position: relative;
+      }
+      .scr .appbar nav .active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -22px;
+        height: 2px;
+        background: var(--primary);
+      }
+      .scr .appbar .lang {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-500);
+        letter-spacing: 0.14em;
+      }
+
+      /* mobile appbar */
+      .scr.mob .appbar {
+        padding: 16px 20px;
+      }
+      .scr.mob .appbar nav {
+        display: none;
+      }
+      .scr.mob .appbar .hamburger {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+      }
+      .scr.mob .appbar .hamburger span {
+        display: block;
+        height: 1.5px;
+        background: var(--ink-900);
+      }
+      .scr.mob .appbar .hamburger span:nth-child(2) {
+        width: 60%;
+        align-self: flex-end;
+      }
+
+      /* footer */
+      .scr footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 48px;
+        border-top: 1px solid var(--line);
+        color: var(--ink-300);
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .scr.mob footer {
+        padding: 20px;
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+      }
+
+      /* generic chips */
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: var(--r-full);
+        background: var(--surface-alt);
+        color: var(--ink-700);
+        font-size: 12px;
+        line-height: 18px;
+        border: 1px solid transparent;
+      }
+      .chip.outline {
+        background: transparent;
+        border-color: var(--line);
+      }
+      .chip.brass {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+      .chip.green {
+        background: var(--primary-container);
+        color: var(--primary-press);
+      }
+
+      /* buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 22px;
+        border-radius: var(--r-full);
+        background: var(--primary);
+        color: var(--on-primary);
+        font-size: 14px;
+        font-weight: 600;
+        border: 1px solid var(--primary);
+        cursor: pointer;
+      }
+      .btn.ghost {
+        background: transparent;
+        color: var(--ink-900);
+        border-color: var(--line-strong);
+      }
+      .btn .arrow {
+        font-family: var(--ff-latin);
+      }
+
+      /* ============================================================
+     SCREEN 01 — HERO
+     ============================================================ */
+      .scr-hero .stage {
+        padding: 80px 48px 96px;
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 64px;
+        align-items: start;
+      }
+      .scr-hero .label-line {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+      .scr-hero .label-line .rule {
+        width: 40px;
+        height: 1px;
+        background: var(--ink-300);
+      }
+      .scr-hero h1.display {
+        font-size: 84px;
+        line-height: 1.02;
+        font-weight: 700;
+        letter-spacing: -0.012em;
+        margin: 0;
+      }
+      .scr-hero .display .accent {
+        color: var(--primary);
+      }
+      .scr-hero .role {
+        margin-top: 28px;
+        font-size: 18px;
+        line-height: 30px;
+        color: var(--ink-700);
+        font-weight: 500;
+      }
+      .scr-hero .lede {
+        margin-top: 20px;
+        font-size: 15px;
+        line-height: 28px;
+        color: var(--ink-500);
+        max-width: 52ch;
+      }
+      .scr-hero .meta-row {
+        display: flex;
+        gap: 28px;
+        margin-top: 32px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        font-size: 12px;
+        color: var(--ink-500);
+      }
+      .scr-hero .meta-row b {
+        color: var(--ink-900);
+        font-weight: 600;
+      }
+      .scr-hero .ctas {
+        display: flex;
+        gap: 12px;
+        margin-top: 36px;
+      }
+
+      .scr-hero .side {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: 28px;
+      }
+      .scr-hero .portrait {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: 999px;
+        background: var(--accent) url("../avatar.png") center/cover no-repeat;
+        box-shadow:
+          0 0 0 1px rgba(30, 22, 17, 0.06),
+          var(--e2);
+        margin-bottom: 24px;
+      }
+      .scr-hero .portrait-caption {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-top: -8px;
+        margin-bottom: 22px;
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-300);
+      }
+      .scr-hero .portrait-caption b {
+        color: var(--ink-700);
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: none;
+      }
+      .scr-hero .side h3 {
+        font-size: 12px;
+        color: var(--ink-300);
+        margin: 0 0 18px;
+        font-family: var(--ff-latin);
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      .scr-hero .stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px 20px;
+      }
+      .scr-hero .stat .num {
+        font-size: 36px;
+        line-height: 1;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        color: var(--primary);
+        letter-spacing: -0.01em;
+      }
+      .scr-hero .stat .lab {
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--ink-500);
+      }
+      .scr-hero .links {
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line-soft);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .scr-hero .links a {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: var(--ink-700);
+      }
+      .scr-hero .links a .ext {
+        font-family: var(--ff-latin);
+        color: var(--ink-300);
+      }
+
+      /* mobile hero */
+      .scr-hero.mob .stage {
+        padding: 32px 20px 48px;
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .scr-hero.mob h1.display {
+        font-size: 44px;
+        letter-spacing: -0.01em;
+      }
+      .scr-hero.mob .role {
+        font-size: 16px;
+        margin-top: 20px;
+      }
+      .scr-hero.mob .lede {
+        font-size: 14px;
+        margin-top: 16px;
+      }
+      .scr-hero.mob .meta-row {
+        flex-direction: column;
+        gap: 6px;
+      }
+      .scr-hero.mob .ctas {
+        flex-direction: column;
+      }
+      .scr-hero.mob .ctas .btn {
+        justify-content: center;
+      }
+      .scr-hero.mob .side {
+        padding: 20px;
+      }
+      .scr-hero.mob .portrait {
+        width: 160px;
+        margin: 0 auto 20px;
+      }
+      .scr-hero.mob .portrait-caption {
+        justify-content: center;
+        gap: 12px;
+      }
+      .scr-hero.mob .stat .num {
+        font-size: 28px;
+      }
+
+      /* ============================================================
+     SCREEN 02 — WORK EXPERIENCE LIST
+     ============================================================ */
+      .scr-list .stage {
+        padding: 64px 48px 96px;
+      }
+      .scr-list .page-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 24px;
+        margin-bottom: 40px;
+      }
+      .scr-list .page-head h1 {
+        font-size: 40px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.005em;
+      }
+      .scr-list .page-head .total {
+        font-family: var(--ff-latin);
+        color: var(--ink-300);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+      }
+      .scr-list .filters {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+      }
+      .scr-list .filters .chip.active {
+        background: var(--ink-900);
+        color: #fff;
+        border-color: var(--ink-900);
+      }
+
+      .work-item {
+        display: grid;
+        grid-template-columns: 120px 1fr auto;
+        gap: 32px;
+        align-items: start;
+        padding: 28px 0;
+        border-top: 1px solid var(--line);
+        cursor: pointer;
+        position: relative;
+      }
+      .work-item:last-child {
+        border-bottom: 1px solid var(--line);
+      }
+      .work-item .year {
+        font-family: var(--ff-latin);
+        font-variant-numeric: tabular-nums;
+        font-size: 13px;
+        color: var(--ink-300);
+        letter-spacing: 0.04em;
+        padding-top: 4px;
+      }
+      .work-item .year b {
+        color: var(--ink-900);
+        display: block;
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .work-item .body h3 {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 0 6px;
+        letter-spacing: -0.005em;
+      }
+      .work-item .body .role {
+        font-size: 14px;
+        color: var(--ink-500);
+        margin-bottom: 14px;
+      }
+      .work-item .body .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .work-item .arrow-link {
+        align-self: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 999px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--ff-latin);
+        color: var(--ink-700);
+      }
+      .work-item:hover .arrow-link {
+        background: var(--primary);
+        color: var(--on-primary);
+        border-color: var(--primary);
+      }
+
+      .scr-list.mob .stage {
+        padding: 24px 20px 48px;
+      }
+      .scr-list.mob .page-head h1 {
+        font-size: 28px;
+      }
+      .scr-list.mob .filters {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+      }
+      .scr-list.mob .work-item {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 20px 0;
+      }
+      .scr-list.mob .work-item .arrow-link {
+        display: none;
+      }
+      .scr-list.mob .work-item .year {
+        padding-top: 0;
+      }
+      .scr-list.mob .work-item .year b {
+        display: inline;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .scr-list.mob .work-item .body h3 {
+        font-size: 17px;
+      }
+
+      /* ============================================================
+     SCREEN 03 — WORK EXPERIENCE DETAIL
+     ============================================================ */
+      .scr-detail .stage {
+        padding: 48px 48px 96px;
+      }
+      .scr-detail .breadcrumb {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        color: var(--ink-300);
+        text-transform: uppercase;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 28px;
+      }
+      .scr-detail .breadcrumb a {
+        color: var(--ink-500);
+      }
+      .scr-detail .breadcrumb .sep {
+        color: var(--ink-100);
+      }
+      .scr-detail .head {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 32px;
+        margin-bottom: 40px;
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 64px;
+        align-items: end;
+      }
+      .scr-detail h1 {
+        font-size: 44px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.008em;
+      }
+      .scr-detail .role-meta {
+        font-size: 16px;
+        color: var(--ink-700);
+        margin-top: 14px;
+        font-weight: 500;
+      }
+      .scr-detail .meta-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px 12px;
+      }
+      .scr-detail .meta-card dt {
+        font-family: var(--ff-latin);
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-300);
+        margin: 0;
+      }
+      .scr-detail .meta-card dd {
+        margin: 2px 0 0;
+        font-size: 13px;
+        color: var(--ink-900);
+        font-weight: 500;
+      }
+      .scr-detail .body {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 64px;
+      }
+      .scr-detail .body section + section {
+        margin-top: 40px;
+      }
+      .scr-detail .body h2 {
+        font-size: 13px;
+        color: var(--ink-300);
+        margin: 0 0 18px;
+        font-family: var(--ff-latin);
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--line-soft);
+      }
+      .scr-detail .body p {
+        font-size: 15px;
+        line-height: 30px;
+        color: var(--ink-700);
+        margin: 0;
+      }
+      .scr-detail .body ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .scr-detail .body li {
+        display: grid;
+        grid-template-columns: 32px 1fr;
+        font-size: 14px;
+        line-height: 26px;
+        color: var(--ink-700);
+      }
+      .scr-detail .body li::before {
+        content: "→";
+        color: var(--primary);
+        font-family: var(--ff-latin);
+      }
+      .scr-detail .tagset {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .subproject {
+        border-top: 1px solid var(--line-soft);
+        padding: 20px 0;
+        display: grid;
+        grid-template-columns: 60px 1fr;
+        gap: 24px;
+      }
+      .subproject:last-child {
+        border-bottom: 1px solid var(--line-soft);
+      }
+      .subproject .num {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-300);
+        letter-spacing: 0.14em;
+        font-variant-numeric: tabular-nums;
+      }
+      .subproject h4 {
+        margin: 0 0 6px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .subproject p {
+        margin: 0;
+        font-size: 13px;
+        color: var(--ink-500);
+        line-height: 22px;
+      }
+
+      .scr-detail .side .side-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: 24px;
+      }
+      .scr-detail .side h3 {
+        font-size: 11px;
+        margin: 0 0 14px;
+        font-family: var(--ff-latin);
+        color: var(--ink-300);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+      .scr-detail .side-card + .side-card {
+        margin-top: 16px;
+      }
+
+      .scr-detail.mob .stage {
+        padding: 24px 20px 48px;
+      }
+      .scr-detail.mob .head,
+      .scr-detail.mob .body {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .scr-detail.mob h1 {
+        font-size: 28px;
+      }
+      .scr-detail.mob .meta-card {
+        grid-template-columns: 1fr 1fr;
+      }
+      .scr-detail.mob .subproject {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      /* ============================================================
+     SCREEN 04 — PERSONAL PROJECTS
+     ============================================================ */
+      .scr-proj .stage {
+        padding: 64px 48px 96px;
+      }
+      .scr-proj .page-head {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 24px;
+        margin-bottom: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .scr-proj .page-head h1 {
+        font-size: 40px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.005em;
+      }
+      .scr-proj .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      .proj-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .proj-card .cover {
+        height: 200px;
+        position: relative;
+        background:
+          repeating-linear-gradient(135deg, rgba(30, 22, 17, 0.06) 0 1px, transparent 1px 14px), var(--surface-alt);
+        border-bottom: 1px solid var(--line-soft);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-300);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .proj-card.green-cover .cover {
+        background:
+          repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 14px), var(--primary);
+        color: rgba(255, 255, 255, 0.7);
+        border-bottom-color: transparent;
+      }
+      .proj-card .body {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        flex: 1;
+      }
+      .proj-card .body .row1 {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .proj-card h3 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .proj-card .type {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        color: var(--ink-300);
+        text-transform: uppercase;
+        margin-top: 4px;
+      }
+      .proj-card p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 24px;
+        color: var(--ink-500);
+      }
+      .proj-card .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 4px;
+      }
+      .proj-card .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 24px;
+        border-top: 1px solid var(--line-soft);
+        font-size: 12px;
+        color: var(--ink-500);
+      }
+      .proj-card .footer a {
+        font-family: var(--ff-latin);
+        color: var(--ink-700);
+        font-weight: 600;
+      }
+
+      .scr-proj.mob .stage {
+        padding: 24px 20px 48px;
+      }
+      .scr-proj.mob .page-head h1 {
+        font-size: 28px;
+      }
+      .scr-proj.mob .grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .scr-proj.mob .proj-card .cover {
+        height: 140px;
+      }
+      .scr-proj.mob .proj-card .body {
+        padding: 18px;
+      }
+      .scr-proj.mob .proj-card h3 {
+        font-size: 17px;
+      }
+
+      /* ============================================================
+     SCREEN 05 — OUTSIDE ACTIVITIES
+     ============================================================ */
+      .scr-act .stage {
+        padding: 64px 48px 96px;
+      }
+      .scr-act .page-head {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 24px;
+        margin-bottom: 40px;
+      }
+      .scr-act .page-head h1 {
+        font-size: 40px;
+        font-weight: 700;
+        margin: 0 0 8px;
+        letter-spacing: -0.005em;
+      }
+      .scr-act .page-head p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--ink-500);
+        max-width: 60ch;
+        line-height: 24px;
+      }
+
+      .act-group {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 40px;
+        padding: 32px 0;
+        border-top: 1px solid var(--line);
+      }
+      .act-group:last-child {
+        border-bottom: 1px solid var(--line);
+      }
+      .act-group .label {
+        position: sticky;
+        top: 0;
+      }
+      .act-group .label .eyebrow {
+        display: block;
+        margin-bottom: 6px;
+      }
+      .act-group .label h3 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+      }
+      .act-group .label .count {
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--ink-500);
+        font-family: var(--ff-latin);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .act-item {
+        display: grid;
+        grid-template-columns: 80px 1fr auto;
+        gap: 24px;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--line-soft);
+        align-items: start;
+      }
+      .act-item:last-child {
+        border-bottom: 0;
+      }
+      .act-item .when {
+        font-family: var(--ff-latin);
+        font-variant-numeric: tabular-nums;
+        font-size: 12px;
+        color: var(--ink-500);
+        padding-top: 3px;
+      }
+      .act-item h4 {
+        margin: 0 0 4px;
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .act-item .where {
+        font-size: 13px;
+        color: var(--ink-500);
+      }
+      .act-item .ext {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        color: var(--ink-300);
+        letter-spacing: 0.14em;
+      }
+
+      .scr-act.mob .stage {
+        padding: 24px 20px 48px;
+      }
+      .scr-act.mob .page-head h1 {
+        font-size: 28px;
+      }
+      .scr-act.mob .act-group {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 24px 0;
+      }
+      .scr-act.mob .act-item {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+      .scr-act.mob .act-item .when {
+        font-size: 11px;
+      }
+      .scr-act.mob .act-item .ext {
+        display: none;
+      }
+
+      /* ============================================================
+     SCREEN 06 — SKILLS
+     ============================================================ */
+      .scr-skills .stage {
+        padding: 64px 48px 96px;
+      }
+      .scr-skills .page-head {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 24px;
+        margin-bottom: 40px;
+      }
+      .scr-skills .page-head h1 {
+        font-size: 40px;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.005em;
+      }
+      .scr-skills .legend {
+        margin-top: 24px;
+        display: flex;
+        gap: 28px;
+        font-size: 12px;
+        color: var(--ink-500);
+        align-items: center;
+      }
+      .scr-skills .legend .key {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .scr-skills .legend .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--primary);
+      }
+      .scr-skills .legend .dot.b {
+        background: var(--primary-container);
+      }
+
+      .skill-block {
+        padding: 32px 0;
+        border-top: 1px solid var(--line);
+      }
+      .skill-block:last-child {
+        border-bottom: 1px solid var(--line);
+      }
+      .skill-block .head {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 40px;
+        align-items: baseline;
+      }
+      .skill-block .head h3 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+      }
+      .skill-block .head .desc {
+        font-size: 13px;
+        color: var(--ink-500);
+        line-height: 22px;
+      }
+      .skill-rows {
+        margin-top: 24px;
+        display: grid;
+        gap: 14px;
+      }
+      .skill-row {
+        display: grid;
+        grid-template-columns: 200px 1fr 80px 60px;
+        gap: 20px;
+        align-items: center;
+        font-size: 14px;
+      }
+      .skill-row .name {
+        font-weight: 500;
+      }
+      .skill-row .bar-track {
+        background: var(--surface-alt);
+        height: 8px;
+        border-radius: var(--r-full);
+        overflow: hidden;
+        position: relative;
+      }
+      .skill-row .bar-fill {
+        height: 100%;
+        background: var(--primary);
+        border-radius: var(--r-full);
+      }
+      .skill-row .years {
+        font-family: var(--ff-latin);
+        font-variant-numeric: tabular-nums;
+        color: var(--ink-500);
+        font-size: 12px;
+      }
+      .skill-row .level {
+        font-family: var(--ff-latin);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        color: var(--ink-700);
+        text-transform: uppercase;
+        text-align: right;
+      }
+
+      .scr-skills.mob .stage {
+        padding: 24px 20px 48px;
+      }
+      .scr-skills.mob .page-head h1 {
+        font-size: 28px;
+      }
+      .scr-skills.mob .skill-block .head {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .scr-skills.mob .skill-block .head h3 {
+        font-size: 18px;
+      }
+      .scr-skills.mob .skill-row {
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+          "name level"
+          "bar bar"
+          "years years";
+        gap: 6px;
+      }
+      .scr-skills.mob .skill-row .name {
+        grid-area: name;
+      }
+      .scr-skills.mob .skill-row .level {
+        grid-area: level;
+      }
+      .scr-skills.mob .skill-row .bar-track {
+        grid-area: bar;
+      }
+      .scr-skills.mob .skill-row .years {
+        grid-area: years;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="blueprint-head">
+        <div>
+          <span class="eyebrow">resume-flutter</span>
+          <h1>work-experience-list</h1>
+        </div>
+        <p>
+          Split from Claude Design blueprint. Content source: resume README. Flutter implementation mirrors the tokens
+          and screen contracts here.
+        </p>
+      </header>
+      <section class="section">
+        <div class="section-head">
+          <span class="section-num">02 / 06</span>
+          <h2 class="section-title">WORK EXPERIENCE — LIST</h2>
+          <span class="section-jp">/ 職務経歴一覧 · `/#/experience`</span>
+        </div>
+        <p class="section-note">
+          時系列で全勤務先を並べ、各行から詳細画面 (`/#/experience/:id`)
+          に遷移します。フィルタは雇用形態・技術スタックで `FilterChip` を再利用。
+        </p>
+
+        <div class="frames">
+          <div class="frame frame-desktop">
+            <div class="frame-label">
+              <span>Desktop</span>
+              <span class="dims">1200 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-list">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>とだやま.ℝ(Todayama_R)</span>
+                  </div>
+                  <nav>
+                    <a>トップ</a>
+                    <a class="active">職務経歴</a>
+                    <a>個人開発</a>
+                    <a>その他活動</a>
+                    <a>スキル</a>
+                  </nav>
+                  <span class="lang">JA</span>
+                </div>
+                <div class="stage">
+                  <div class="page-head">
+                    <div>
+                      <span class="eyebrow">02 — Work Experience</span>
+                      <h1>職務経歴</h1>
+                    </div>
+                    <span class="total">合計 4 社 · 9 年 6 ヶ月</span>
+                  </div>
+                  <div class="filters">
+                    <span class="chip active">すべて</span>
+                    <span class="chip outline">正社員</span>
+                    <span class="chip outline">業務委託</span>
+                    <span class="chip outline">Flutter</span>
+                    <span class="chip outline">iOS</span>
+                    <span class="chip outline">Android</span>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      2025.09 – 2026.03
+                      <b>7 ヶ月</b>
+                    </div>
+                    <div class="body">
+                      <h3>オイシックス・ラ・大地株式会社</h3>
+                      <div class="role">Android アプリ開発・技術基盤改善 / モバイルプラットフォームチーム</div>
+                      <div class="tags">
+                        <span class="chip">Flutter</span>
+                        <span class="chip">Dart</span>
+                        <span class="chip">Riverpod</span>
+                        <span class="chip">go_router</span>
+                        <span class="chip">Firebase</span>
+                      </div>
+                    </div>
+                    <div class="arrow-link">→</div>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      2019.07 – 2022.03
+                      <b>2 年 8 ヶ月</b>
+                    </div>
+                    <div class="body">
+                      <h3>株式会社 newmo株式会社</h3>
+                      <div class="role">Flutter エンジニア / プロダクト開発部</div>
+                      <div class="tags">
+                        <span class="chip">Flutter</span>
+                        <span class="chip">Bloc</span>
+                        <span class="chip">gRPC</span>
+                        <span class="chip">GitHub Actions</span>
+                      </div>
+                    </div>
+                    <div class="arrow-link">→</div>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      2017.04 – 2019.06
+                      <b>2 年 3 ヶ月</b>
+                    </div>
+                    <div class="body">
+                      <h3>株式会社 株式会社ドワンゴ（KADOKAWAグループ）</h3>
+                      <div class="role">iOS エンジニア / 受託開発本部</div>
+                      <div class="tags">
+                        <span class="chip">Swift</span>
+                        <span class="chip">UIKit</span>
+                        <span class="chip">Objective-C</span>
+                        <span class="chip">RxSwift</span>
+                      </div>
+                    </div>
+                    <div class="arrow-link">→</div>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      2016.10 – 2017.03
+                      <b>6 ヶ月</b>
+                    </div>
+                    <div class="body">
+                      <h3>フリーランス</h3>
+                      <div class="role">受託開発 / モバイル UI 実装</div>
+                      <div class="tags">
+                        <span class="chip">Swift</span>
+                        <span class="chip">Kotlin</span>
+                        <span class="chip">Figma</span>
+                      </div>
+                    </div>
+                    <div class="arrow-link">→</div>
+                  </div>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Built with Flutter Web · Hash routing</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+
+          <div class="frame frame-mobile">
+            <div class="frame-label">
+              <span>Mobile</span>
+              <span class="dims">375 × auto</span>
+            </div>
+            <div class="frame-body">
+              <div class="scr scr-list mob">
+                <div class="appbar">
+                  <div class="brand">
+                    <span class="brand-mark"></span>
+                    <span>職務経歴</span>
+                  </div>
+                  <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+                <div class="stage">
+                  <div class="page-head">
+                    <div>
+                      <span class="eyebrow">02 — Work</span>
+                      <h1>職務経歴</h1>
+                    </div>
+                    <span class="total">4 社 · 9 年 6 ヶ月</span>
+                  </div>
+                  <div class="filters">
+                    <span class="chip active">すべて</span>
+                    <span class="chip outline">正社員</span>
+                    <span class="chip outline">業務委託</span>
+                    <span class="chip outline">Flutter</span>
+                    <span class="chip outline">iOS</span>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      <b>2025.09 – 2026.03</b>
+                      · 7 ヶ月
+                    </div>
+                    <div class="body">
+                      <h3>オイシックス・ラ・大地株式会社</h3>
+                      <div class="role">Android アプリ開発・技術基盤改善</div>
+                      <div class="tags">
+                        <span class="chip">Flutter</span>
+                        <span class="chip">Riverpod</span>
+                        <span class="chip">Firebase</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      <b>2019.07 – 2022.03</b>
+                      · 2 年 8 ヶ月
+                    </div>
+                    <div class="body">
+                      <h3>株式会社 newmo株式会社</h3>
+                      <div class="role">Flutter エンジニア</div>
+                      <div class="tags">
+                        <span class="chip">Flutter</span>
+                        <span class="chip">Bloc</span>
+                        <span class="chip">gRPC</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      <b>2017.04 – 2019.06</b>
+                      · 2 年 3 ヶ月
+                    </div>
+                    <div class="body">
+                      <h3>株式会社 株式会社ドワンゴ（KADOKAWAグループ）</h3>
+                      <div class="role">iOS エンジニア</div>
+                      <div class="tags">
+                        <span class="chip">Swift</span>
+                        <span class="chip">UIKit</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="work-item">
+                    <div class="year">
+                      <b>2016.10 – 2017.03</b>
+                      · 6 ヶ月
+                    </div>
+                    <div class="body">
+                      <h3>フリーランス</h3>
+                      <div class="role">受託開発 / UI 実装</div>
+                      <div class="tags">
+                        <span class="chip">Swift</span>
+                        <span class="chip">Kotlin</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <footer>
+                  <span>© 2026 とだやま.ℝ(Todayama_R)</span>
+                  <span>Flutter Web</span>
+                </footer>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================== -->
+      <!-- 03 — WORK EXPERIENCE DETAIL                            -->
+      <!-- ====================================================== -->
+    </main>
+  </body>
+</html>

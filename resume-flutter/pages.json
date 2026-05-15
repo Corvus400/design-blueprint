@@ -1,0 +1,70 @@
+{
+  "pages": [
+    {
+      "name": "hero",
+      "file": "Hero/Hero.html",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "work-experience-list",
+      "file": "Work Experience List/Work Experience List.html",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "work-experience-detail",
+      "file": "Work Experience Detail/Work Experience Detail.html",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "personal-projects",
+      "file": "Personal Projects/Personal Projects.html",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "outside-activities",
+      "file": "Outside Activities/Outside Activities.html",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    },
+    {
+      "name": "skills",
+      "file": "Skills/Skills.html",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
+    }
+  ]
+}
