@@ -974,7 +974,7 @@
         grid-template-columns: 66fr 34fr;
       }
       .frame.tablet.splitview .body.split-2 {
-        grid-template-columns: 66fr 34fr;
+        grid-template-columns: 64fr 36fr;
       }
       /* iPhone landscape: left-rail pattern (mirrors Bookmark screen).
          No top toolbar — segmented tabs and search field live vertically
@@ -1102,7 +1102,6 @@
       .frame.tablet.splitview .body.split-2 .utility-pane {
         padding: 14px 14px 80px;
       }
-
       /* Filter chips strip (applied) */
       .applied-chips {
         display: flex;
@@ -2626,6 +2625,10 @@
                   (1 × 2 × 9 + 4 × 2 × 7 = 74)
                 </div>
               </div>
+              <div>
+                <div class="lbl">History</div>
+                <div class="val">Visible history rows = latest 5. Storage/query retention is implementation-owned.</div>
+              </div>
             </div>
           </div>
         </section>
@@ -2738,7 +2741,8 @@
             <strong>left-rail</strong>
             2-pane (rail に検索 + 縦タブ + utility-pane 常駐 / master-pane が結果)。iPad 3 クラスは
             <code>.toolbar</code>
-            + 右側 utility-pane の 2-pane。modal 状態は left-rail / utility-pane device には存在しない。
+            + 右側 utility-pane の 2-pane。modal 状態は left-rail / utility-pane device には存在しない。iPad Split View
+            は 960px 代表フレームで、右 utility-pane が 300px 以上確保されることを inline verification で固定する。
           </p>
           <div id="mocks-root"></div>
         </section>
@@ -2808,6 +2812,47 @@
               </tbody>
             </table>
           </div>
+          <div class="card" id="flutter-handoff-contract">
+            <h4 style="margin: 0 0 10px; font: 700 13px var(--jp)">Flutter handoff — acceptance mapping</h4>
+            <p style="margin: 0 0 10px; font: 12.5px/1.7 var(--jp); color: var(--page-muted)">
+              This HTML remains the visual SSOT. Flutter implementation should map the frame matrix to golden /
+              design-contract coverage without duplicating design requirements elsewhere.
+            </p>
+            <table class="a11y-table">
+              <thead>
+                <tr>
+                  <th>Design contract</th>
+                  <th>Flutter verification target</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-handoff-contract="matrix">
+                  <td>74 representative frames: device × theme × state</td>
+                  <td>
+                    Search golden matrix plus responsive device cases for iPhone landscape, iPad landscape, and 960px
+                    split view two-pane.
+                  </td>
+                </tr>
+                <tr data-handoff-contract="search-tab-axis">
+                  <td>SearchTab axis is fixed by target contracts, not by duplicating all 74 frames.</td>
+                  <td>
+                    Drug and disease idle/history/results/filter/sort states remain separately asserted by existing
+                    search tests.
+                  </td>
+                </tr>
+                <tr data-handoff-contract="inline-history">
+                  <td>
+                    iPhone portrait idle renders inline history; no focus-only overlay state is part of the final
+                    contract.
+                  </td>
+                  <td>
+                    History dropdown tests may stay as transition coverage, but final idle/empty-history goldens must
+                    verify inline history.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <div class="atom-grid" id="atom-root"></div>
         </section>
 
@@ -2828,7 +2873,7 @@
         <section class="block" id="sec-verify">
           <h2 class="section-title">
             08 — Verification report
-            <span class="tag">VR-01..VR-27</span>
+            <span class="tag">VR-01..VR-28</span>
           </h2>
           <p class="section-sub">
             Computed by inline JS on load. Every row must read PASS for the deliverable to ship.
@@ -2840,8 +2885,14 @@
             hidden
             data-frame-total="74"
             data-phone-states="9"
+            data-utility-device-count="4"
             data-utility-device-states="7"
-            data-history-limit="5"
+            data-history-display-limit="5"
+            data-split-view-frame-width="960"
+            data-split-view-height="700"
+            data-split-view-mode="tablet-two-pane"
+            data-split-view-utility-min-width="300"
+            data-ipad-portrait-mode="utility-pane"
             data-phone-history="inline"
             data-nav-rail-scope="app-shell-all-tabs"
             data-utility-pane-role="history-filter-sort"
@@ -3423,7 +3474,7 @@
               '<div class="utility-history-empty" role="status" aria-live="polite">' +
               '<span class="ico">history</span>' +
               '<div class="head">検索履歴はまだありません</div>' +
-              '<div class="sub">検索すると履歴が最大 5 件まで残ります。履歴は端末内にのみ保存されます。</div>' +
+              '<div class="sub">検索すると最新 5 件まで表示されます。履歴は端末内にのみ保存されます。</div>' +
               "</div>";
           } else {
             var rows = HISTORY_ROWS.slice(0, 5)
@@ -3757,7 +3808,7 @@
               '<div class="history-inline-empty" role="status" aria-live="polite">' +
               '<span class="ico">history</span>' +
               '<div class="head">検索履歴はまだありません</div>' +
-              '<div class="sub">検索すると履歴が最大 5 件まで残ります。履歴は端末内にのみ保存されます。</div>' +
+              '<div class="sub">検索すると最新 5 件まで表示されます。履歴は端末内にのみ保存されます。</div>' +
               '<div class="hint"><span class="ico">search</span>上の検索バーから始める</div>' +
               "</div>" +
               "</div>";
@@ -4226,7 +4277,7 @@
                 ? "iPhone landscape は <strong>nav-rail (icon-only, 52px) + left-rail (240px)</strong> + master-pane の 3 列構成。<code>.toolbar</code> 無し、bottom-nav 無し。最左の nav-rail にトップレベルナビ (検索 active / ブックマーク / 閲覧履歴 / 計算ツール、アイコンのみ)。その右に left-rail がコンパクト検索 + 縦 seg-tabs + utility-pane (履歴 / 絞り込み / 並び替え) を積み、master-pane が残り幅を取り結果を描画。utility-pane は rail 内で縦スクロール — 結果リストを覆わない。modal なし、7 states のみ (idle / idle-empty-history を含む)。"
                 : D.id === "iPad"
                   ? "iPad portrait は <code>.toolbar</code> 上 + 右 utility-pane (履歴 / 絞り込み / 並び替え 常駐) の 2-pane、bottom-nav あり。modal は存在しないので 7 states のみ (idle / idle-empty-history を含む)。"
-                  : "iPad landscape クラス。最左に <strong>nav-rail (icon-only, 72px)</strong>、その右に <code>.toolbar</code> 上 + master-pane + 右 utility-pane の 2-pane。bottom-nav は nav-rail に置き換わり消滅。modal なし、7 states のみ (idle / idle-empty-history を含む)。") +
+                  : "iPad landscape / Split View クラス。最左に <strong>nav-rail (icon-only, 72px)</strong>、その右に <code>.toolbar</code> 上 + master-pane + 右 utility-pane の 2-pane。bottom-nav は nav-rail に置き換わり消滅。modal なし、7 states のみ (idle / idle-empty-history を含む)。") +
             "</p>";
 
           statesForDevice.forEach(function (S) {
@@ -6017,6 +6068,90 @@
               (targetBad.length === 0 ? "none" : targetBad.join(", ")),
           };
 
+          var splitBad = [];
+          var splitContract = document.querySelector("#search-spec-audit-contract");
+          if (
+            !splitContract ||
+            splitContract.getAttribute("data-history-display-limit") !== "5" ||
+            splitContract.getAttribute("data-split-view-frame-width") !== "960" ||
+            splitContract.getAttribute("data-split-view-height") !== "700" ||
+            splitContract.getAttribute("data-split-view-mode") !== "tablet-two-pane" ||
+            splitContract.getAttribute("data-split-view-utility-min-width") !== "300" ||
+            splitContract.getAttribute("data-ipad-portrait-mode") !== "utility-pane" ||
+            splitContract.getAttribute("data-utility-device-count") !== "4"
+          ) {
+            splitBad.push("hidden contract attributes");
+          }
+          var iPadPortraitFrames = Array.from(
+            document.querySelectorAll(".frame.tablet:not(.landscape):not(.splitview)"),
+          );
+          if (iPadPortraitFrames.length !== 14) {
+            splitBad.push("iPad portrait frame count=" + iPadPortraitFrames.length);
+          }
+          iPadPortraitFrames.forEach(function (frame) {
+            var label = frame.getAttribute("data-frame-label") || "?";
+            var state = frame.getAttribute("data-state") || "";
+            var hasPortraitUtility =
+              frame.querySelector(":scope .body.split-2") &&
+              frame.querySelector(":scope .utility-pane") &&
+              frame.querySelector(":scope .bottom-nav");
+            var hasPhoneModal = frame.querySelector(":scope .filter-sheet, :scope .sort-sheet");
+            if (state === "filter-open" || state === "sort-open" || !hasPortraitUtility || hasPhoneModal) {
+              splitBad.push(label + " iPad portrait mode mismatch");
+            }
+          });
+          var splitFrames = Array.from(document.querySelectorAll(".frame.splitview"));
+          if (splitFrames.length !== 14) {
+            splitBad.push("split frame count=" + splitFrames.length);
+          }
+          splitFrames.forEach(function (frame) {
+            var label = frame.getAttribute("data-frame-label") || "?";
+            var state = frame.getAttribute("data-state") || "";
+            var frameRect = frame.getBoundingClientRect();
+            var device = frame.querySelector(":scope > .device");
+            var deviceRect = device ? device.getBoundingClientRect() : { height: 0 };
+            var utilityPane = frame.querySelector(":scope .utility-pane");
+            var utilityRect = utilityPane ? utilityPane.getBoundingClientRect() : { width: 0 };
+            var hasTwoPaneChrome =
+              frame.classList.contains("tablet") &&
+              frame.querySelector(":scope .nav-rail") &&
+              frame.querySelector(":scope .body.split-2") &&
+              utilityPane &&
+              !frame.querySelector(":scope .bottom-nav") &&
+              !frame.querySelector(":scope .filter-sheet, :scope .sort-sheet");
+            if (state === "filter-open" || state === "sort-open") {
+              splitBad.push(label + " modal state leaked");
+            }
+            if (
+              Math.abs(frameRect.width - 960) > 1 ||
+              Math.abs(deviceRect.height - 700) > 1 ||
+              Math.round(utilityRect.width) < 300 ||
+              !hasTwoPaneChrome
+            ) {
+              splitBad.push(
+                label +
+                  " " +
+                  Math.round(frameRect.width) +
+                  "x" +
+                  Math.round(deviceRect.height) +
+                  " utility=" +
+                  Math.round(utilityRect.width),
+              );
+            }
+          });
+          var handoffRows = document.querySelectorAll("#flutter-handoff-contract [data-handoff-contract]");
+          if (handoffRows.length !== 3) {
+            splitBad.push("handoff rows=" + handoffRows.length);
+          }
+          var vr28 = {
+            id: "VR-28",
+            method: "C",
+            pass: splitBad.length === 0,
+            evidence:
+              "iPad portrait and iPad Split View stay utility-pane two-pane with no phone modal states. Split View representative frame is 960×700 with nav-rail, no bottom-nav, and utility-pane width >= 300px. Visible history limit is 5 and Flutter handoff mapping is present. Bad: " +
+              (splitBad.length === 0 ? "none" : splitBad.slice(0, 8).join(" | ")),
+          };
+
           var rows_ = [
             vr01,
             vr02,
@@ -6047,6 +6182,7 @@
             vr25,
             vr26,
             vr27,
+            vr28,
           ];
 
           // VR-14 — aggregate
@@ -6065,7 +6201,7 @@
             method: "C",
             pass: !anyFail,
             evidence:
-              "Aggregate of VR-01..VR-13, VR-15..VR-27. " +
+              "Aggregate of VR-01..VR-13, VR-15..VR-28. " +
               failRowIds.length +
               " FAIL row(s)" +
               (failRowIds.length ? " [" + failRowIds.join(", ") + "]" : "") +
@@ -6101,6 +6237,7 @@
             vr25,
             vr26,
             vr27,
+            vr28,
           ];
 
           // Render banner

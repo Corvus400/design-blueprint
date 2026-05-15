@@ -44,7 +44,7 @@ export async function compareProject(project) {
         diff_file_path: null,
         compare_file_path: null,
         diff_percentage: null,
-        spec_path: path.join(project, "spec.md"),
+        page_file: page.file,
         ai_assertion_results: null,
         timestamp: Date.now(),
       });
@@ -77,7 +77,7 @@ export async function compareProject(project) {
       diff_file_path: path.relative(process.cwd(), diffOut),
       compare_file_path: null,
       diff_percentage: Number(diffPercentage.toFixed(6)),
-      spec_path: path.join(project, "spec.md"),
+      page_file: page.file,
       ai_assertion_results: null,
       timestamp: Date.now(),
     });

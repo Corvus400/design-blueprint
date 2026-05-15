@@ -6,7 +6,7 @@ HTML design repository with **pre-commit + pre-push VRT** and built-in **AI visu
 
 - Each design lives in a top-level directory whose name matches the implementation repository, for example `fictional-drug-and-disease-ref-flutter/`.
 - A directory is considered a VRT-managed project if and only if it contains `pages.json`.
-- Per-project files: `index.html`, `spec.md`, `pages.json`, `snapshots/chromium/<page>.png` (baselines, git-tracked).
+- Per-project files: page HTML files registered in `pages.json`, plus `snapshots/chromium/<page>.png` (baselines, git-tracked).
 
 ## Setup
 
@@ -34,13 +34,13 @@ When editing a large spec HTML, prefer adding or updating an audit rule over rel
 
 ## First-Time Commit For A New Project
 
-The first commit auto-records the captured PNG as the baseline. Treat that baseline as a starting point, not the truth: review it against `spec.md` and adjust HTML iteratively. See `CLAUDE.md` for the AI-driven review loop.
+The first commit auto-records the captured PNG as the baseline. Treat that baseline as a starting point, not the truth: review it against the page HTML listed in `pages.json` and adjust HTML iteratively. See `CLAUDE.md` for the AI-driven review loop.
 
 ## When VRT Fails
 
 The hook prints comparison image paths and exits non-zero. Ask Claude Code or Codex:
 
-> VRT failed. Read `.vrt-output/comparison/<project>/<page>.png` and `<project>/spec.md`, then output JSON `{ "fulfillment_percent": <0-100>, "explanation": "..." }`.
+> VRT failed. Read `.vrt-output/comparison/<project>/<page>.png` and the `page_file` value in `.vrt-output/report/results.json`, then output JSON `{ "fulfillment_percent": <0-100>, "explanation": "..." }`.
 
 To accept the diff as the new baseline:
 
@@ -62,7 +62,7 @@ Pixel snapshots depend on OS, Chromium version, font rendering, and `deviceScale
 
 ## Adding A New Project
 
-1. Create `<repo-name>/index.html`, `<repo-name>/spec.md`, and `<repo-name>/pages.json` at the repository root. Use the implementation repo name verbatim.
+1. Create the page HTML file and `<repo-name>/pages.json` at the repository root. Use the implementation repo name verbatim.
 2. Stage `<repo-name>/` and commit. The first VRT run records the baseline automatically.
 
 ## Re-Staging Note

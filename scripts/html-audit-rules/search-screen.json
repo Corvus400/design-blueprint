@@ -45,6 +45,7 @@
     "合計 64",
     "utility-pane devices → 6 states",
     "直近 10 件",
+    "検索すると履歴が最大 5 件まで残ります",
     "ドロップダウン履歴 + bottom-sheet",
     "single source of truth — all screen states for all devices and themes live in this one page",
     "病名・ICD-10 コード",
@@ -52,7 +53,13 @@
     "skeleton × 4",
     "skeleton card × 4",
     "履歴をクリア",
-    "全件クリア"
+    "全件クリア",
+    "data-frame-total=\"78\"",
+    "78-representative-device-theme-state",
+    "data-compact-device-states",
+    "data-split-view-logical-width",
+    "data-split-view-mode=\"compact-single-pane\"",
+    "iPad Split View 50/50 は 597"
   ],
   "requiredSelectors": [
     {
@@ -66,14 +73,19 @@
       "message": "Search SSOT must declare the full 74-frame matrix for VRT/inline verification."
     },
     {
-      "selector": "#search-spec-audit-contract[data-phone-states=\"9\"][data-utility-device-states=\"7\"]",
+      "selector": "#search-spec-audit-contract[data-phone-states=\"9\"][data-utility-device-count=\"4\"][data-utility-device-states=\"7\"]",
       "min": 1,
-      "message": "Search SSOT must declare 9 phone states and 7 utility-pane states."
+      "message": "Search SSOT must declare 9 phone states and 7 states for the four utility-pane device classes."
     },
     {
-      "selector": "#search-spec-audit-contract[data-history-limit=\"5\"]",
+      "selector": "#search-spec-audit-contract[data-history-display-limit=\"5\"]",
       "min": 1,
-      "message": "Search history limit must remain aligned with the Flutter SSOT of 5 items."
+      "message": "Search visible history limit must remain aligned with the Flutter UI display contract of 5 items."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-split-view-frame-width=\"960\"][data-split-view-height=\"700\"][data-split-view-mode=\"tablet-two-pane\"][data-split-view-utility-min-width=\"300\"][data-ipad-portrait-mode=\"utility-pane\"]",
+      "min": 1,
+      "message": "iPad portrait and iPad Split View must stay utility-pane two-pane; Split View must keep a 960x700 representative frame and a utility pane width of at least 300px."
     },
     {
       "selector": "#search-spec-audit-contract[data-phone-history=\"inline\"] [data-required=\"history-inline\"]",
@@ -134,6 +146,16 @@
       "selector": "#search-target-contracts [data-target-contract=\"disease\"]",
       "min": 1,
       "message": "Target contract table must include the disease tab contract."
+    },
+    {
+      "selector": "#flutter-handoff-contract [data-handoff-contract=\"matrix\"]",
+      "min": 1,
+      "message": "Flutter handoff must map the 74-frame matrix to implementation verification."
+    },
+    {
+      "selector": "#flutter-handoff-contract [data-handoff-contract=\"inline-history\"]",
+      "min": 1,
+      "message": "Flutter handoff must clarify inline history as the final idle-state contract."
     }
   ]
 }

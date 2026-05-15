@@ -1,6 +1,6 @@
 # Claude Code Operating Guide For design-blueprint
 
-This repository stores HTML designs and gates every commit and push with VRT. As Claude Code, implement HTML changes that match `spec.md` and act as the visual reviewer when VRT detects a diff.
+This repository stores HTML designs and gates every commit and push with VRT. As Claude Code, implement HTML changes that match the page HTML registered in `pages.json` and act as the visual reviewer when VRT detects a diff.
 
 ## Repository Invariants
 
@@ -10,11 +10,11 @@ This repository stores HTML designs and gates every commit and push with VRT. As
 
 ## When Authoring Or Modifying HTML
 
-1. Read `<project>/spec.md` first.
+1. Read the changed page HTML registered in `<project>/pages.json` first.
 2. Make the HTML change.
 3. Stage the changed HTML.
 4. Commit so the pre-commit hook runs lint, matching HTML audit rules, and VRT.
-5. If VRT reports an INITIAL BASELINE, that PNG is staged and committed together with the HTML. Initial captures are explicitly considered untrusted; review the rendered baseline against `spec.md`.
+5. If VRT reports an INITIAL BASELINE, that PNG is staged and committed together with the HTML. Initial captures are explicitly considered untrusted; review the rendered baseline against the page HTML.
 6. If VRT reports a DIFF, switch to visual reviewer mode.
 
 ## HTML Audit Rules
@@ -32,7 +32,7 @@ When pre-commit or pre-push fails with a VRT diff:
    - `compare_file_path`, the 3-pane comparison PNG: expected / diff / actual
    - `golden_file_path`, the current baseline
    - `actual_file_path`, the new render
-   - `spec_path`, the design spec
+   - `page_file`, the page HTML registered in `pages.json`
 3. Emit a JSON object and only a JSON object:
 
 ```json
@@ -40,7 +40,7 @@ When pre-commit or pre-push fails with a VRT diff:
   "project": "...",
   "page": "...",
   "fulfillment_percent": 0,
-  "explanation": "concise, focused on what changed and whether it matches spec.md"
+  "explanation": "concise, focused on what changed and whether it matches the page HTML"
 }
 ```
 
@@ -52,7 +52,7 @@ When pre-commit or pre-push fails with a VRT diff:
 
 ## Initial Baseline Review
 
-The hook auto-stages the first capture as the baseline. The user explicitly accepts that initial baselines are unfinished. Treat the captured baseline as a draft and compare it to `spec.md`. Propose HTML changes to converge the baseline toward the spec.
+The hook auto-stages the first capture as the baseline. The user explicitly accepts that initial baselines are unfinished. Treat the captured baseline as a draft and compare it to the page HTML registered in `pages.json`. Propose HTML changes to converge the baseline toward the page contract.
 
 ## Forbidden
 
