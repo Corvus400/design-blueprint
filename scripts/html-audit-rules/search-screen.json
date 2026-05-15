@@ -59,12 +59,15 @@
     "data-compact-device-states",
     "data-split-view-logical-width",
     "data-split-view-mode=\"compact-single-pane\"",
-    "iPad Split View 50/50 は 597"
+    "iPad Split View 50/50 は 597",
+    "1194pt 50/50"
   ],
   "requiredText": [
     "id: \"VR-28\"",
     "iPad portrait and iPad Split View stay utility-pane two-pane with no phone modal states",
     "Split View representative frame is 960×700 with nav-rail, no bottom-nav, and utility-pane width >= 300px",
+    "Filter option vocabularies come from Flutter domain/l10n plus",
+    "Existing history dropdown tests may stay as transition coverage, but final idle/empty-history",
     "else if (device === \"iPad Split View\") cls += \" tablet splitview\"",
     "return device === \"iPhone landscape\" || device === \"iPad landscape\" || device === \"iPad Split View\"",
     "var statesForDevice = D.id === \"iPhone\" ? STATES_FULL : STATES_UTIL"
@@ -141,6 +144,21 @@
       "message": "Bottom navigation height must stay aligned with Flutter NavigationBarThemeData.height."
     },
     {
+      "selector": "#search-spec-audit-contract[data-category-source=\"/v1/categories\"]",
+      "min": 1,
+      "message": "Filter category source must remain aligned with the Flutter loadCategories()/mock-server /v1/categories contract."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-page-size=\"20\"][data-skeleton-count=\"5\"][data-search-tablet-breakpoint=\"600\"]",
+      "min": 1,
+      "message": "Page size, loading skeleton count, and tablet breakpoint must remain aligned with SearchConstants."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-nav-rail-iphone-width=\"52\"][data-nav-rail-tablet-width=\"72\"]",
+      "min": 1,
+      "message": "Landscape navigation rail widths must remain explicit for iPhone landscape and iPad landscape/Split View."
+    },
+    {
       "selector": "#search-target-contracts[data-frame-axis-policy=\"74-representative-device-theme-state\"][data-search-tab-axis=\"drug|disease\"]",
       "min": 1,
       "message": "Visible target contract table must clarify that 74 frames are representative and SearchTab is a separate axis."
@@ -164,6 +182,11 @@
       "selector": "#flutter-handoff-contract [data-handoff-contract=\"inline-history\"]",
       "min": 1,
       "message": "Flutter handoff must clarify inline history as the final idle-state contract."
+    },
+    {
+      "selector": "#flutter-handoff-contract [data-handoff-contract=\"category-source\"]",
+      "min": 1,
+      "message": "Flutter handoff must document that filter categories are implementation-backed rather than invented in HTML."
     }
   ]
 }

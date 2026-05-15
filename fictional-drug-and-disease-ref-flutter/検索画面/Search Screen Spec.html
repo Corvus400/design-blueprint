@@ -2604,7 +2604,8 @@
               <div>
                 <div class="lbl">Devices</div>
                 <div class="val">
-                  5 — iPhone portrait, iPhone landscape, iPad portrait, iPad landscape, iPad Split View (1194pt 50/50)
+                  5 — iPhone portrait, iPhone landscape, iPad portrait, iPad landscape, iPad Split View representative
+                  frame 960×700
                 </div>
               </div>
               <div>
@@ -2627,7 +2628,10 @@
               </div>
               <div>
                 <div class="lbl">History</div>
-                <div class="val">Visible history rows = latest 5. Storage/query retention is implementation-owned.</div>
+                <div class="val">
+                  Visible history rows = latest 5. Storage/query retention is implementation-owned. Search page size =
+                  20.
+                </div>
               </div>
             </div>
           </div>
@@ -2768,7 +2772,9 @@
             <h4 style="margin: 0 0 10px; font: 700 13px var(--jp)">Target contracts — SearchTab axis</h4>
             <p style="margin: 0 0 10px; font: 12.5px/1.7 var(--jp); color: var(--page-muted)">
               74 フレームは device × theme × state の代表行列。医薬品 / 疾患のタブ差分は、この契約表と filter / sort の
-              wire value で固定する。
+              wire value で固定する。Filter option vocabularies come from Flutter domain/l10n plus
+              <code>/v1/categories</code>
+              ; this HTML shows representative labels and must not invent category values.
             </p>
             <table class="a11y-table">
               <thead>
@@ -2829,8 +2835,8 @@
                 <tr data-handoff-contract="matrix">
                   <td>74 representative frames: device × theme × state</td>
                   <td>
-                    Search golden matrix plus responsive device cases for iPhone landscape, iPad landscape, and 960px
-                    split view two-pane.
+                    Search golden matrix plus responsive device cases for iPhone landscape, iPad landscape, and Split
+                    View represented as a 960×700 two-pane frame with utility pane width ≥ 300px.
                   </td>
                 </tr>
                 <tr data-handoff-contract="search-tab-axis">
@@ -2846,8 +2852,20 @@
                     contract.
                   </td>
                   <td>
-                    History dropdown tests may stay as transition coverage, but final idle/empty-history goldens must
-                    verify inline history.
+                    Existing history dropdown tests may stay as transition coverage, but final idle/empty-history
+                    goldens must verify inline history.
+                  </td>
+                </tr>
+                <tr data-handoff-contract="category-source">
+                  <td>
+                    Filter categories and labels are implementation-backed: Flutter l10n/domain constants plus
+                    <code>/v1/categories</code>
+                    for ATC, therapeutic categories, ICD-10 chapters, and departments.
+                  </td>
+                  <td>
+                    Assert category loading through
+                    <code>loadCategories()</code>
+                    and keep filter axis counts/selection mode aligned with domain params.
                   </td>
                 </tr>
               </tbody>
@@ -2900,6 +2918,12 @@
             data-drug-sort-wire="-revised_at|brand_name_kana|atc_code|therapeutic_category_name"
             data-disease-sort-wire="-revised_at|name_kana|icd10_chapter"
             data-bottom-nav-height="64"
+            data-category-source="/v1/categories"
+            data-page-size="20"
+            data-skeleton-count="5"
+            data-search-tablet-breakpoint="600"
+            data-nav-rail-iphone-width="52"
+            data-nav-rail-tablet-width="72"
           >
             <span data-required="history-inline"></span>
             <span data-required="bottom-nav-phone"></span>
@@ -6078,7 +6102,13 @@
             splitContract.getAttribute("data-split-view-mode") !== "tablet-two-pane" ||
             splitContract.getAttribute("data-split-view-utility-min-width") !== "300" ||
             splitContract.getAttribute("data-ipad-portrait-mode") !== "utility-pane" ||
-            splitContract.getAttribute("data-utility-device-count") !== "4"
+            splitContract.getAttribute("data-utility-device-count") !== "4" ||
+            splitContract.getAttribute("data-category-source") !== "/v1/categories" ||
+            splitContract.getAttribute("data-page-size") !== "20" ||
+            splitContract.getAttribute("data-skeleton-count") !== "5" ||
+            splitContract.getAttribute("data-search-tablet-breakpoint") !== "600" ||
+            splitContract.getAttribute("data-nav-rail-iphone-width") !== "52" ||
+            splitContract.getAttribute("data-nav-rail-tablet-width") !== "72"
           ) {
             splitBad.push("hidden contract attributes");
           }
@@ -6140,7 +6170,7 @@
             }
           });
           var handoffRows = document.querySelectorAll("#flutter-handoff-contract [data-handoff-contract]");
-          if (handoffRows.length !== 3) {
+          if (handoffRows.length !== 4) {
             splitBad.push("handoff rows=" + handoffRows.length);
           }
           var vr28 = {
