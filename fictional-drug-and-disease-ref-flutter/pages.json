@@ -223,6 +223,14 @@
       "deviceScaleFactor": 1,
       "threshold": 0.1,
       "mask": []
+    },
+    {
+      "name": "search-screen-spec",
+      "file": "検索画面/Search Screen Spec.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.1,
+      "mask": []
     }
   ]
 }

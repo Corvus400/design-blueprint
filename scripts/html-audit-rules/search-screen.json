@@ -1,0 +1,97 @@
+{
+  "file": "fictional-drug-and-disease-ref-flutter/検索画面/Search Screen Spec.html",
+  "description": "Search screen structural guardrails for implementation-ready Flutter design SSOT.",
+  "tocSections": {
+    "tocSelector": "nav.toc a[href^=\"#sec-\"]",
+    "sectionSelector": "main section.block[id^=\"sec-\"]",
+    "requiredAnchors": [
+      "sec-cover",
+      "sec-colors",
+      "sec-type",
+      "sec-spacing",
+      "sec-mocks",
+      "sec-components",
+      "sec-a11y",
+      "sec-verify"
+    ]
+  },
+  "forbiddenSelectors": [
+    {
+      "selector": ".material-symbols-outlined",
+      "message": "External Material Symbols font usage is forbidden in this HTML design repository."
+    },
+    {
+      "selector": ".detail-pane",
+      "message": "Search utility pane must not become a detail preview pane."
+    },
+    {
+      "selector": ".summary-card",
+      "message": "Search screen must not inherit detail-screen summary-card markup."
+    },
+    {
+      "selector": ".open-detail-cta",
+      "message": "The search utility pane is for history/filter/sort, not detail navigation CTA."
+    },
+    {
+      "selector": ".empty-detail",
+      "message": "Empty detail placeholders are not part of the search screen contract."
+    }
+  ],
+  "forbiddenText": [
+    "https://fonts.googleapis.com",
+    "https://fonts.gstatic.com",
+    "https://unpkg.com",
+    "material-symbols-outlined",
+    "合計 64",
+    "utility-pane devices → 6 states",
+    "直近 10 件",
+    "ドロップダウン履歴 + bottom-sheet"
+  ],
+  "requiredSelectors": [
+    {
+      "selector": "#sec-verify",
+      "min": 1,
+      "message": "Inline verification report must remain present."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-frame-total=\"74\"]",
+      "min": 1,
+      "message": "Search SSOT must declare the full 74-frame matrix for VRT/inline verification."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-phone-states=\"9\"][data-utility-device-states=\"7\"]",
+      "min": 1,
+      "message": "Search SSOT must declare 9 phone states and 7 utility-pane states."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-history-limit=\"5\"]",
+      "min": 1,
+      "message": "Search history limit must remain aligned with the Flutter SSOT of 5 items."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-phone-history=\"inline\"] [data-required=\"history-inline\"]",
+      "min": 1,
+      "message": "Phone portrait idle states must use inline history instead of a focus-only dropdown."
+    },
+    {
+      "selector": "#search-spec-audit-contract [data-required=\"bottom-nav-phone\"]",
+      "min": 1,
+      "message": "Phone portrait keeps bottom navigation."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-nav-rail-scope=\"app-shell-all-tabs\"] [data-required=\"nav-rail-landscape\"]",
+      "min": 1,
+      "message": "Landscape nav rail must be app-shell scoped and available to all tabs."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-utility-pane-role=\"history-filter-sort\"] [data-required=\"utility-pane\"]",
+      "min": 1,
+      "message": "Utility pane must remain history/filter/sort, not a detail preview."
+    },
+    {
+      "selector": "#search-spec-audit-contract [data-required=\"left-rail\"]",
+      "min": 1,
+      "message": "iPhone landscape must keep the compact left-rail search workspace."
+    }
+  ]
+}
