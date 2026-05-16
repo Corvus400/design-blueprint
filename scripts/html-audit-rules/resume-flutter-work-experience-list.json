@@ -1,0 +1,53 @@
+{
+  "file": "resume-flutter/Work Experience List/Work Experience List.html",
+  "description": "Work experience list guardrails from user review feedback.",
+  "forbiddenText": [
+    "README",
+    "日本ミッドタウン",
+    "35 分",
+    "A11y",
+    "週次",
+    "ポートフォリオです",
+    "Android と",
+    "実装を見せる。",
+    "Androidの経験を",
+    "読み解ける形に。",
+    "連絡先",
+    "日本 · 拠点",
+    "8 年 · モバイル経験",
+    "日本語 · 母語",
+    "menu-line",
+    "hamburger",
+    "関連プロジェクト",
+    "主な成果",
+    "MOCKSERVER",
+    "レビュー支援",
+    "mock-server / design-blueprint workflow",
+    "HTML Design Blueprint + VRT workflow",
+    "設計ワークフロー",
+    "A11y 監査",
+    "side-card",
+    "achievement-list",
+    "Riverpod",
+    "go_router",
+    "Firebase",
+    "Bloc",
+    "gRPC",
+    "UIKit",
+    "RxSwift"
+  ],
+  "requiredText": [
+    "最新 4 件 / 全 24 件",
+    "全24件の職務経歴を見る",
+    "resume repository",
+    "オイシックス・ラ・大地株式会社",
+    "newmo株式会社",
+    "株式会社ドワンゴ（KADOKAWAグループ）"
+  ],
+  "selectorCounts": [
+    {
+      "selector": ".scr-list .page-head .total",
+      "equals": 2
+    }
+  ]
+}

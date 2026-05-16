@@ -1,0 +1,160 @@
+{
+  "file": "resume-flutter/blueprint.html",
+  "description": "Integrated blueprint guardrails from user review feedback.",
+  "forbiddenText": [
+    "README",
+    "日本ミッドタウン",
+    "35 分",
+    "A11y",
+    "週次",
+    "ポートフォリオです",
+    "Android と",
+    "実装を見せる。",
+    "Androidの経験を",
+    "読み解ける形に。",
+    "連絡先",
+    "日本 · 拠点",
+    "8 年 · モバイル経験",
+    "日本語 · 母語",
+    "menu-line",
+    "hamburger",
+    "関連プロジェクト",
+    "主な成果",
+    "MOCKSERVER",
+    "レビュー支援",
+    "mock-server / design-blueprint workflow",
+    "HTML Design Blueprint + VRT workflow",
+    "設計ワークフロー",
+    "A11y 監査",
+    "side-card",
+    "achievement-list",
+    "Riverpod",
+    "go_router",
+    "Firebase",
+    "Bloc",
+    "gRPC",
+    "UIKit",
+    "RxSwift",
+    "App Store",
+    "mock-server / design-blueprint",
+    "design-blueprint workflow",
+    "非公開",
+    "CONTRIBUTION",
+    "日本ミッドタウン · 35 分"
+  ],
+  "requiredText": [
+    "経験と実装を",
+    "<span class=\"accent\">Flutter Web</span>",
+    "構造化して伝える。",
+    "拠点",
+    "日本",
+    "モバイル経験",
+    "8 年",
+    "母語",
+    "日本語",
+    "DroidKaigi マージPR",
+    "247件",
+    "24件",
+    "最新 4 件 / 全 24 件",
+    "全24件の職務経歴を見る",
+    "resume repository",
+    "オイシックス・ラ・大地株式会社",
+    "newmo株式会社",
+    "株式会社ドワンゴ（KADOKAWAグループ）",
+    "触れた技術スタック",
+    "概要",
+    "担当",
+    "課題",
+    "取り組み",
+    "工夫した点",
+    "counter-reset: detail-item;",
+    "grid-template-columns: 60px 1fr;",
+    "grid-template-columns: 44px 1fr;",
+    "3 repositories",
+    "fictional-drug-and-disease-ref-flutter(メディマスタ)",
+    "fictional-drug-and-disease-ref-mock-server(メディマスタ)",
+    "resume-flutter",
+    "https://github.com/Corvus400/fictional-drug-and-disease-ref-flutter",
+    "https://github.com/Corvus400/fictional-drug-and-disease-ref-mock-server",
+    "https://github.com/Corvus400/resume-flutter",
+    "fddr-flutter-header.png",
+    "fddr-mock-server-header.png",
+    "white-space: nowrap;",
+    "writing-mode: horizontal-tb;",
+    "DroidKaigi コントリビュートと Zenn 記事の記録。",
+    "DroidKaigi2025 コントリビュート",
+    "DroidKaigi2024 コントリビュート",
+    "DroidKaigi2023 コントリビュート",
+    "Zenn: DroidKaigi contribution write-ups",
+    "Android Developers 翻訳動画",
+    ".scr-act .page-head + .act-group",
+    "border-top: 0;",
+    "padding-top: 16px;",
+    "言語",
+    "プラットフォーム / フレームワーク",
+    "AI活用歴",
+    "Kotlin",
+    "7年(86ヶ月)",
+    "Java",
+    "3年(35ヶ月)",
+    "C++",
+    "1.5年(18ヶ月)",
+    "Android Mobile",
+    "8年(96ヶ月)",
+    "Claude Code",
+    "9ヶ月",
+    "style=\"width: 100%\"",
+    "style=\"width: 90%\"",
+    ".scr-skills .page-head + .skill-block",
+    "border-top: 0;",
+    "padding-top: 16px;"
+  ],
+  "requiredSelectors": [
+    {
+      "selector": ".scr-hero .ctas .btn",
+      "min": 1,
+      "message": "Hero must keep the work-experience CTA."
+    },
+    {
+      "selector": ".scr-detail .body li",
+      "min": 10,
+      "message": "Detail sections must use numbered rows for overview/responsibility/issues/notes."
+    },
+    {
+      "selector": ".scr-detail .body .subproject",
+      "min": 10,
+      "message": "Initiatives must remain numbered subproject rows."
+    },
+    {
+      "selector": ".scr-act .act-group",
+      "min": 5,
+      "message": "Outside activities must keep DroidKaigi/Zenn/translation groups across desktop and mobile."
+    }
+  ],
+  "selectorCounts": [
+    {
+      "selector": ".scr-hero .ctas .btn.ghost",
+      "equals": 0
+    },
+    {
+      "selector": ".scr-list .page-head .total",
+      "equals": 2
+    },
+    {
+      "selector": ".scr-proj .proj-card",
+      "equals": 6
+    },
+    {
+      "selector": ".scr-proj .proj-card .cover.image-cover img",
+      "equals": 4
+    },
+    {
+      "selector": ".scr-proj .proj-card .body .row1 > .chip",
+      "equals": 6
+    },
+    {
+      "selector": ".scr-skills .skill-block",
+      "equals": 6
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "file": "resume-flutter/Work Experience Detail/Work Experience Detail.html",
+  "description": "Work experience detail guardrails from user review feedback.",
+  "forbiddenText": [
+    "README",
+    "日本ミッドタウン",
+    "35 分",
+    "A11y",
+    "週次",
+    "ポートフォリオです",
+    "Android と",
+    "実装を見せる。",
+    "Androidの経験を",
+    "読み解ける形に。",
+    "連絡先",
+    "日本 · 拠点",
+    "8 年 · モバイル経験",
+    "日本語 · 母語",
+    "menu-line",
+    "hamburger",
+    "関連プロジェクト",
+    "主な成果",
+    "MOCKSERVER",
+    "レビュー支援",
+    "mock-server / design-blueprint workflow",
+    "HTML Design Blueprint + VRT workflow",
+    "設計ワークフロー",
+    "A11y 監査",
+    "side-card",
+    "achievement-list"
+  ],
+  "requiredText": [
+    "触れた技術スタック",
+    "概要",
+    "担当",
+    "課題",
+    "取り組み",
+    "工夫した点",
+    "counter-reset: detail-item;",
+    "grid-template-columns: 60px 1fr;",
+    "grid-template-columns: 44px 1fr;"
+  ],
+  "requiredSelectors": [
+    {
+      "selector": ".scr-detail .body li",
+      "min": 10,
+      "message": "Detail sections must use numbered rows for overview/responsibility/issues/notes."
+    },
+    {
+      "selector": ".scr-detail .body .subproject",
+      "min": 10,
+      "message": "Initiatives must remain numbered subproject rows."
+    }
+  ]
+}

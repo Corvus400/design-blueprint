@@ -1,0 +1,63 @@
+{
+  "file": "resume-flutter/Personal Projects/Personal Projects.html",
+  "description": "Personal project guardrails from user review feedback.",
+  "forbiddenText": [
+    "README",
+    "日本ミッドタウン",
+    "35 分",
+    "A11y",
+    "週次",
+    "ポートフォリオです",
+    "Android と",
+    "実装を見せる。",
+    "Androidの経験を",
+    "読み解ける形に。",
+    "連絡先",
+    "日本 · 拠点",
+    "8 年 · モバイル経験",
+    "日本語 · 母語",
+    "menu-line",
+    "hamburger",
+    "関連プロジェクト",
+    "主な成果",
+    "MOCKSERVER",
+    "レビュー支援",
+    "mock-server / design-blueprint workflow",
+    "HTML Design Blueprint + VRT workflow",
+    "設計ワークフロー",
+    "A11y 監査",
+    "side-card",
+    "achievement-list",
+    "App Store",
+    "mock-server / design-blueprint",
+    "design-blueprint workflow",
+    "非公開"
+  ],
+  "requiredText": [
+    "3 repositories",
+    "fictional-drug-and-disease-ref-flutter(メディマスタ)",
+    "fictional-drug-and-disease-ref-mock-server(メディマスタ)",
+    "resume-flutter",
+    "https://github.com/Corvus400/fictional-drug-and-disease-ref-flutter",
+    "https://github.com/Corvus400/fictional-drug-and-disease-ref-mock-server",
+    "https://github.com/Corvus400/resume-flutter",
+    "fddr-flutter-header.png",
+    "fddr-mock-server-header.png",
+    "white-space: nowrap;",
+    "writing-mode: horizontal-tb;"
+  ],
+  "selectorCounts": [
+    {
+      "selector": ".scr-proj .proj-card",
+      "equals": 6
+    },
+    {
+      "selector": ".scr-proj .proj-card .cover.image-cover img",
+      "equals": 4
+    },
+    {
+      "selector": ".scr-proj .proj-card .body .row1 > .chip",
+      "equals": 6
+    }
+  ]
+}

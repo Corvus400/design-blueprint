@@ -1,0 +1,59 @@
+{
+  "file": "resume-flutter/Hero/Hero.html",
+  "description": "Hero guardrails from user review feedback.",
+  "forbiddenText": [
+    "README",
+    "日本ミッドタウン",
+    "35 分",
+    "A11y",
+    "週次",
+    "ポートフォリオです",
+    "Android と",
+    "実装を見せる。",
+    "Androidの経験を",
+    "読み解ける形に。",
+    "連絡先",
+    "日本 · 拠点",
+    "8 年 · モバイル経験",
+    "日本語 · 母語",
+    "menu-line",
+    "hamburger",
+    "関連プロジェクト",
+    "主な成果",
+    "MOCKSERVER",
+    "レビュー支援",
+    "mock-server / design-blueprint workflow",
+    "HTML Design Blueprint + VRT workflow",
+    "設計ワークフロー",
+    "A11y 監査",
+    "side-card",
+    "achievement-list"
+  ],
+  "requiredText": [
+    "経験と実装を",
+    "<span class=\"accent\">Flutter Web</span>",
+    "構造化して伝える。",
+    "拠点",
+    "日本",
+    "モバイル経験",
+    "8 年",
+    "母語",
+    "日本語",
+    "DroidKaigi マージPR",
+    "247件",
+    "24件"
+  ],
+  "requiredSelectors": [
+    {
+      "selector": ".scr-hero .ctas .btn",
+      "min": 1,
+      "message": "Hero must keep the work-experience CTA."
+    }
+  ],
+  "selectorCounts": [
+    {
+      "selector": ".scr-hero .ctas .btn.ghost",
+      "equals": 0
+    }
+  ]
+}

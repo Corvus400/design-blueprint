@@ -483,23 +483,6 @@
       .scr.mob .appbar nav {
         display: none;
       }
-      .scr.mob .appbar .hamburger {
-        width: 28px;
-        height: 28px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 5px;
-      }
-      .scr.mob .appbar .hamburger span {
-        display: block;
-        height: 1.5px;
-        background: var(--ink-900);
-      }
-      .scr.mob .appbar .hamburger span:nth-child(2) {
-        width: 60%;
-        align-self: flex-end;
-      }
 
       /* footer */
       .scr footer {
@@ -526,6 +509,10 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
+        flex: 0 0 auto;
+        white-space: nowrap;
+        word-break: keep-all;
+        overflow-wrap: normal;
         padding: 4px 10px;
         border-radius: var(--r-full);
         background: var(--surface-alt);
@@ -600,6 +587,7 @@
       }
       .scr-hero .display .accent {
         color: var(--primary);
+        white-space: nowrap;
       }
       .scr-hero .role {
         margin-top: 28px;
@@ -722,7 +710,7 @@
         gap: 32px;
       }
       .scr-hero.mob h1.display {
-        font-size: 44px;
+        font-size: 40px;
         letter-spacing: -0.01em;
       }
       .scr-hero.mob .role {
@@ -1035,25 +1023,6 @@
         line-height: 22px;
       }
 
-      .scr-detail .side .side-card {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: var(--r-md);
-        padding: 24px;
-      }
-      .scr-detail .side h3 {
-        font-size: 11px;
-        margin: 0 0 14px;
-        font-family: var(--ff-latin);
-        color: var(--ink-300);
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        font-weight: 600;
-      }
-      .scr-detail .side-card + .side-card {
-        margin-top: 16px;
-      }
-
       .scr-detail.mob .stage {
         padding: 24px 20px 48px;
       }
@@ -1140,6 +1109,17 @@
         align-items: flex-start;
         gap: 16px;
       }
+      .proj-card .body .row1 > div {
+        min-width: 0;
+      }
+      .proj-card .body .row1 > .chip {
+        flex: 0 0 auto;
+        min-width: max-content;
+        white-space: nowrap;
+        word-break: keep-all;
+        overflow-wrap: normal;
+        writing-mode: horizontal-tb;
+      }
       .proj-card h3 {
         margin: 0;
         font-size: 20px;
@@ -1209,7 +1189,7 @@
       .scr-act .page-head {
         border-bottom: 1px solid var(--line);
         padding-bottom: 24px;
-        margin-bottom: 40px;
+        margin-bottom: 24px;
       }
       .scr-act .page-head h1 {
         font-size: 40px;
@@ -1234,6 +1214,10 @@
       }
       .act-group:last-child {
         border-bottom: 1px solid var(--line);
+      }
+      .scr-act .page-head + .act-group {
+        border-top: 0;
+        padding-top: 16px;
       }
       .act-group .label {
         position: sticky;
@@ -1321,35 +1305,13 @@
       .scr-skills .page-head {
         border-bottom: 1px solid var(--line);
         padding-bottom: 24px;
-        margin-bottom: 40px;
+        margin-bottom: 24px;
       }
       .scr-skills .page-head h1 {
         font-size: 40px;
         font-weight: 700;
         margin: 0;
         letter-spacing: -0.005em;
-      }
-      .scr-skills .legend {
-        margin-top: 24px;
-        display: flex;
-        gap: 28px;
-        font-size: 12px;
-        color: var(--ink-500);
-        align-items: center;
-      }
-      .scr-skills .legend .key {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .scr-skills .legend .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 999px;
-        background: var(--primary);
-      }
-      .scr-skills .legend .dot.b {
-        background: var(--primary-container);
       }
 
       .skill-block {
@@ -1359,21 +1321,17 @@
       .skill-block:last-child {
         border-bottom: 1px solid var(--line);
       }
+      .scr-skills .page-head + .skill-block {
+        border-top: 0;
+        padding-top: 16px;
+      }
       .skill-block .head {
-        display: grid;
-        grid-template-columns: 280px 1fr;
-        gap: 40px;
-        align-items: baseline;
+        display: block;
       }
       .skill-block .head h3 {
         margin: 0;
         font-size: 22px;
         font-weight: 700;
-      }
-      .skill-block .head .desc {
-        font-size: 13px;
-        color: var(--ink-500);
-        line-height: 22px;
       }
       .skill-rows {
         margin-top: 24px;
@@ -1460,8 +1418,8 @@
           <h1>outside-activities</h1>
         </div>
         <p>
-          Split from Claude Design blueprint. Content source: resume README. Flutter implementation mirrors the tokens
-          and screen contracts here.
+          Split from Claude Design blueprint. Content source: resume data. Flutter implementation mirrors the tokens and
+          screen contracts here.
         </p>
       </header>
       <section class="section">
@@ -1470,11 +1428,7 @@
           <h2 class="section-title">OUTSIDE ACTIVITIES</h2>
           <span class="section-jp">/ その他活動 · `/#/activities`</span>
         </div>
-        <p class="section-note">
-          登壇・OSS 貢献・執筆・コミュニティの 4
-          種をスティッキーラベル付きのセクションで時系列に表示。`SliverPersistentHeader`
-          で左ラベルを縦長スクロール上に固定。
-        </p>
+        <p class="section-note">DroidKaigi コントリビュートと Android Developers 翻訳動画を時系列に表示。</p>
 
         <div class="frames">
           <div class="frame frame-desktop">
@@ -1496,82 +1450,47 @@
                     <a class="active">その他活動</a>
                     <a>スキル</a>
                   </nav>
-                  <span class="lang">JA</span>
                 </div>
                 <div class="stage">
                   <div class="page-head">
                     <span class="eyebrow">05 — Outside Activities</span>
                     <h1 style="margin-top: 8px">その他活動</h1>
                     <p>
-                      登壇・OSS
-                      貢献・執筆・コミュニティ運営など、業務外で関わった活動の記録。プラットフォームを超えた一次情報の発信を意識しています。
+                      DroidKaigi コントリビュート、Zenn での振り返り、Android Developers
+                      翻訳動画など、業務外活動の記録。
                     </p>
                   </div>
 
                   <div class="act-group">
                     <div class="label">
-                      <span class="eyebrow">talks</span>
-                      <h3>登壇</h3>
-                      <div class="count">5 件</div>
+                      <span class="eyebrow">droidkaigi</span>
+                      <h3>DroidKaigi</h3>
+                      <div class="count">4 年分</div>
                     </div>
                     <div>
                       <div class="act-item">
-                        <div class="when">2024.11</div>
+                        <div class="when">2025.08 – 2025.09</div>
                         <div>
                           <h4>DroidKaigi2025 コントリビュート</h4>
-                          <div class="where">日本ミッドタウン · 35 分セッション</div>
+                          <div class="where">24日間コントリビュート · Zenn記事</div>
                         </div>
-                        <div class="ext">VIDEO ↗</div>
+                        <div class="ext">ZENN ↗</div>
                       </div>
                       <div class="act-item">
-                        <div class="when">2024.04</div>
+                        <div class="when">2024.08 – 2024.09</div>
                         <div>
                           <h4>DroidKaigi2024 コントリビュート</h4>
-                          <div class="where">渋谷 · 20 分 LT</div>
+                          <div class="where">31日間コントリビュート · Zenn記事</div>
                         </div>
-                        <div class="ext">SLIDES ↗</div>
+                        <div class="ext">ZENN ↗</div>
                       </div>
                       <div class="act-item">
-                        <div class="when">2023.10</div>
+                        <div class="when">2023.08 – 2023.09</div>
                         <div>
                           <h4>DroidKaigi2023 コントリビュート</h4>
-                          <div class="where">早稲田大学 · 30 分セッション</div>
+                          <div class="where">30日間コントリビュート · Zenn記事</div>
                         </div>
-                        <div class="ext">VIDEO ↗</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="act-group">
-                    <div class="label">
-                      <span class="eyebrow">open source</span>
-                      <h3>OSS 貢献</h3>
-                      <div class="count">67 PR · 12 リポジトリ</div>
-                    </div>
-                    <div>
-                      <div class="act-item">
-                        <div class="when">継続</div>
-                        <div>
-                          <h4>DroidKaigi conference-app contributions</h4>
-                          <div class="where">アクセシビリティ関連 PR 9 件 · ドキュメント整備</div>
-                        </div>
-                        <div class="ext">GITHUB ↗</div>
-                      </div>
-                      <div class="act-item">
-                        <div class="when">継続</div>
-                        <div>
-                          <h4>fictional-drug-and-disease-ref(メディマスタ) repositories</h4>
-                          <div class="where">ハッシュ戦略・型安全ルートのバグ修正</div>
-                        </div>
-                        <div class="ext">GITHUB ↗</div>
-                      </div>
-                      <div class="act-item">
-                        <div class="when">2023.07</div>
-                        <div>
-                          <h4>HTML Design Blueprint + VRT workflow</h4>
-                          <div class="where">riverpod_generator のドキュメント翻訳 (英 → 日)</div>
-                        </div>
-                        <div class="ext">GITHUB ↗</div>
+                        <div class="ext">ZENN ↗</div>
                       </div>
                     </div>
                   </div>
@@ -1580,14 +1499,14 @@
                     <div class="label">
                       <span class="eyebrow">writing</span>
                       <h3>執筆</h3>
-                      <div class="count">22 記事</div>
+                      <div class="count">Zenn</div>
                     </div>
                     <div>
                       <div class="act-item">
                         <div class="when">2025.06</div>
                         <div>
                           <h4>Zenn: DroidKaigi contribution write-ups</h4>
-                          <div class="where">全 6 章 · 累計 12,300 view</div>
+                          <div class="where">DroidKaigi コントリビュートの振り返り</div>
                         </div>
                         <div class="ext">ZENN ↗</div>
                       </div>
@@ -1595,35 +1514,35 @@
                         <div class="when">2024.12</div>
                         <div>
                           <h4>Android Developers 翻訳動画</h4>
-                          <div class="where">技術評論社 · 16 頁</div>
+                          <div class="where">参画先のキャッチアップ時間で話題提供</div>
                         </div>
-                        <div class="ext">PRINT ↗</div>
+                        <div class="ext">ZENN ↗</div>
                       </div>
                     </div>
                   </div>
 
                   <div class="act-group">
                     <div class="label">
-                      <span class="eyebrow">community</span>
-                      <h3>コミュニティ</h3>
-                      <div class="count">2 団体 · スタッフ</div>
+                      <span class="eyebrow">recognition</span>
+                      <h3>紹介・認知</h3>
+                      <div class="count">Welcome Talk</div>
                     </div>
                     <div>
                       <div class="act-item">
                         <div class="when">2022 – 現在</div>
                         <div>
                           <h4>DroidKaigi community contribution</h4>
-                          <div class="where">隔月開催の運営 · 登壇者調整</div>
+                          <div class="where">Welcome Talk にて紹介</div>
                         </div>
-                        <div class="ext">CONNPASS ↗</div>
+                        <div class="ext">X ↗</div>
                       </div>
                       <div class="act-item">
                         <div class="when">2023 – 2024</div>
                         <div>
                           <h4>Welcome Talk recognition</h4>
-                          <div class="where">CFP レビュー · トラック編成</div>
+                          <div class="where">貢献順位に関する紹介</div>
                         </div>
-                        <div class="ext">FLUTTERKAIGI ↗</div>
+                        <div class="ext">X ↗</div>
                       </div>
                     </div>
                   </div>
@@ -1648,60 +1567,32 @@
                     <span class="brand-mark"></span>
                     <span>その他活動</span>
                   </div>
-                  <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
                 </div>
                 <div class="stage">
                   <div class="page-head">
                     <span class="eyebrow">05 — Activities</span>
                     <h1 style="margin-top: 8px">その他活動</h1>
-                    <p style="font-size: 13px">登壇・OSS 貢献・執筆・コミュニティ運営の記録。</p>
+                    <p style="font-size: 13px">DroidKaigi コントリビュートと Zenn 記事の記録。</p>
                   </div>
 
                   <div class="act-group">
                     <div class="label">
-                      <span class="eyebrow">talks</span>
-                      <h3>登壇</h3>
+                      <span class="eyebrow">droidkaigi</span>
+                      <h3>DroidKaigi</h3>
                     </div>
                     <div>
                       <div class="act-item">
-                        <div class="when">2024.11</div>
+                        <div class="when">2025.08 – 2025.09</div>
                         <div>
                           <h4>DroidKaigi2025 コントリビュート</h4>
-                          <div class="where">日本ミッドタウン · 35 分</div>
+                          <div class="where">24日間コントリビュート · Issue 106件作成</div>
                         </div>
                       </div>
                       <div class="act-item">
-                        <div class="when">2024.04</div>
+                        <div class="when">2024.08 – 2024.09</div>
                         <div>
                           <h4>DroidKaigi2024 コントリビュート</h4>
-                          <div class="where">渋谷 · 20 分 LT</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="act-group">
-                    <div class="label">
-                      <span class="eyebrow">open source</span>
-                      <h3>OSS 貢献</h3>
-                    </div>
-                    <div>
-                      <div class="act-item">
-                        <div class="when">継続</div>
-                        <div>
-                          <h4>DroidKaigi conference-app contributions</h4>
-                          <div class="where">アクセシビリティ関連 PR 9 件</div>
-                        </div>
-                      </div>
-                      <div class="act-item">
-                        <div class="when">継続</div>
-                        <div>
-                          <h4>fictional-drug-and-disease-ref(メディマスタ) repositories</h4>
-                          <div class="where">ハッシュ戦略のバグ修正</div>
+                          <div class="where">31日間コントリビュート · Zenn記事</div>
                         </div>
                       </div>
                     </div>
@@ -1717,7 +1608,7 @@
                         <div class="when">2025.06</div>
                         <div>
                           <h4>Zenn: DroidKaigi contribution write-ups</h4>
-                          <div class="where">全 6 章 · 12,300 view</div>
+                          <div class="where">DroidKaigi コントリビュートの振り返り</div>
                         </div>
                       </div>
                     </div>
