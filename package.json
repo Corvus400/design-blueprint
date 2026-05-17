@@ -22,7 +22,7 @@
   "devDependencies": {
     "htmlhint": "^1.1.4",
     "husky": "^9.1.6",
-    "pixelmatch": "^6.0.0",
+    "pixelmatch": "^7.0.0",
     "playwright": "^1.49.0",
     "pngjs": "^7.0.0",
     "prettier": "^3.3.3",
