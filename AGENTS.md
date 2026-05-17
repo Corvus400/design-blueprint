@@ -20,7 +20,7 @@ Codex acts on files via `apply_patch`. The same invariants and review loop as `C
 ## Design Conflict Recovery
 
 - If the user reports that a design is broken, unchanged, visually wrong, or needs recurrence prevention, stop adding speculative fixes. First inspect `git diff`, the affected page HTML, `pages.json`, the matching audit rule, and the VRT actual/comparison output.
-- For repo-wide recurrence-prevention requests, run `npm run session:conflict-audit -- --repo . --inventory` before designing guardrails. Treat `cwd_exact` sessions as authoritative and repo mention records as completeness candidates; do not emit raw transcript text.
+- For repo-wide recurrence-prevention requests, run `npm run session:conflict-audit -- --repo . --inventory` before designing guardrails. Treat `cwd_exact` sessions as authoritative and remote/project/page alias records as completeness candidates; do not emit raw transcript text.
 - Separate changes into `revert mistaken change`, `keep intended change`, and `add guardrail`. Restore the previous design contract before adding new behavior when the issue was introduced by the current session.
 - Do not change a page's device classes, frame count, state matrix, or responsive mode from inference alone. Record the current contract, source evidence, intended contract, and impact before editing.
 - For visual design conflicts, DOM audit and VRT are not enough by themselves. Capture or inspect a rendered screenshot/crop of the affected frame before approving a VRT diff or claiming the layout is fixed.

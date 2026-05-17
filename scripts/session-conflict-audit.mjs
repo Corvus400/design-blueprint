@@ -6,6 +6,15 @@ import { pathToFileURL } from "node:url";
 
 const DEFAULT_SESSIONS_DIR = path.join(os.homedir(), ".codex", "sessions");
 const DEFAULT_SUMMARIES_DIR = path.join(os.homedir(), ".codex", "memories", "rollout_summaries");
+const GENERIC_ALIAS_STOPLIST = new Set([
+  "design system",
+  "elevation",
+  "hero",
+  "iconography",
+  "index",
+  "radii",
+  "skills",
+]);
 
 const CATEGORIES = [
   {
@@ -106,12 +115,53 @@ function bucketFor(text) {
   return hits;
 }
 
-function repoNeedles(repoRoot) {
-  return [repoRoot, path.basename(repoRoot)].filter(Boolean);
+function addAlias(aliases, value) {
+  const alias = `${value ?? ""}`.trim();
+  if (GENERIC_ALIAS_STOPLIST.has(alias.toLowerCase())) return;
+  if (alias.length >= 4) aliases.add(alias);
 }
 
-function includesRepoMention(text, repoRoot) {
-  return repoNeedles(repoRoot).some((needle) => text.includes(needle));
+function githubSlugFromRemote(remoteUrl) {
+  const match = remoteUrl.match(/github\.com[:/]([^/\s]+\/[^/\s.]+)(?:\.git)?/);
+  return match?.[1] ?? null;
+}
+
+async function collectRepoAliases(repoRoot) {
+  const aliases = new Set([repoRoot, path.basename(repoRoot)]);
+
+  const gitConfigPath = path.join(repoRoot, ".git", "config");
+  if (existsSync(gitConfigPath)) {
+    const gitConfig = await readFile(gitConfigPath, "utf8");
+    const originUrl = gitConfig.match(/^\s*url\s*=\s*(.+)$/m)?.[1]?.trim();
+    const githubSlug = githubSlugFromRemote(originUrl ?? "");
+    addAlias(aliases, githubSlug);
+    addAlias(aliases, githubSlug?.split("/").at(-1));
+  }
+
+  const entries = await readdir(repoRoot, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const pagesPath = path.join(repoRoot, entry.name, "pages.json");
+    if (!existsSync(pagesPath)) continue;
+    addAlias(aliases, entry.name);
+    const pagesJson = safeJson(await readFile(pagesPath, "utf8"));
+    for (const page of pagesJson?.pages ?? []) {
+      addAlias(aliases, page.name);
+      if (typeof page.file === "string") {
+        addAlias(aliases, path.basename(page.file, path.extname(page.file)));
+      }
+    }
+  }
+
+  return [...aliases].sort();
+}
+
+function findRepoMentions(text, aliases) {
+  return aliases.filter((needle) => text.includes(needle));
+}
+
+function includesRepoMention(text, aliases) {
+  return findRepoMentions(text, aliases).length > 0;
 }
 
 function parseToolArguments(value) {
@@ -123,17 +173,17 @@ function parseToolArguments(value) {
   }
 }
 
-function hasRepoWorkdirMention(argumentsValue, repoRoot) {
+function hasRepoWorkdirMention(argumentsValue, aliases) {
   const parsed = parseToolArguments(argumentsValue);
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return false;
-  return typeof parsed.workdir === "string" && includesRepoMention(parsed.workdir, repoRoot);
+  return typeof parsed.workdir === "string" && includesRepoMention(parsed.workdir, aliases);
 }
 
 function countValues(values) {
   return values.reduce((sum, value) => sum + value, 0);
 }
 
-async function analyzeSession(file, repoRoot) {
+async function analyzeSession(file, repoRoot, aliases) {
   const raw = await readFile(file, "utf8");
   const lines = raw.split(/\n/).filter(Boolean);
   const first = safeJson(lines[0]);
@@ -155,15 +205,20 @@ async function analyzeSession(file, repoRoot) {
       user: 0,
       assistant: 0,
     },
+    alias_mention_count: 0,
     tool_workdir_mentions: 0,
+    parse_failures: 0,
   };
 
   for (const line of lines) {
     const item = safeJson(line);
-    if (!item) continue;
+    if (!item) {
+      session.parse_failures += 1;
+      continue;
+    }
     if (item.type === "response_item" && item.payload?.type === "function_call") {
       session.function_calls += 1;
-      if (hasRepoWorkdirMention(item.payload.arguments, repoRoot)) {
+      if (hasRepoWorkdirMention(item.payload.arguments, aliases)) {
         session.tool_workdir_mentions += 1;
         if (!session.match_reasons.includes("tool_workdir_repo_mention")) {
           session.match_reasons.push("tool_workdir_repo_mention");
@@ -176,8 +231,10 @@ async function analyzeSession(file, repoRoot) {
     if (role === "assistant") session.assistant_messages += 1;
     const text = textFromContent(item.payload.content);
     if (role === "user" || role === "assistant") {
-      if (includesRepoMention(text, repoRoot)) {
+      const mentions = findRepoMentions(text, aliases);
+      if (mentions.length > 0) {
         session.message_mentions[role] += 1;
+        session.alias_mention_count += mentions.length;
         const reason = `${role}_message_repo_mention`;
         if (!session.match_reasons.includes(reason)) session.match_reasons.push(reason);
       }
@@ -193,11 +250,11 @@ async function analyzeSession(file, repoRoot) {
   return session;
 }
 
-async function analyzeSummary(file, repoRoot) {
+async function analyzeSummary(file, repoRoot, aliases) {
   const raw = await readFile(file, "utf8");
   const cwdMatch = raw.match(/^cwd:\s*(.+)$/m);
   const cwdExact = Boolean(cwdMatch && path.resolve(cwdMatch[1].trim()) === repoRoot);
-  const repoMention = includesRepoMention(raw, repoRoot);
+  const repoMention = includesRepoMention(raw, aliases);
   if (!cwdExact && !repoMention) return null;
   const idMatch = raw.match(/^thread_id:\s*(.+)$/m);
   const categories = Object.fromEntries(CATEGORIES.map((category) => [category.id, 0]));
@@ -226,19 +283,31 @@ async function main() {
   const repoRoot = path.resolve(options.repo);
   const repoStats = await stat(repoRoot);
   if (!repoStats.isDirectory()) throw new Error(`--repo is not a directory: ${repoRoot}`);
+  const aliases = await collectRepoAliases(repoRoot);
 
   const sessionFiles = await walkFiles(options.sessionsDir, (file) => file.endsWith(".jsonl"));
   const summaryFiles = await walkFiles(options.summariesDir, (file) => file.endsWith(".md"));
 
-  const allSessions = (await Promise.all(sessionFiles.map((file) => analyzeSession(file, repoRoot)))).filter(Boolean);
+  const allSessions = (await Promise.all(sessionFiles.map((file) => analyzeSession(file, repoRoot, aliases)))).filter(
+    Boolean,
+  );
   const sessions = allSessions.filter((session) => session.match_reasons.includes("cwd_exact"));
   const inventorySessions = allSessions.filter((session) => session.match_reasons.length > 0);
-  const summaries = (await Promise.all(summaryFiles.map((file) => analyzeSummary(file, repoRoot)))).filter(Boolean);
+  const summaries = (await Promise.all(summaryFiles.map((file) => analyzeSummary(file, repoRoot, aliases)))).filter(
+    Boolean,
+  );
   const exactSummaries = summaries.filter((summary) => summary.match_reasons.includes("cwd_exact"));
 
   const result = {
     repo: repoRoot,
     generated_at: new Date().toISOString(),
+    coverage: {
+      session_files_scanned: sessionFiles.length,
+      summary_files_scanned: summaryFiles.length,
+      session_parse_failures: allSessions.reduce((sum, session) => sum + session.parse_failures, 0),
+      alias_count: aliases.length,
+      aliases,
+    },
     raw_sessions: {
       count: sessions.length,
       categories: aggregate(sessions),
@@ -276,7 +345,9 @@ async function main() {
           assistant_messages: session.assistant_messages,
           function_calls: session.function_calls,
           message_mentions: session.message_mentions,
+          alias_mention_count: session.alias_mention_count,
           tool_workdir_mentions: session.tool_workdir_mentions,
+          parse_failures: session.parse_failures,
           category_hit_count: countValues(Object.values(session.inventory_categories)),
           categories: session.inventory_categories,
         })),
@@ -313,6 +384,7 @@ async function main() {
           memory_summary_count: result.memory_summaries.count,
           inventory_raw_session_count: result.inventory.raw_sessions.total_inventory_count,
           inventory_memory_summary_count: result.inventory.memory_summaries.total_inventory_count,
+          coverage: result.coverage,
           raw_categories: result.raw_sessions.categories,
           memory_categories: result.memory_summaries.categories,
           privacy_note: result.privacy_note,

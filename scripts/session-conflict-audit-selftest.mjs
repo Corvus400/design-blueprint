@@ -23,9 +23,26 @@ try {
   const sessionsDir = path.join(tempDir, "sessions");
   const summariesDir = path.join(tempDir, "summaries");
   await mkdir(repo, { recursive: true });
+  await mkdir(path.join(repo, ".git"), { recursive: true });
+  await mkdir(path.join(repo, "example-html-spec"), { recursive: true });
   await mkdir(otherRepo, { recursive: true });
   await mkdir(sessionsDir, { recursive: true });
   await mkdir(summariesDir, { recursive: true });
+  await writeFile(
+    path.join(repo, ".git", "config"),
+    '[remote "origin"]\n\turl = https://github.com/example-owner/example-blueprint\n',
+  );
+  await writeFile(
+    path.join(repo, "example-html-spec", "pages.json"),
+    JSON.stringify({
+      pages: [
+        {
+          name: "search-results",
+          file: "Search Results/Search Results.html",
+        },
+      ],
+    }),
+  );
 
   await writeFile(
     path.join(sessionsDir, "cwd-exact.jsonl"),
@@ -64,6 +81,20 @@ try {
     ]),
   );
   await writeFile(
+    path.join(sessionsDir, "alias-mention.jsonl"),
+    jsonl([
+      { type: "session_meta", payload: { id: "alias-mention", cwd: otherRepo } },
+      {
+        type: "response_item",
+        payload: {
+          type: "message",
+          role: "user",
+          content: [{ text: "example-blueprint の search-results ページで全UIの見た目を再監査してください" }],
+        },
+      },
+    ]),
+  );
+  await writeFile(
     path.join(sessionsDir, "unrelated.jsonl"),
     jsonl([
       { type: "session_meta", payload: { id: "unrelated", cwd: otherRepo } },
@@ -86,12 +117,19 @@ try {
     path.join(summariesDir, "repo-mention.md"),
     "cwd: /tmp/elsewhere\nthread_id: summary-repo-mention\ndesign-blueprint needs recurrence prevention\n",
   );
+  await writeFile(
+    path.join(summariesDir, "alias-mention.md"),
+    "cwd: /tmp/elsewhere\nthread_id: summary-alias-mention\nexample-owner/example-blueprint search-results visual coverage\n",
+  );
 
   const summary = run(["--repo", repo, "--sessions-dir", sessionsDir, "--summaries-dir", summariesDir, "--summary"]);
   assert.equal(summary.raw_session_count, 1);
   assert.equal(summary.memory_summary_count, 1);
-  assert.equal(summary.inventory_raw_session_count, 2);
-  assert.equal(summary.inventory_memory_summary_count, 2);
+  assert.equal(summary.inventory_raw_session_count, 3);
+  assert.equal(summary.inventory_memory_summary_count, 3);
+  assert.ok(summary.coverage.aliases.includes("example-owner/example-blueprint"));
+  assert.ok(summary.coverage.aliases.includes("example-html-spec"));
+  assert.ok(summary.coverage.aliases.includes("search-results"));
 
   const inventory = run([
     "--repo",
@@ -103,13 +141,18 @@ try {
     "--inventory",
   ]);
   assert.equal(inventory.raw_sessions.cwd_exact_count, 1);
-  assert.equal(inventory.raw_sessions.candidate_mention_count, 1);
-  assert.equal(inventory.raw_sessions.total_inventory_count, 2);
+  assert.equal(inventory.raw_sessions.candidate_mention_count, 2);
+  assert.equal(inventory.raw_sessions.total_inventory_count, 3);
   assert.equal(inventory.memory_summaries.cwd_exact_count, 1);
-  assert.equal(inventory.memory_summaries.candidate_mention_count, 1);
+  assert.equal(inventory.memory_summaries.candidate_mention_count, 2);
   assert.ok(inventory.raw_sessions.sessions.some((session) => session.match_reasons.includes("cwd_exact")));
   assert.ok(
     inventory.raw_sessions.sessions.some((session) => session.match_reasons.includes("tool_workdir_repo_mention")),
+  );
+  assert.ok(
+    inventory.raw_sessions.sessions.some(
+      (session) => session.id === "alias-mention" && session.alias_mention_count >= 2,
+    ),
   );
   assert.ok(inventory.note.includes("false positives"));
 
