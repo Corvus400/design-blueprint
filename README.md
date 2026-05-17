@@ -47,6 +47,10 @@ npm run lint
 npm run vrt
 ```
 
+`package.json` の `prepare` script は Husky hook を設定します。`npm install` または `npm ci` を実行していない clone では、commit / push 時の VRT が有効になりません。
+
+---
+
 ## 収録プロジェクト
 
 | Project | 内容 |
@@ -61,7 +65,7 @@ npm run vrt
 
 ## アーキテクチャ
 
-HTML 仕様、DOM audit、VRT baseline を分離しています。画面固有の契約は HTML 本文と audit rule に置き、共通 runner は project / page を `pages.json` から読み込みます。
+HTML 仕様、DOM audit、VRT baseline、Git hook を分離しています。画面固有の契約は HTML 本文と audit rule に置き、共通 runner は project / page を `pages.json` から読み込みます。
 
 ```mermaid
 graph TD
@@ -70,10 +74,13 @@ graph TD
   AUDIT["html-audit rules — DOM contracts"]
   VRT["VRT runner — Playwright / pixelmatch"]
   SNAP["snapshots/chromium — tracked baselines"]
+  HOOKS["Husky hooks"]
   DESIGN --> PAGES
   PAGES --> VRT
   DESIGN --> AUDIT
+  AUDIT --> HOOKS
   VRT --> SNAP
+  SNAP --> HOOKS
 ```
 
 ---
@@ -90,7 +97,16 @@ npm run html:audit
 # VRT
 npm run vrt
 
+# VRT 差分を baseline として承認
+npm run vrt:approve -- --project <project> --page <page>
 ```
+
+### HTML 仕様の編集
+
+1. 対象 project の `pages.json` を確認します。
+2. 変更する HTML を読み、画面状態・操作状態・responsive contract を把握します。
+3. 大きい仕様修正や再発防止が必要な修正では、`scripts/html-audit-rules/*.json` に契約を追加します。
+4. VRT 失敗時は `.vrt-output/report/results.json` の `compare_file_path`、`golden_file_path`、`actual_file_path`、`page_file` を確認します。
 
 ## ライセンス
 
