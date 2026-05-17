@@ -8,6 +8,7 @@
   "schedule": [
     "before 1am on sunday"
   ],
+  "rebaseWhen": "never",
   "dependencyDashboard": true,
   "enabledManagers": [
     "npm",
@@ -16,6 +17,9 @@
   "labels": [
     "dependencies",
     "renovate"
+  ],
+  "assignees": [
+    "Corvus400"
   ],
   "prConcurrentLimit": 3,
   "prHourlyLimit": 1,
