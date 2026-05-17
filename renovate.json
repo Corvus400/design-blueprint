@@ -18,6 +18,18 @@
     "dependencies",
     "renovate"
   ],
+  "prBodyColumns": [
+    "Package",
+    "Change",
+    "Age",
+    "Adoption",
+    "Passing",
+    "Confidence",
+    "Source"
+  ],
+  "prBodyDefinitions": {
+    "Source": "{{#if sourceUrl}}[source]({{{sourceUrl}}}){{else}}—{{/if}}"
+  },
   "assignees": [
     "Corvus400"
   ],
