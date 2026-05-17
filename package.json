@@ -14,6 +14,7 @@
     "html:audit": "node scripts/html-audit.mjs --all",
     "html:audit:selftest": "node scripts/html-audit-selftest.mjs",
     "session:conflict-audit": "node scripts/session-conflict-audit.mjs",
+    "session:conflict-audit:selftest": "node scripts/session-conflict-audit-selftest.mjs",
     "public:audit": "node scripts/public-release-audit.mjs",
     "public:audit:selftest": "node scripts/public-release-audit.mjs --selftest",
     "visual:hook": "node scripts/visual-review-hook.mjs --staged",
