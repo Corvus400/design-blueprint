@@ -13,6 +13,8 @@
     "lint:fix": "prettier --write \"**/*.html\" \"!**/snapshots/**\" \"!.vrt-output/**\" \"!node_modules/**\"",
     "html:audit": "node scripts/html-audit.mjs --all",
     "html:audit:selftest": "node scripts/html-audit-selftest.mjs",
+    "public:audit": "node scripts/public-release-audit.mjs",
+    "public:audit:selftest": "node scripts/public-release-audit.mjs --selftest",
     "vrt": "node scripts/vrt-hook.mjs --all",
     "vrt:approve": "node scripts/vrt-approve.mjs",
     "vrt:report": "node scripts/vrt-report.mjs"
