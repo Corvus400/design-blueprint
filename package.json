@@ -16,6 +16,7 @@
     "session:conflict-audit": "node scripts/session-conflict-audit.mjs",
     "public:audit": "node scripts/public-release-audit.mjs",
     "public:audit:selftest": "node scripts/public-release-audit.mjs --selftest",
+    "visual:hook": "node scripts/visual-review-hook.mjs --staged",
     "visual:manifest": "node scripts/visual-review-manifest.mjs",
     "vrt": "node scripts/vrt-hook.mjs --all",
     "vrt:approve": "node scripts/vrt-approve.mjs",

@@ -1,2 +1,3 @@
 node scripts/lint-hook.mjs --staged || exit 1
+node scripts/visual-review-hook.mjs --staged || exit 1
 node scripts/vrt-hook.mjs --staged

@@ -30,14 +30,13 @@ function safeName(value) {
     .slice(0, 120);
 }
 
-async function main() {
-  const options = parseArgs(process.argv.slice(2));
-  const pages = await loadPages(options.project);
-  const target = pages.find((page) => page.name === options.page);
-  if (!target) throw new Error(`page not found in ${options.project}/pages.json: ${options.page}`);
+export async function captureVisualManifest({ project, pageName, maxFrames = null, outputScreenshots = true }) {
+  const pages = await loadPages(project);
+  const target = pages.find((page) => page.name === pageName);
+  if (!target) throw new Error(`page not found in ${project}/pages.json: ${pageName}`);
 
-  const htmlAbs = path.join(REPO_ROOT, options.project, target.file);
-  const outDir = path.join(OUTPUT_DIR, "visual-review", options.project, options.page);
+  const htmlAbs = path.join(REPO_ROOT, project, target.file);
+  const outDir = path.join(OUTPUT_DIR, "visual-review", project, pageName);
   await mkdir(outDir, { recursive: true });
 
   const browser = await chromium.launch();
@@ -65,23 +64,25 @@ async function main() {
     );
 
     if (frames.length === 0) throw new Error(`no [data-frame-label] frames found in ${target.file}`);
-    if (options.maxFrames !== null && frames.length > options.maxFrames) {
-      throw new Error(`frame count ${frames.length} exceeds --max-frames ${options.maxFrames}`);
+    if (maxFrames !== null && frames.length > maxFrames) {
+      throw new Error(`frame count ${frames.length} exceeds --max-frames ${maxFrames}`);
     }
 
     const captures = [];
     for (const frame of frames) {
-      const locator = page.locator("[data-frame-label]").nth(frame.index);
       const fileName = `${String(frame.index + 1).padStart(3, "0")}-${safeName(frame.label || `frame-${frame.index}`)}.png`;
-      const relativePath = path.join(".vrt-output", "visual-review", options.project, options.page, fileName);
+      const relativePath = path.join(".vrt-output", "visual-review", project, pageName, fileName);
       const absPath = path.join(REPO_ROOT, relativePath);
-      await locator.screenshot({ path: absPath, animations: "disabled" });
+      if (outputScreenshots) {
+        const locator = page.locator("[data-frame-label]").nth(frame.index);
+        await locator.screenshot({ path: absPath, animations: "disabled" });
+      }
       captures.push({ ...frame, screenshot: relativePath });
     }
 
     const manifest = {
-      project: options.project,
-      page: options.page,
+      project,
+      page: pageName,
       page_file: target.file,
       generated_at: new Date().toISOString(),
       frame_count: frames.length,
@@ -90,19 +91,28 @@ async function main() {
       captures,
     };
     await writeFile(path.join(outDir, "manifest.json"), JSON.stringify(manifest, null, 2));
-    if (manifest.missing_capture_count !== 0) {
-      throw new Error(`missing visual captures: ${manifest.missing_capture_count}`);
-    }
-    console.log(
-      `[visual-review-manifest] OK project=${options.project} page=${options.page} frames=${frames.length} manifest=${path.relative(
-        REPO_ROOT,
-        path.join(outDir, "manifest.json"),
-      )}`,
-    );
+    return { ...manifest, manifest_path: path.relative(REPO_ROOT, path.join(outDir, "manifest.json")) };
   } finally {
     await context.close();
     await browser.close();
   }
 }
 
-await main();
+async function main() {
+  const options = parseArgs(process.argv.slice(2));
+  const manifest = await captureVisualManifest({
+    project: options.project,
+    pageName: options.page,
+    maxFrames: options.maxFrames,
+  });
+  if (manifest.missing_capture_count !== 0) {
+    throw new Error(`missing visual captures: ${manifest.missing_capture_count}`);
+  }
+  console.log(
+    `[visual-review-manifest] OK project=${options.project} page=${options.page} frames=${manifest.frame_count} manifest=${manifest.manifest_path}`,
+  );
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  await main();
+}
