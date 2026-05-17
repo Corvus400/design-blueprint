@@ -27,6 +27,8 @@ This repository contains design specifications for a FICTIONAL drug and disease 
 - **HTML 仕様を SSOT として管理** — 各デザインは実装リポジトリ名と同じ top-level directory に置き、`pages.json` で VRT 対象を宣言します。
 - **VRT baseline 管理** — Playwright と pixelmatch で HTML 仕様の visual regression を確認します。
 - **DOM ベースの HTML audit** — stale text、親子構造、TOC、画面契約を `scripts/html-audit-rules/*.json` で固定します。
+- **全状態 visual review** — `npm run visual:manifest -- --project <project> --page <page>` で `[data-frame-label]` ごとの crop manifest を生成し、代表画像だけでは見落とす UI 状態を確認します。
+- **セッション衝突監査** — `npm run session:conflict-audit -- --repo . --summary` で、この repo を cwd とした Codex session の失敗カテゴリを raw transcript 非出力で集計します。
 - **Claude Design から Codex 実装へ橋渡し** — 見た目だけでなく、Flutter 実装や mock-server fixture と照合した契約を仕様に残します。
 
 ---
@@ -43,6 +45,8 @@ npx playwright install chromium
 # HTML audit / lint / VRT
 npm run html:audit:selftest
 npm run html:audit
+npm run session:conflict-audit -- --repo . --summary
+npm run visual:manifest -- --project fictional-drug-and-disease-ref-flutter --page search-screen-spec
 npm run lint
 npm run vrt
 ```
@@ -53,11 +57,11 @@ npm run vrt
 
 ## 収録プロジェクト
 
-| Project | 内容 |
-| --- | --- |
+| Project                                   | 内容                                                                                              |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | `fictional-drug-and-disease-ref-flutter/` | 架空医薬品・疾患リファレンスアプリの検索、詳細、ブックマーク、閲覧履歴、計算ツール、Design System |
-| `resume-flutter/` | Flutter Web 履歴書の Hero、職務経歴、個人開発、その他活動、スキル、Design System |
-| `fictional-drug-and-disease-ref-sample/` | VRT と audit の最小サンプル |
+| `resume-flutter/`                         | Flutter Web 履歴書の Hero、職務経歴、個人開発、その他活動、スキル、Design System                  |
+| `fictional-drug-and-disease-ref-sample/`  | VRT と audit の最小サンプル                                                                       |
 
 各 project は `pages.json` を持つ directory として検出されます。HTML と snapshot PNG は同じ project directory に閉じ、baseline 更新は `npm run vrt:approve` 経由で行います。
 
@@ -114,12 +118,12 @@ npm run vrt:approve -- --project <project> --page <page>
 
 ### サードパーティソフトウェア
 
-| ライブラリ / アセット | ライセンス | 用途 |
-| --- | --- | --- |
-| [Playwright](https://playwright.dev/) | Apache-2.0 | Chromium capture / VRT 実行 |
-| [pixelmatch](https://github.com/mapbox/pixelmatch) | ISC | PNG 差分比較 |
-| [pngjs](https://github.com/pngjs/pngjs) | MIT | PNG 読み書き |
-| [sharp](https://sharp.pixelplumbing.com/) | Apache-2.0 | VRT comparison image composition |
-| [htmlhint](https://htmlhint.com/) | MIT | HTML lint |
-| [Prettier](https://prettier.io/) | MIT | HTML formatting check |
-| [Noto Sans JP](https://fonts.google.com/noto/specimen/Noto+Sans+JP) | SIL OFL 1.1 | Design System preview fonts |
+| ライブラリ / アセット                                               | ライセンス  | 用途                             |
+| ------------------------------------------------------------------- | ----------- | -------------------------------- |
+| [Playwright](https://playwright.dev/)                               | Apache-2.0  | Chromium capture / VRT 実行      |
+| [pixelmatch](https://github.com/mapbox/pixelmatch)                  | ISC         | PNG 差分比較                     |
+| [pngjs](https://github.com/pngjs/pngjs)                             | MIT         | PNG 読み書き                     |
+| [sharp](https://sharp.pixelplumbing.com/)                           | Apache-2.0  | VRT comparison image composition |
+| [htmlhint](https://htmlhint.com/)                                   | MIT         | HTML lint                        |
+| [Prettier](https://prettier.io/)                                    | MIT         | HTML formatting check            |
+| [Noto Sans JP](https://fonts.google.com/noto/specimen/Noto+Sans+JP) | SIL OFL 1.1 | Design System preview fonts      |

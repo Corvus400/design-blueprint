@@ -17,6 +17,21 @@ This repository stores HTML designs and gates every commit and push with VRT. As
 5. If VRT reports an INITIAL BASELINE, that PNG is staged and committed together with the HTML. Initial captures are explicitly considered untrusted; review the rendered baseline against the page HTML.
 6. If VRT reports a DIFF, switch to visual reviewer mode.
 
+## Branch And PR Workflow
+
+- This repository's default branch is protected by the active `protect-default-branch` ruleset. Do not commit directly to `main` for repo changes.
+- Start from current `main`, create a feature branch, push it, and open a PR into `main`.
+- PR titles and PR bodies must be Japanese. The PR body must include changed areas, verification results, and any intentional visual baseline approval.
+- Do not merge until the required `ci-gate` status check passes and review threads are resolved.
+
+## All-State Visual Review
+
+- For multi-state HTML specs, visual review means every `[data-frame-label]` frame, not a representative section or the currently visible TOC area.
+- Run `npm run visual:manifest -- --project <project> --page <page>` for changed multi-frame pages. Inspect `.vrt-output/visual-review/<project>/<page>/manifest.json` and the generated crops; `missing_capture_count` must be `0`.
+- Search-screen work must cover at least empty, error, filter-open, sort-open, applied-filter results, loading, loading-more, iPhone landscape, iPad portrait, iPad landscape, and iPad Split View.
+- Repeated visual misses around icon glyphs, bottom/nav selected treatment, result-card anatomy, placeholder image ratio/icon, shimmer rows, sticky chip headers, WCAG chip contrast, and pane width must be converted into inline verification or page-specific HTML audit rules before the task is closed.
+- When icon, card, copy, or sizing truth exists in the implementation repo, read that source before changing the design HTML. Do not guess from a similar design page unless the task explicitly names it as the SSOT.
+
 ## HTML Audit Rules
 
 - `scripts/html-audit.mjs` reads `scripts/html-audit-rules/*.json` and performs DOM-based structural checks for matching HTML files.
@@ -30,6 +45,7 @@ This repository stores HTML designs and gates every commit and push with VRT. As
 - Treat device classes, frame totals, state matrices, breakpoints, and responsive modes as locked contracts. Any change to them needs explicit source evidence from the page contract or implementation repo and must be reflected in audit rules.
 - DOM audit and VRT are necessary but not sufficient for UI judgement. Inspect a rendered screenshot/crop of the affected state before approving a VRT diff or reporting that a visual conflict is resolved.
 - The final corrected constraint must become deterministic: add a page-specific audit rule or inline verification row so the same broken state cannot pass on the next session.
+- If the user says to revert or restore, confirm whether they mean unstaging or discarding worktree changes unless the wording is explicit. Never discard a visual correction just because it is not ready to stage.
 
 ## Visual Reviewer Mode
 
