@@ -127,6 +127,11 @@ try {
   assert.equal(summary.memory_summary_count, 1);
   assert.equal(summary.inventory_raw_session_count, 3);
   assert.equal(summary.inventory_memory_summary_count, 3);
+  assert.equal(summary.raw_categories.goal_branch_workflow, 1);
+  assert.equal(summary.raw_categories.all_ui_visual_coverage, 0);
+  assert.equal(summary.inventory_categories.raw_sessions.goal_branch_workflow, 1);
+  assert.equal(summary.inventory_categories.raw_sessions.all_ui_visual_coverage, 1);
+  assert.equal(summary.inventory_categories.memory_summaries.all_ui_visual_coverage, 0);
   assert.ok(summary.coverage.aliases.includes("example-owner/example-blueprint"));
   assert.ok(summary.coverage.aliases.includes("example-html-spec"));
   assert.ok(summary.coverage.aliases.includes("search-results"));

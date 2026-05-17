@@ -28,7 +28,7 @@ This repository contains design specifications for a FICTIONAL drug and disease 
 - **VRT baseline 管理** — Playwright と pixelmatch で HTML 仕様の visual regression を確認します。
 - **DOM ベースの HTML audit** — stale text、親子構造、TOC、画面契約を `scripts/html-audit-rules/*.json` で固定します。
 - **全状態 visual review** — `npm run visual:manifest -- --project <project> --page <page>` で `[data-frame-label]` ごとの crop manifest を生成し、代表画像だけでは見落とす UI 状態を確認します。
-- **セッション衝突監査** — `npm run session:conflict-audit -- --repo . --inventory` で、この repo を cwd とした Codex session と remote/project/page alias 候補を raw transcript 非出力で集計します。
+- **セッション衝突監査** — `npm run session:conflict-audit -- --repo . --summary` と `--inventory` で、この repo を cwd とした Codex session と remote/project/page alias 候補を raw transcript 非出力で集計します。
 - **Claude Design から Codex 実装へ橋渡し** — 見た目だけでなく、Flutter 実装や mock-server fixture と照合した契約を仕様に残します。
 
 ---

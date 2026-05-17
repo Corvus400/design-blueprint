@@ -387,6 +387,10 @@ async function main() {
           coverage: result.coverage,
           raw_categories: result.raw_sessions.categories,
           memory_categories: result.memory_summaries.categories,
+          inventory_categories: {
+            raw_sessions: result.inventory.raw_sessions.categories,
+            memory_summaries: result.inventory.memory_summaries.categories,
+          },
           privacy_note: result.privacy_note,
         },
         null,
