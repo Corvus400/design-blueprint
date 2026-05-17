@@ -19,6 +19,7 @@
 
 ## Enforcement
 
-リポジトリ owner は、この Code of Conduct に反する Issue、Pull Request、コメント、その他の投稿を close、hide、delete、または report することがあります。
+リポジトリ owner は、この Code of Conduct に反する Issue、Pull Request、
+コメント、その他の投稿を close、hide、delete、または report することがあります。
 
 脆弱性の疑いがある内容は GitHub Security Advisories から非公開で報告してください。public Issue には投稿しないでください。
