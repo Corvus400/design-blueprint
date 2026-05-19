@@ -60,6 +60,8 @@ try {
                 "実装と同じにしろと言っているのに近似で済ませないでください",
                 "実装に存在しない Other app neighbor や独自実装キーボードを残さないでください",
                 "実機の見た目と実装両方を照らし合わせ、検証項目が未達ならコミットしないでください",
+                "検証手段を見直し、DOM や VRT だけでは不足していることを認識してください",
+                "指摘されないと分からない状態を止め、自分で認知・修正のイテレーションを回してください",
               ].join("。"),
             },
           ],
@@ -143,6 +145,8 @@ try {
   assert.equal(summary.raw_categories.implementation_parity_gap, 1);
   assert.equal(summary.raw_categories.premature_visual_completion, 1);
   assert.equal(summary.raw_categories.real_device_evidence_gap, 1);
+  assert.equal(summary.raw_categories.invalid_verification_method, 1);
+  assert.equal(summary.raw_categories.human_oracle_loop, 1);
   assert.equal(summary.inventory_categories.raw_sessions.goal_branch_workflow, 1);
   assert.equal(summary.inventory_categories.raw_sessions.all_ui_visual_coverage, 1);
   assert.equal(summary.inventory_categories.raw_sessions.approximation_used, 1);
@@ -150,6 +154,8 @@ try {
   assert.equal(summary.inventory_categories.raw_sessions.implementation_parity_gap, 1);
   assert.equal(summary.inventory_categories.raw_sessions.premature_visual_completion, 1);
   assert.equal(summary.inventory_categories.raw_sessions.real_device_evidence_gap, 1);
+  assert.equal(summary.inventory_categories.raw_sessions.invalid_verification_method, 1);
+  assert.equal(summary.inventory_categories.raw_sessions.human_oracle_loop, 1);
   assert.equal(summary.inventory_categories.memory_summaries.all_ui_visual_coverage, 0);
   assert.ok(summary.coverage.aliases.includes("example-owner/example-blueprint"));
   assert.ok(summary.coverage.aliases.includes("example-html-spec"));

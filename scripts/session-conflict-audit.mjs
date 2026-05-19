@@ -77,6 +77,16 @@ const CATEGORIES = [
     label: "Real-device or rendered evidence was required before commit or approval",
     patterns: [/実機/, /実機を操作/, /実機の見た目/, /screenshot/i, /スクリーンショット/],
   },
+  {
+    id: "invalid_verification_method",
+    label: "The verification method was insufficient for the requested implementation parity",
+    patterns: [/検証手段/, /検証方法/, /DOM.*不足/i, /VRT.*不足/i, /実機の見た目と実装/, /両方.*照らし合わせ/],
+  },
+  {
+    id: "human_oracle_loop",
+    label: "The user had to act as the repeated defect detector instead of the agent auditing the pattern",
+    patterns: [/指摘されないと/, /何度も同じ指摘/, /10回以上/, /自分で認知/, /修正のイテレーション/, /場当たり/],
+  },
 ];
 
 function parseArgs(argv) {
