@@ -17,6 +17,15 @@ Codex acts on files via `apply_patch`. The same invariants and review loop as `C
 - For search-screen changes, explicitly check empty, error, filter-open, sort-open, applied-filter results, loading, loading-more, iPhone landscape, iPad portrait, iPad landscape, and iPad Split View states. Repeated user-reported failures around icons, cards, chips, shimmer rows, sticky headers, and pane widths must become inline verification or `scripts/html-audit-rules/*.json` checks.
 - If the intended source is the implementation repo, read the implementation before changing icon glyphs, card anatomy, placeholder icons, sizes, state matrices, or copy. Do not substitute browsing-history or another HTML design as SSOT unless the task explicitly says it is the SSOT.
 
+## Implementation-Ready Design Specs
+
+- Treat implementation-backed HTML specs as code-generation inputs, not presentation mockups. A wrong spec can cause the next Codex implementation to build the wrong app.
+- Before changing implementation-backed UI, identify the concrete implementation source files and tests that own each changed claim. Record that evidence in the HTML spec itself, then encode the same invariant in `scripts/html-audit-rules/*.json`.
+- Do not use visual approximations for icons, charts, device classes, navigation, headers, ribbons, keyboards, copy, or placeholder panes. If the implementation uses a framework glyph/font, source constant, widget, route, or test key, the spec must use or explicitly cite that exact source.
+- Do not repair one user-reported frame in isolation. Re-audit the surrounding component family and responsive state matrix so the same class of error cannot remain in nearby frames.
+- If a frame represents a device or mode only by width class, still preserve the device identity in the chrome and contract text. For example, iPad Split View may use compact CalcView content, but it must remain an iPad frame and must not invent a neighboring app pane unless the implementation owns that pane.
+- A spec is not implementation-ready until lint, HTML audit, visual manifest with `missing_capture_count: 0`, and visual inspection of the affected frame family all pass. Report those separately from functional tests or VRT.
+
 ## Design Conflict Recovery
 
 - If the user reports that a design is broken, unchanged, visually wrong, or needs recurrence prevention, stop adding speculative fixes. First inspect `git diff`, the affected page HTML, `pages.json`, the matching audit rule, and the VRT actual/comparison output.

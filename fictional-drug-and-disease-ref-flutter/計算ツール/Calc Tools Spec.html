@@ -4,16 +4,6 @@
     <meta charset="utf-8" />
     <title>Calc Tools — Design SSOT (BMI / eGFR / CrCl)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
-      rel="stylesheet"
-    />
     <style>
       /* =======================================================================
    PAGE TOKENS  (HEX confined here; .color-token-display also allowed)
@@ -21,6 +11,7 @@
       :root {
         --jp: "Noto Sans JP", system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic UI", sans-serif;
         --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+        --material-icons: "MaterialIcons";
 
         /* Page chrome (the SSOT document itself, not the mocks) */
         --page-bg: #f4f5f7;
@@ -133,6 +124,13 @@
         --dur-fast: 120ms;
         --dur-base: 200ms;
         --dur-slow: 320ms;
+      }
+      @font-face {
+        font-family: "MaterialIcons";
+        src: url("../assets/fonts/MaterialIcons-Regular.otf") format("opentype");
+        font-weight: normal;
+        font-style: normal;
+        font-display: block;
       }
 
       /* ---- DARK shell tokens — applied via .frame.dark ---- */
@@ -684,6 +682,9 @@
       .mock-row.landscape {
         grid-template-columns: repeat(auto-fit, minmax(820px, max-content));
       }
+      .mock-row.splitview {
+        grid-template-columns: repeat(auto-fit, minmax(520px, max-content));
+      }
       .mock-row > .row-label {
         grid-column: 1/-1;
         display: flex;
@@ -763,10 +764,13 @@
         border-radius: 24px;
       }
       .frame.tablet.landscape {
-        width: 1214px;
+        width: 1210px;
+        padding: 0;
+        border-radius: 0;
+        background: transparent;
       }
       .frame.tablet.splitview {
-        width: 1194px;
+        width: 500px;
         border-radius: 24px;
       }
       .frame.iphone-landscape {
@@ -787,8 +791,8 @@
         border-radius: 18px;
       }
       .frame.tablet.landscape .device {
-        height: 760px;
-        border-radius: 18px;
+        height: 834px;
+        border-radius: 0;
       }
       .frame.iphone-landscape .device {
         height: 380px;
@@ -819,19 +823,22 @@
         font-size: 13px;
       }
       .frame .status .right .ico {
-        font-family: "Material Symbols Outlined";
         font-size: 14px;
       }
 
-      /* App bar */
+      /* App tab header (Flutter AppTabHeader; no drawer/menu on calc tab) */
       .frame .appbar {
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 6px 8px 8px;
-        background: var(--c6-bg);
+        height: 56px;
+        padding: 0 8px 0 16px;
+        background: var(--c6-surface);
         border-bottom: 1px solid var(--c6-hairline);
         flex: 0 0 auto;
+      }
+      .frame.tablet .appbar {
+        height: 56px;
       }
       .frame .appbar .icon-btn {
         width: 40px;
@@ -842,16 +849,25 @@
         color: var(--c6-ink);
       }
       .frame .appbar .icon-btn .ico {
-        font-family: "Material Symbols Outlined";
         font-size: 22px;
       }
       .frame .appbar .title {
         flex: 1;
         text-align: left;
-        font-size: 17px;
+        font-size: 20px;
         font-weight: 700;
         color: var(--c6-ink);
-        padding-left: 6px;
+      }
+      .frame .appbar .info-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+        display: grid;
+        place-items: center;
+        color: var(--c6-ink);
+      }
+      .frame .appbar .info-btn .ico {
+        font-size: 24px;
       }
 
       /* Body / scroll area */
@@ -861,8 +877,20 @@
         position: relative;
         padding: var(--s-4);
       }
+      .frame:not(.has-rail) .body {
+        margin-bottom: 90px; /* Scaffold body excludes DisclaimerRibbon(26)+NavigationBar(64). */
+      }
+      .frame.has-rail .body {
+        margin-bottom: 22px; /* Landscape phone shell bottom bar is DisclaimerRibbon only. */
+      }
       .frame.tablet .body {
         padding: var(--s-7);
+      }
+      .frame.tablet:not(.has-rail) .body {
+        margin-bottom: 92px; /* DisclaimerRibbon(28)+NavigationBar(64). */
+      }
+      .frame.tablet.has-rail .body {
+        margin-bottom: 28px;
       }
 
       /* Bottom-nav (calc tab active) */
@@ -871,7 +899,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        height: 56px;
+        height: 64px;
         background: var(--c6-surface);
         border-top: 1px solid var(--c6-hairline);
         display: flex;
@@ -885,20 +913,100 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        font: 500 10px var(--jp);
+        font: 600 10px/1.2 var(--jp);
         color: var(--c6-muted);
-        gap: 2px;
+        gap: 3px;
+      }
+      .frame .bottom-nav .nav-item .nav-indicator {
+        width: 64px;
+        height: 32px;
+        border-radius: 22px;
+        display: grid;
+        place-items: center;
+        background: transparent;
+      }
+      .frame .bottom-nav .nav-item.active .nav-indicator {
+        background: var(--c6-primary-cont);
       }
       .frame .bottom-nav .nav-item .ico {
-        font-family: "Material Symbols Outlined";
-        font-size: 22px;
-        font-variation-settings: "FILL" 0;
+        width: 24px;
+        height: 24px;
+        font-size: 24px;
       }
       .frame .bottom-nav .nav-item.active {
         color: var(--c6-primary);
       }
-      .frame .bottom-nav .nav-item.active .ico {
-        font-variation-settings: "FILL" 1;
+
+      /* Navigation rail (Flutter AppShellAdaptiveNavigation when width > height) */
+      .frame .nav-rail {
+        display: none;
+      }
+      .frame.has-rail .nav-rail {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 22px;
+        width: 52px;
+        background: var(--c6-surface);
+        border-right: 1px solid var(--c6-hairline);
+        z-index: 9;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 8px;
+        gap: 12px;
+      }
+      .frame.has-rail.tablet .nav-rail {
+        top: 0;
+        bottom: 28px;
+        width: 72px;
+        padding-top: 44px;
+      }
+      .frame.has-rail .nav-rail .rail-item {
+        width: 48px;
+        height: 36px;
+        border-radius: 18px;
+        display: grid;
+        place-items: center;
+        color: var(--c6-muted);
+      }
+      .frame.has-rail .nav-rail .rail-item.active {
+        background: var(--c6-primary-cont);
+        color: var(--c6-on-primary-cont);
+      }
+      .frame.has-rail.tablet .nav-rail .rail-item {
+        width: 56px;
+        height: 32px;
+        border-radius: 16px;
+      }
+      .frame.has-rail .nav-rail .ico {
+        width: 24px;
+        height: 24px;
+        font-size: 24px;
+      }
+      .frame.has-rail .nav-rail .nav-indicator {
+        width: 24px;
+        height: 24px;
+        border-radius: 0;
+        display: grid;
+        place-items: center;
+        background: transparent;
+      }
+      .frame.has-rail .appbar,
+      .frame.has-rail .body {
+        margin-left: 52px;
+      }
+      .frame.has-rail.tablet .appbar,
+      .frame.has-rail.tablet .body {
+        margin-left: 72px;
+      }
+      .frame.has-rail .bottom-nav {
+        display: none;
+      }
+      .frame.has-rail .ribbon {
+        left: 0;
+        right: 0;
+        bottom: 0;
       }
 
       /* Disclaimer ribbon (always-on, sits above bottom-nav) */
@@ -906,7 +1014,7 @@
         position: absolute;
         left: 0;
         right: 0;
-        bottom: 56px;
+        bottom: 64px;
         height: 26px;
         background: var(--rib-bg-light);
         color: var(--rib-fg);
@@ -917,11 +1025,25 @@
         padding: 0 12px;
         user-select: none;
         pointer-events: none;
-        font: 700 10px/1 var(--jp);
-        letter-spacing: 0.04em;
-        white-space: nowrap;
+        font: 700 11px/1 var(--jp);
+        letter-spacing: 0.44px;
         z-index: 7;
         overflow: hidden;
+      }
+      .frame .ribbon .rib-text {
+        min-width: 0;
+        flex: 0 1 auto;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: clip;
+      }
+      .frame.landscape:not(.tablet) .ribbon {
+        height: 22px;
+        font-size: 9px;
+      }
+      .frame.tablet .ribbon {
+        height: 28px;
+        font-size: 11px;
       }
       .frame.dark .ribbon {
         background: var(--rib-bg-dark);
@@ -951,8 +1073,8 @@
         position: absolute;
         left: var(--s-4);
         right: var(--s-4);
-        bottom: 90px; /* above ribbon+nav stack */
-        height: 44px;
+        bottom: 106px; /* Scaffold body bottom + spacing.s4 above ribbon/nav stack. */
+        height: 42px;
         z-index: 5;
       }
       .seg .opt {
@@ -974,15 +1096,11 @@
         display: none;
       } /* tablet uses left tool list */
       .frame.iphone-landscape .seg {
-        bottom: auto;
-        top: 8px;
-        right: auto;
-        left: auto;
+        position: static;
         width: 340px;
         height: 36px;
         font-size: 12px;
-        position: absolute;
-        left: 8px;
+        margin-bottom: var(--s-4);
       }
 
       /* Top tool meta strip */
@@ -1060,7 +1178,6 @@
         align-items: center;
       }
       .field .errmsg .ico {
-        font-family: "Material Symbols Outlined";
         font-size: 14px;
       }
 
@@ -1083,7 +1200,6 @@
         gap: 4px;
       }
       .sex-seg .opt .ico {
-        font-family: "Material Symbols Outlined";
         font-size: 16px;
       }
       .sex-seg .opt.on {
@@ -1098,8 +1214,10 @@
         border: 1px solid var(--c6-hairline);
         border-radius: var(--r-card);
         padding: var(--s-4);
-        display: grid;
-        gap: var(--s-2);
+        min-height: 95px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
         box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
       }
       .result .head {
@@ -1118,6 +1236,7 @@
         color: var(--c6-muted);
       }
       .result .value {
+        margin-top: var(--s-2);
         font: 700 36px var(--mono);
         color: var(--c6-ink);
         line-height: 1;
@@ -1132,7 +1251,13 @@
       .result .value.placeholder {
         color: var(--c6-muted-2);
       }
+      .result .hint {
+        margin-top: var(--s-2);
+        font: 500 11px var(--jp);
+        color: var(--c6-muted);
+      }
       .result .badge-row {
+        margin-top: var(--s-2);
         display: flex;
         gap: var(--s-2);
         align-items: center;
@@ -1157,7 +1282,7 @@
         background: currentColor;
       }
       .cbadge .ico {
-        font-family: "Material Symbols Outlined";
+        font-family: var(--jp);
         font-size: 14px;
       }
       /* shape variants per class — non-color cue (G1/G2/G3a/G3b/G4/G5 etc.) */
@@ -1260,9 +1385,15 @@
 
       /* Number-line chart (BMI) */
       .chart-bmi {
+        position: relative;
+        height: 44px;
         margin-top: var(--s-2);
       }
       .chart-bmi .scale {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
         height: 24px;
         border-radius: var(--r-tile);
         overflow: hidden;
@@ -1306,9 +1437,11 @@
         color: var(--bmi-7-on);
       }
       .chart-bmi .axis {
-        position: relative;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 28px;
         height: 16px;
-        margin-top: 4px;
         font: 500 9px var(--mono);
         color: var(--c6-muted);
       }
@@ -1351,9 +1484,15 @@
 
       /* eGFR CKD-stage band */
       .chart-egfr {
+        position: relative;
+        height: 44px;
         margin-top: var(--s-2);
       }
       .chart-egfr .scale {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
         height: 24px;
         border-radius: var(--r-tile);
         overflow: hidden;
@@ -1397,11 +1536,18 @@
         width: 25%;
       }
       .chart-egfr .axis {
-        position: relative;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 28px;
         height: 16px;
-        margin-top: 4px;
         font: 500 9px var(--mono);
         color: var(--c6-muted);
+      }
+      .chart-egfr .axis .tick {
+        position: absolute;
+        top: 0;
+        transform: translateX(-50%);
       }
       .chart-egfr .marker {
         position: absolute;
@@ -1437,6 +1583,7 @@
 
       /* CrCl age-stratified normal-range bar */
       .chart-crcl {
+        height: 74px;
         margin-top: var(--s-2);
         display: grid;
         gap: 6px;
@@ -1447,6 +1594,7 @@
         grid-template-columns: 96px 1fr;
         gap: 8px;
         align-items: center;
+        height: 14px;
       }
       .chart-crcl .crow .grp {
         font: 500 10px var(--mono);
@@ -1476,6 +1624,10 @@
         border-radius: 7px;
         border: 2px solid var(--c6-surface);
       }
+      .result.has-badges .chart-bmi,
+      .result.has-badges .chart-egfr {
+        margin-top: var(--s-8);
+      }
 
       /* History */
       .history {
@@ -1497,7 +1649,6 @@
         color: var(--c6-muted);
       }
       .history .header .ico {
-        font-family: "Material Symbols Outlined";
         font-size: 18px;
         color: var(--c6-muted);
       }
@@ -1531,7 +1682,6 @@
         font-weight: 700;
       }
       .history .list .row .ico {
-        font-family: "Material Symbols Outlined";
         font-size: 18px;
         color: var(--c6-muted);
       }
@@ -1552,7 +1702,6 @@
       }
       .history .list.empty .ico {
         display: block;
-        font-family: "Material Symbols Outlined";
         font-size: 36px;
         margin-bottom: 6px;
         color: var(--c6-muted-2);
@@ -1573,7 +1722,7 @@
       }
       .history .list .swipe-row .delete {
         width: 72px;
-        background: var(--c6-error);
+        background: #b3261e;
         color: #ffffff;
         display: flex;
         align-items: center;
@@ -1587,7 +1736,6 @@
         gap: 4px;
       }
       .history .list .swipe-row .delete .ico {
-        font-family: "Material Symbols Outlined";
         font-size: 18px;
       }
 
@@ -1616,51 +1764,43 @@
         border-radius: 50%;
       }
 
-      /* On-screen numeric keyboard */
-      .keyboard {
+      /* iOS phone input accessory toolbar; no custom keyboard is drawn by Flutter. */
+      .input-toolbar {
         position: absolute;
         left: 0;
         right: 0;
         bottom: 0;
-        height: 240px;
-        background: var(--c6-surface-2);
-        border-top: 1px solid var(--c6-hairline);
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-        padding: 8px;
-        z-index: 8;
-      }
-      .keyboard .key {
+        height: 44px;
         background: var(--c6-surface);
-        border-radius: 6px;
+        border-top: 1px solid var(--c6-hairline);
         display: flex;
         align-items: center;
-        justify-content: center;
-        font: 600 22px var(--jp);
-        color: var(--c6-ink);
-        border: 1px solid var(--c6-hairline);
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 0 8px;
+        box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.14);
+        z-index: 8;
       }
-      .keyboard .key.action {
-        background: var(--c6-primary);
-        color: var(--c6-on-primary);
-      }
-      .keyboard .key.dim {
-        color: var(--c6-muted);
+      .input-toolbar .tool-action {
+        border: 0;
+        background: transparent;
+        color: var(--c6-primary);
+        font: 700 12px var(--jp);
+        min-width: 48px;
+        height: 36px;
+        border-radius: 18px;
+        padding: 0 10px;
       }
 
-      /* iPad two-pane / three-pane */
+      /* iPad two-column responsive layouts */
       .frame.tablet .twopane {
         display: grid;
         grid-template-columns: 280px 1fr;
         gap: var(--s-6);
         height: 100%;
       }
-      .frame.tablet .threepane {
-        display: grid;
-        grid-template-columns: 240px 1fr 1fr;
-        gap: var(--s-6);
-        height: 100%;
+      .frame.tablet.landscape .twopane {
+        grid-template-columns: 440px 1fr;
       }
       .tool-list {
         display: flex;
@@ -1677,27 +1817,31 @@
         font: 700 14px var(--jp);
         color: var(--c6-ink);
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 10px;
       }
-      .tool-list .ti .ico {
-        font-family: "Material Symbols Outlined";
+      .tool-list .ti .tool-svg {
+        font-family: var(--material-icons);
         font-size: 20px;
+        line-height: 1;
+        width: 20px;
+        height: 20px;
+        flex: 0 0 20px;
         color: var(--c6-muted);
       }
       .tool-list .ti .formula {
+        display: block;
         font: 500 11px var(--mono);
         color: var(--c6-muted);
-        margin-left: auto;
+        margin-top: 3px;
         text-transform: none;
       }
       .tool-list .ti.active {
         background: var(--c6-primary-cont);
         color: var(--c6-on-primary-cont);
       }
-      .tool-list .ti.active .ico {
+      .tool-list .ti.active .tool-svg {
         color: var(--c6-on-primary-cont);
-        font-variation-settings: "FILL" 1;
       }
       .tool-list .ti.active .formula {
         color: var(--c6-on-primary-cont);
@@ -1762,67 +1906,13 @@
         padding: 6px 14px;
       }
 
-      /* iPad Split View — 50/50 neighbor + Calc Tools (Compact-width fallback) */
+      /* iPad Split View width class — render only the Calc Tools compact-width app. */
       .frame.tablet.splitview .device {
-        display: flex;
-        flex-direction: row;
-        align-items: stretch;
-        height: 760px;
+        height: 900px;
         border-radius: 18px;
-      }
-      .frame.tablet.splitview .sv-neighbor {
-        flex: 1;
-        min-width: 0;
-        background: var(--c6-surface-3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font: 600 14px var(--jp);
-        color: var(--c6-muted);
-        letter-spacing: 0.04em;
-        border-right: 1px solid var(--c6-hairline);
-        position: relative;
-      }
-      .frame.tablet.splitview .sv-neighbor::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: repeating-linear-gradient(135deg, transparent 0 14px, var(--c6-hairline-2) 14px 15px);
-        pointer-events: none;
-        opacity: 0.6;
-      }
-      .frame.tablet.splitview .sv-neighbor .lbl {
-        position: relative;
-        z-index: 1;
-        background: var(--c6-surface);
-        padding: 8px 14px;
-        border-radius: var(--r-pill);
-        border: 1px solid var(--c6-hairline);
-      }
-      .frame.tablet.splitview .sv-app {
-        flex: 1;
-        min-width: 0;
-        display: flex;
-        flex-direction: column;
-        background: var(--c6-bg);
-        position: relative;
-      }
-      .frame.tablet.splitview .sv-app .body {
-        flex: 1 1 auto;
-        overflow: hidden;
-        position: relative;
-        padding: var(--s-4);
       }
       .frame.tablet.splitview .seg {
         display: flex;
-      }
-      .frame.tablet.splitview .ribbon {
-        left: 50%;
-        right: 0;
-      }
-      .frame.tablet.splitview .bottom-nav {
-        left: 50%;
-        right: 0;
       }
 
       /* =======================================================================
@@ -2000,9 +2090,19 @@
         max-width: 280px;
       }
 
-      /* Material symbol generic */
+      /* Flutter Material Icons glyphs; codepoints mirror Icons.* constants. */
       .ico {
-        font-family: "Material Symbols Outlined";
+        font-family: var(--material-icons);
+        font-weight: normal;
+        font-style: normal;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-font-feature-settings: "liga";
+        -webkit-font-smoothing: antialiased;
         line-height: 1;
       }
     </style>
@@ -2102,6 +2202,48 @@
                 </div>
               </div>
             </div>
+          </div>
+          <div
+            id="calc-tools-audit-contract"
+            hidden
+            data-ssot="flutter-implementation-readonly"
+            data-shell-tabs="search|bookmarks|history|calc"
+            data-active-tab="calc"
+            data-app-header="AppTabHeader"
+            data-app-header-leading="none"
+            data-app-header-title="計算ツール"
+            data-app-header-actions="about"
+            data-bottom-nav-tabs="4"
+            data-nav-rail-condition="width>height"
+            data-nav-rail-compact-width="52"
+            data-nav-rail-expanded-width="72"
+            data-nav-rail-label-type="none"
+            data-disclaimer-source="detailDisclaimer"
+            data-calc-input-ranges="heightCm:50.0-250.0 cm|weightKg:1.0-300.0 kg|ageYears:18-120 years|serumCreatinineMgDl:0.10-20.00 mg/dL"
+            data-band-chart-contract="height44|band24|markerDot10|markerLine32|axisTop28|clipNone"
+            data-bmi-chart-contract="marker:(value-10)/40|ticks:10,30,50|segments:&lt;18.5,18.5,25,30,35,40,>=45|flex:1,1,1,1,1,1,1"
+            data-egfr-chart-contract="marker:value/120|ticks:0,15,30,45,60,90,120|segments:&lt;15,15,30,45,60,>=90|flex:1,1,1,1,2,2"
+            data-crcl-chart-contract="height74|marker:value/170|rows:男性 18-39,男性 40-59,男性 60+,女性 60+|normal:0.60/0.05,0.50/0.10,0.35/0.25,0.30/0.35"
+            data-history-limit="50"
+            data-responsive-modes="compact|landscapePhone|iPadPortrait|iPadLandscape|splitViewCompact"
+            data-ipad-landscape-real-device-display="1210x834pt@2x"
+            data-codex-implementation-input="true"
+            data-approximation-policy="forbidden"
+            data-evidence-ledger-required="true"
+            data-splitview-device-contract="iPad chrome|480pt compact CalcView content|no neighbor app"
+          >
+            <span data-required="app-tab-header-no-leading">
+              AppTabHeader has no drawer or history leading controls.
+            </span>
+            <span data-required="bottom-nav-4-tabs">Bottom navigation uses Search, Bookmarks, History, Calc.</span>
+            <span data-required="landscape-rail">Landscape shell uses navigation rail instead of bottom nav.</span>
+            <span data-required="flutter-chart-contract">
+              BMI, eGFR, and CrCl charts mirror Flutter chart primitives, not local approximations.
+            </span>
+            <span data-required="flutter-golden-inventory">Flutter calc golden inventory is mapped in sec-verify.</span>
+            <span data-required="codex-implementation-handoff">
+              This HTML is a Codex implementation input and must not contain visual-only approximations.
+            </span>
           </div>
         </section>
 
@@ -2621,9 +2763,11 @@
             ;
             <strong>landscape-iphone × 2 = 2 frames</strong>
             ;
+            <strong>iPad landscape × 2 = 2 frames</strong>
+            ;
             <strong>iPad Split View × 2 = 2 frames</strong>
             ; total
-            <strong>108 frames</strong>
+            <strong>110 frames</strong>
             。各フレームは
             <code>iPhone × Light × empty (BMI)</code>
             形式のヘッダラベルを持ち、同じ文字列が
@@ -3320,20 +3464,329 @@
             Verification report
           </h2>
           <p class="section-sub">
-            28 行 / 1 行 1 チェックリスト項目 (A1, A2, A3, A4, B1, B2, B3, B4, C1, C2, C3, C4, C5, C6, D1, D2, D3, D4,
-            E1, E2, E3, E4, E5, F1, F2, F3, G1, G2)。Result 列は
+            実装照合表 + 28 行 / 1 行 1 チェックリスト項目 (A1, A2, A3, A4, B1, B2, B3, B4, C1, C2, C3, C4, C5, C6, D1,
+            D2, D3, D4, E1, E2, E3, E4, E5, F1, F2, F3, G1, G2)。Result 列は
             <code>PASS</code>
             /
             <code>FAIL</code>
             のみ。Evidence 列は HTML 内部の引用または視覚確認の要約。Notes は空 (PASS) または失敗時の修正記録。
           </p>
+          <table class="vr-table" id="implementation-reconciliation">
+            <thead>
+              <tr>
+                <th>HTML claim</th>
+                <th>Flutter evidence</th>
+                <th>判定</th>
+                <th>修正方針</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>App header is title + about only.</td>
+                <td>
+                  <code>AppTabHeader</code>
+                  :
+                  <code>automaticallyImplyLeading:false</code>
+                  ,
+                  <code>IconButton(Icons.info_outline)</code>
+                </td>
+                <td>aligned</td>
+                <td>
+                  Uses
+                  <code>MaterialIcons-Regular.otf</code>
+                  codepoint
+                  <code>info_outline</code>
+                  ; hamburger/history actions and hand-written SVGs are forbidden by audit.
+                </td>
+              </tr>
+              <tr>
+                <td>App shell and calc icons use Flutter Material Icons, not approximations.</td>
+                <td>
+                  <code>AppShellTab</code>
+                  uses
+                  <code>Icons.search</code>
+                  ,
+                  <code>Icons.bookmark_outline</code>
+                  ,
+                  <code>Icons.history</code>
+                  ,
+                  <code>Icons.calculate_outlined</code>
+                  .
+                  <code>_CalcToolList</code>
+                  uses
+                  <code>Icons.monitor_weight</code>
+                  ,
+                  <code>Icons.water_drop</code>
+                  ,
+                  <code>Icons.science</code>
+                  . History empty uses
+                  <code>Icons.history_toggle_off</code>
+                  .
+                </td>
+                <td>aligned</td>
+                <td>
+                  All these icons render from the bundled MaterialIcons font; audit forbids text glyph substitutes and
+                  SVG approximations.
+                </td>
+              </tr>
+              <tr>
+                <td>Portrait shell uses DisclaimerRibbon above 64px NavigationBar.</td>
+                <td>
+                  <code>AppShellBottomNavigation</code>
+                  renders
+                  <code>DisclaimerRibbon()</code>
+                  then
+                  <code>NavigationBar</code>
+                  ; theme height 64.
+                </td>
+                <td>aligned</td>
+                <td>Bottom nav height 64; ribbon bottom 64; compact selector bottom reserves 90+16px.</td>
+              </tr>
+              <tr>
+                <td>Landscape shell uses icon-only navigation rail.</td>
+                <td>
+                  <code>AppShellAdaptiveNavigation</code>
+                  : iPhone compact rail width 52, iPad
+                  <code>NavigationRail</code>
+                  width 72,
+                  <code>labelType:none</code>
+                  .
+                </td>
+                <td>aligned</td>
+                <td>Rail labels omitted; iPhone item 48x36, iPad item 56x32, active calc tab highlighted.</td>
+              </tr>
+              <tr>
+                <td>iPhone landscape BMI/eGFR/CrCl selector belongs in the left pane.</td>
+                <td>
+                  <code>_CalcLandscapePhoneLayout</code>
+                  places
+                  <code>calc-tool-selector-landscape</code>
+                  inside the left ListView, width 340, height 36, followed by 16px gap.
+                </td>
+                <td>aligned</td>
+                <td>Selector rendered inside landscape body, not as global overlay near header/rail.</td>
+              </tr>
+              <tr>
+                <td>iPad landscape is 2-column.</td>
+                <td>
+                  <code>_CalcIPadLandscapeLayout</code>
+                  : left 440px with tool list + form, right 1fr with result + history.
+                </td>
+                <td>aligned</td>
+                <td>
+                  Removed the stale extra-column layout; frame uses the observed real-device landscape display contract
+                  <code>1210x834pt@2x</code>
+                  plus the Flutter 72px rail and 440px left pane.
+                </td>
+              </tr>
+              <tr>
+                <td>Split View state is compact-width CalcView only.</td>
+                <td>
+                  <code>calc_view_validation_responsive_test</code>
+                  sets the surface to 480x900 and expects
+                  <code>calc-layout-compact</code>
+                  /
+                  <code>calc-tool-selector-bottom</code>
+                  while
+                  <code>calc-tool-list</code>
+                  is absent.
+                </td>
+                <td>aligned</td>
+                <td>
+                  Removed the non-implementation adjacent-app placeholder; audit forbids the stale placeholder strings
+                  and classes.
+                </td>
+              </tr>
+              <tr>
+                <td>BMI/eGFR band charts use Flutter geometry.</td>
+                <td>
+                  <code>CalcBandChart</code>
+                  : height 44, band 24, axis top 28, marker label top -26, marker dot 10x10, marker line 2x32,
+                  <code>clipBehavior: Clip.none</code>
+                  .
+                </td>
+                <td>aligned</td>
+                <td>Marker is rendered outside the clipped band; badge-present result cards add the 32px chart gap.</td>
+              </tr>
+              <tr>
+                <td>BMI/eGFR segment labels, ticks, and marker formulae are implementation-backed.</td>
+                <td>
+                  <code>BmiChart</code>
+                  :
+                  <code>((value - 10) / 40)</code>
+                  , ticks 10/30/50, label
+                  <code>&gt;=45</code>
+                  .
+                  <code>EgfrChart</code>
+                  :
+                  <code>value / 120</code>
+                  , ticks 0/15/30/45/60/90/120, flex 1/1/1/1/2/2, label
+                  <code>&gt;=90</code>
+                  .
+                </td>
+                <td>aligned</td>
+                <td>Audit forbids the visually similar Unicode threshold glyphs and clipped marker structure.</td>
+              </tr>
+              <tr>
+                <td>CrCl normal-range chart mirrors Flutter row primitive.</td>
+                <td>
+                  <code>CrClChart</code>
+                  : height 74, marker
+                  <code>value / 170</code>
+                  , labels
+                  <code>男性 18-39</code>
+                  /
+                  <code>男性 40-59</code>
+                  , normal ranges 0.60/0.05, 0.50/0.10, 0.35/0.25, 0.30/0.35.
+                </td>
+                <td>aligned</td>
+                <td>HTML uses the same row labels, 14px rows, 6px spacing, and marker center offset.</td>
+              </tr>
+              <tr>
+                <td>Focused iOS input state uses Flutter input accessory toolbar only.</td>
+                <td>
+                  <code>_showsInputToolbar</code>
+                  allows
+                  <code>_CalcInputToolbar</code>
+                  only on iOS non-tablet focused fields; there is no custom numeric keyboard widget.
+                </td>
+                <td>aligned</td>
+                <td>
+                  Removed the prior
+                  <code>keyboard-open</code>
+                  state; audit now forbids custom keyboard DOM and requires
+                  <code>input-toolbar-open</code>
+                  .
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div
+            class="card"
+            id="codex-implementation-handoff"
+            data-purpose="implementation-source"
+            data-ssot-evidence-required="true"
+            data-approximation-policy="forbidden"
+            data-all-frame-visual-review="required"
+          >
+            <h4 style="margin: 0 0 8px; font-size: 13px">Codex implementation handoff gate</h4>
+            <p style="margin: 0 0 12px; font: 13px/1.6 var(--jp); color: var(--page-fg)">
+              This design file is an implementation input. A future Codex task may implement from this HTML, so the page
+              is not allowed to carry visually plausible but implementation-external UI. Every changed claim must cite
+              the owning Flutter file or test below, and the same invariant must be represented in
+              <code>scripts/html-audit-rules/calc-tools-spec.json</code>
+              before the spec can be treated as implementation-ready.
+            </p>
+            <table class="vr-table" id="codex-implementation-evidence-ledger">
+              <thead>
+                <tr>
+                  <th>Spec surface</th>
+                  <th>Flutter source evidence</th>
+                  <th>HTML/audit invariant</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-evidence="shell-tabs-header-ribbon">
+                  <td>Header, bottom navigation, navigation rail, disclaimer ribbon</td>
+                  <td>
+                    <code>lib/ui/shell/app_tab_header.dart</code>
+                    ;
+                    <code>lib/ui/shell/app_shell_tab.dart</code>
+                    ;
+                    <code>lib/ui/shell/app_shell.dart</code>
+                    ;
+                    <code>lib/ui/_common/disclaimer_ribbon.dart</code>
+                  </td>
+                  <td>
+                    <code>#calc-tools-audit-contract</code>
+                    records tab order, no-leading header, rail widths, and
+                    <code>detailDisclaimer</code>
+                    source; audit forbids stale drawer/history/SVG approximations.
+                  </td>
+                </tr>
+                <tr data-evidence="material-icons">
+                  <td>All icons and empty-state glyphs</td>
+                  <td>
+                    <code>Icons.search</code>
+                    /
+                    <code>Icons.bookmark_outline</code>
+                    /
+                    <code>Icons.history</code>
+                    /
+                    <code>Icons.calculate_outlined</code>
+                    /
+                    <code>Icons.monitor_weight</code>
+                    /
+                    <code>Icons.water_drop</code>
+                    /
+                    <code>Icons.science</code>
+                    /
+                    <code>Icons.history_toggle_off</code>
+                  </td>
+                  <td>
+                    HTML uses bundled
+                    <code>MaterialIcons-Regular.otf</code>
+                    codepoints only; audit forbids text substitutes such as kg, 水, or hand-written SVGs.
+                  </td>
+                </tr>
+                <tr data-evidence="calc-responsive-layout">
+                  <td>Responsive layout, iPad landscape, and iPad Split View</td>
+                  <td>
+                    <code>lib/ui/calc/calc_responsive_layout.dart</code>
+                    ;
+                    <code>test/ui/calc/calc_view_validation_responsive_test.part.dart</code>
+                    uses 480x900 compact fallback checks.
+                  </td>
+                  <td>
+                    Split View renders compact CalcView content inside iPad chrome, preserves
+                    <code>data-frame-label="iPad × ... × valid-input-splitview"</code>
+                    semantics, and never invents a neighboring app pane.
+                  </td>
+                </tr>
+                <tr data-evidence="calc-charts">
+                  <td>BMI/eGFR/CrCl chart geometry and marker positions</td>
+                  <td>
+                    <code>lib/ui/calc/widgets/charts/calc_chart_primitives.dart</code>
+                    ;
+                    <code>bmi_chart.dart</code>
+                    ;
+                    <code>egfr_chart.dart</code>
+                    ;
+                    <code>crcl_chart.dart</code>
+                    ;
+                    <code>test/ui/calc/widgets/calc_chart_atoms_test.dart</code>
+                  </td>
+                  <td>
+                    Data attributes pin marker formulas, ticks, segment flexes, CrCl rows, normal ranges, and unclipped
+                    marker stack; audit forbids clipped chart marker structures and Unicode threshold substitutions.
+                  </td>
+                </tr>
+                <tr data-evidence="input-toolbar">
+                  <td>Focused input state</td>
+                  <td>
+                    <code>lib/ui/calc/calc_view.dart</code>
+                    renders
+                    <code>_CalcInputToolbar</code>
+                    only; no custom numeric keyboard exists.
+                  </td>
+                  <td>
+                    HTML state is
+                    <code>input-toolbar-open</code>
+                    ; audit forbids
+                    <code>keyboard-open</code>
+                    and any custom keyboard DOM.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <div id="verify-root"></div>
         </section>
       </main>
     </div>
 
     <!-- =======================================================================
-     APP SCRIPT — generates 106 mock frames, atom states, verification report
+     APP SCRIPT — generates 110 mock frames, atom states, verification report
      All HEX values referenced inside generated frames are CSS variables only.
      ======================================================================= -->
     <script>
@@ -3388,42 +3841,95 @@
         };
 
         // ---------- helpers ----------
+        var ICONS = {
+          signal_cellular_alt: "\ue5a7",
+          wifi: "\ue6e7",
+          battery_full: "\ue0d2",
+          search: "\ue567",
+          bookmark_outline: "\ue0f4",
+          history: "\ue314",
+          calculate_outlined: "\uef10",
+          error: "\ue237",
+          expand_more: "\ue246",
+          expand_less: "\ue245",
+          history_toggle_off: "\ue316",
+          delete: "\ue1b9",
+          refresh: "\ue514",
+          done: "\ue1f6",
+          male: "\ue3c5",
+          female: "\ue261",
+          monitor_weight: "\ue3fc",
+          water_drop: "\u{f05a2}",
+          science: "\ue55a",
+          info_outline: "\ue33d",
+        };
+        function ico(name) {
+          return '<span class="ico" aria-hidden="true">' + (ICONS[name] || name) + "</span>";
+        }
+        function navIcon(name) {
+          return '<span class="nav-indicator">' + ico(name) + "</span>";
+        }
         function statusBar() {
-          return '<div class="status"><span>9:41</span><span class="right"><span class="ico">signal_cellular_alt</span><span class="ico">wifi</span><span class="ico">battery_full</span></span></div>';
+          return (
+            '<div class="status"><span>9:41</span><span class="right">' +
+            ico("signal_cellular_alt") +
+            ico("wifi") +
+            ico("battery_full") +
+            "</span></div>"
+          );
         }
         function appbar(opts) {
           opts = opts || {};
           return (
-            '<div class="appbar"><div class="icon-btn"><span class="ico">menu</span></div>' +
+            '<div class="appbar">' +
             '<div class="title">' +
             (opts.title || L.screenTitle) +
             "</div>" +
-            '<div class="icon-btn"><span class="ico">history</span></div></div>'
+            '<div class="info-btn" aria-label="アプリについて">' +
+            ico("info_outline") +
+            "</div></div>"
           );
         }
         function ribbon() {
-          return '<div class="ribbon"><span class="accent">·</span> FICTIONAL DATA - NOT FOR MEDICAL USE <span class="accent">·</span> 架空データ・医療判断には使用不可 <span class="accent">·</span></div>';
+          return '<div class="ribbon" aria-label="免責: 架空データ・医療判断には使用しないでください"><span class="accent">·</span><span class="rib-text">FICTIONAL DATA - NOT FOR MEDICAL USE</span><span class="accent">·</span><span class="rib-text">架空データ・医療判断には使用不可</span><span class="accent">·</span></div>';
         }
         function bottomNav() {
           var items = [
-            { ic: "medication", lbl: "薬剤" },
-            { ic: "sick", lbl: "疾患" },
-            { ic: "calculate", lbl: "計算", active: true },
-            { ic: "bookmark", lbl: "保存" },
-            { ic: "settings", lbl: "設定" },
+            { ic: "search", lbl: "検索" },
+            { ic: "bookmark_outline", lbl: "ブックマーク" },
+            { ic: "history", lbl: "閲覧履歴" },
+            { ic: "calculate_outlined", lbl: "計算ツール", active: true },
           ];
           return (
             '<div class="bottom-nav">' +
             items
               .map(function (it) {
                 return (
-                  '<div class="nav-item' +
+                  '<div class="nav-item' + (it.active ? " active" : "") + '">' + navIcon(it.ic) + it.lbl + "</div>"
+                );
+              })
+              .join("") +
+            "</div>"
+          );
+        }
+        function navRail() {
+          var items = [
+            { ic: "search", lbl: "検索" },
+            { ic: "bookmark_outline", lbl: "ブックマーク" },
+            { ic: "history", lbl: "閲覧履歴" },
+            { ic: "calculate_outlined", lbl: "計算ツール", active: true },
+          ];
+          return (
+            '<div class="nav-rail" aria-label="App navigation rail">' +
+            items
+              .map(function (it) {
+                return (
+                  '<div class="rail-item' +
                   (it.active ? " active" : "") +
-                  '">' +
-                  '<span class="ico">' +
-                  it.ic +
-                  "</span>" +
+                  '" title="' +
                   it.lbl +
+                  '">' +
+                  navIcon(it.ic) +
                   "</div>"
                 );
               })
@@ -3451,11 +3957,11 @@
             (opts.placeholder ? " placeholder" : "") +
             '">' +
             "<span>" +
-            (opts.placeholder ? L.placeholder : opts.val || "") +
+            (opts.placeholder ? opts.placeholderText || L.placeholder : opts.val || "") +
             "</span>" +
             (opts.unit ? '<span class="unit">' + opts.unit + "</span>" : "") +
             "</div>";
-          var err = opts.error ? '<div class="errmsg"><span class="ico">error</span>' + opts.errMsg + "</div>" : "";
+          var err = opts.error ? '<div class="errmsg">' + ico("error") + opts.errMsg + "</div>" : "";
           return (
             '<div class="field"><div class="lbl">' +
             opts.lbl +
@@ -3475,12 +3981,14 @@
             '<div class="sex-seg">' +
             '<div class="opt' +
             (sel === "m" ? " on" : "") +
-            '"><span class="ico">male</span>' +
+            '">' +
+            ico("male") +
             L.sex.m +
             "</div>" +
             '<div class="opt' +
             (sel === "f" ? " on" : "") +
-            '"><span class="ico">female</span>' +
+            '">' +
+            ico("female") +
             L.sex.f +
             "</div>" +
             "</div></div>"
@@ -3491,18 +3999,29 @@
         function inputs(calc, state) {
           var f = [];
           if (calc === "bmi") {
-            if (state === "empty") {
+            if (state === "input-toolbar-open") {
+              f.push(
+                field({
+                  lbl: L.fields.height,
+                  unit: "cm",
+                  placeholder: true,
+                  placeholderText: "50.0〜250.0",
+                  focus: true,
+                }),
+              );
+              f.push(field({ lbl: L.fields.weight, unit: "kg", placeholder: true, placeholderText: "1.0〜300.0" }));
+            } else if (state === "empty") {
               f.push(field({ lbl: L.fields.height, unit: "cm", placeholder: true }));
               f.push(field({ lbl: L.fields.weight, unit: "kg", placeholder: true }));
             } else if (state === "partial-input") {
-              f.push(field({ lbl: L.fields.height, val: "170.0", unit: "cm" }));
+              f.push(field({ lbl: L.fields.height, val: "170", unit: "cm" }));
               f.push(field({ lbl: L.fields.weight, unit: "kg", placeholder: true, focus: true }));
             } else if (state === "out-of-range") {
               f.push(field({ lbl: L.fields.height, val: "30.0", unit: "cm", error: true, errMsg: L.err.height }));
               f.push(field({ lbl: L.fields.weight, val: "65.0", unit: "kg" }));
             } else {
-              f.push(field({ lbl: L.fields.height, val: "170.0", unit: "cm" }));
-              f.push(field({ lbl: L.fields.weight, val: "65.0", unit: "kg" }));
+              f.push(field({ lbl: L.fields.height, val: "167", unit: "cm" }));
+              f.push(field({ lbl: L.fields.weight, val: "68", unit: "kg" }));
             }
           } else if (calc === "egfr") {
             if (state === "empty") {
@@ -3510,7 +4029,7 @@
               f.push(sexField("m"));
               f.push(field({ lbl: L.fields.creat, unit: "mg/dL", placeholder: true }));
             } else if (state === "partial-input") {
-              f.push(field({ lbl: L.fields.age, val: "62", unit: "歳" }));
+              f.push(field({ lbl: L.fields.age, val: "50", unit: "歳" }));
               f.push(sexField("m"));
               f.push(field({ lbl: L.fields.creat, unit: "mg/dL", placeholder: true, focus: true }));
             } else if (state === "out-of-range") {
@@ -3518,9 +4037,9 @@
               f.push(sexField("f"));
               f.push(field({ lbl: L.fields.creat, val: "25.00", unit: "mg/dL", error: true, errMsg: L.err.creat }));
             } else {
-              f.push(field({ lbl: L.fields.age, val: "62", unit: "歳" }));
+              f.push(field({ lbl: L.fields.age, val: "50", unit: "歳" }));
               f.push(sexField("m"));
-              f.push(field({ lbl: L.fields.creat, val: "1.10", unit: "mg/dL" }));
+              f.push(field({ lbl: L.fields.creat, val: "1", unit: "mg/dL" }));
             }
           } else if (calc === "crcl") {
             if (state === "empty") {
@@ -3529,9 +4048,9 @@
               f.push(field({ lbl: L.fields.weight, unit: "kg", placeholder: true }));
               f.push(field({ lbl: L.fields.creat, unit: "mg/dL", placeholder: true }));
             } else if (state === "partial-input") {
-              f.push(field({ lbl: L.fields.age, val: "70", unit: "歳" }));
-              f.push(sexField("f"));
-              f.push(field({ lbl: L.fields.weight, val: "52.0", unit: "kg" }));
+              f.push(field({ lbl: L.fields.age, val: "50", unit: "歳" }));
+              f.push(sexField("m"));
+              f.push(field({ lbl: L.fields.weight, val: "65", unit: "kg" }));
               f.push(field({ lbl: L.fields.creat, unit: "mg/dL", placeholder: true, focus: true }));
             } else if (state === "out-of-range") {
               f.push(field({ lbl: L.fields.age, val: "70", unit: "歳" }));
@@ -3539,10 +4058,10 @@
               f.push(field({ lbl: L.fields.weight, val: "350.0", unit: "kg", error: true, errMsg: L.err.weight }));
               f.push(field({ lbl: L.fields.creat, val: "1.20", unit: "mg/dL" }));
             } else {
-              f.push(field({ lbl: L.fields.age, val: "70", unit: "歳" }));
-              f.push(sexField("f"));
-              f.push(field({ lbl: L.fields.weight, val: "52.0", unit: "kg" }));
-              f.push(field({ lbl: L.fields.creat, val: "1.20", unit: "mg/dL" }));
+              f.push(field({ lbl: L.fields.age, val: "50", unit: "歳" }));
+              f.push(sexField("m"));
+              f.push(field({ lbl: L.fields.weight, val: "65", unit: "kg" }));
+              f.push(field({ lbl: L.fields.creat, val: "1", unit: "mg/dL" }));
             }
           }
           return '<div class="form">' + f.join("") + "</div>";
@@ -3552,7 +4071,7 @@
         function classifyBadge(calc, withClass) {
           if (!withClass) return "";
           if (calc === "bmi") {
-            // 22.5 -> 普通体重 (idx 1)
+            // 24.4 -> 普通体重 (idx 1)
             var idx = 1;
             return (
               '<span class="cbadge bmi-' +
@@ -3582,45 +4101,42 @@
         }
 
         function chartBmi() {
-          // segments mapping the 7 classes — value 22.5 sits in s2 zone
-          // BMI scale 10..50, value=22.5 → ((22.5-10)/40)*100 = 31.25%
-          var pos = 31.25;
+          // Flutter BmiChart: markerPosition = ((value - 10) / 40).clamp(0, 1); 24.4 -> 35.96%.
+          var pos = 35.96;
           return (
             '<div class="chart-bmi">' +
-            '<div class="scale" style="position:relative">' +
+            '<div class="scale">' +
             '<div class="seg-bmi s1">&lt;18.5</div>' +
             '<div class="seg-bmi s2">18.5</div>' +
             '<div class="seg-bmi s3">25</div>' +
             '<div class="seg-bmi s4">30</div>' +
             '<div class="seg-bmi s5">35</div>' +
             '<div class="seg-bmi s6">40</div>' +
-            '<div class="seg-bmi s7">≥45</div>' +
+            '<div class="seg-bmi s7">&gt;=45</div>' +
+            "</div>" +
             '<div class="marker" style="left:' +
             pos +
-            '%"><div class="pin-val">22.5</div></div>' +
-            "</div>" +
+            '%"><div class="pin-val">24.4</div></div>' +
             '<div class="axis"><span class="tick" style="left:0%">10</span><span class="tick" style="left:50%">30</span><span class="tick" style="left:100%">50</span></div>' +
             "</div>"
           );
         }
         function chartEgfr() {
-          // Linear 0..120 mL/min/1.73m²; band widths sum to 100%:
-          //   G5 <15 = 12.5%, G4 15–30 = 12.5%, G3b 30–45 = 12.5%, G3a 45–60 = 12.5%, G2 60–90 = 25%, G1 ≥90 = 25%
-          // Marker for 78.4 → (78.4 / 120) * 100 = 65.33% — falls inside G2 band (50%..75%).
-          var pos = 65.3;
+          // Flutter EgfrChart: markerPosition = (value / 120).clamp(0, 1).
+          var pos = 52.58;
           return (
             '<div class="chart-egfr">' +
-            '<div class="scale" style="position:relative">' +
+            '<div class="scale">' +
             '<div class="seg-egfr g5">&lt;15</div>' +
             '<div class="seg-egfr g4">15</div>' +
             '<div class="seg-egfr g3b">30</div>' +
             '<div class="seg-egfr g3a">45</div>' +
             '<div class="seg-egfr g2">60</div>' +
-            '<div class="seg-egfr g1">≥90</div>' +
+            '<div class="seg-egfr g1">&gt;=90</div>' +
+            "</div>" +
             '<div class="marker" style="left:' +
             pos +
-            '%"><div class="pin-val">78.4</div></div>' +
-            "</div>" +
+            '%"><div class="pin-val">63.1</div></div>' +
             '<div class="axis">' +
             '<span class="tick" style="left:0%">0</span>' +
             '<span class="tick" style="left:12.5%">15</span>' +
@@ -3634,12 +4150,22 @@
           );
         }
         function chartCrcl() {
+          // Flutter CrClChart: markerLeft = (value / 170).clamp(0, 1); 81.3 -> 47.82%.
+          var marker = "calc(47.82% - 7px)";
           return (
             '<div class="chart-crcl">' +
-            '<div class="crow"><span class="grp">男性 18–39</span><div class="track"><div class="normal" style="left:60%;right:5%"></div><div class="pt" style="left:55%"></div></div></div>' +
-            '<div class="crow"><span class="grp">男性 40–59</span><div class="track"><div class="normal" style="left:50%;right:10%"></div><div class="pt" style="left:55%"></div></div></div>' +
-            '<div class="crow"><span class="grp">男性 60+</span><div class="track"><div class="normal" style="left:35%;right:25%"></div><div class="pt" style="left:55%"></div></div></div>' +
-            '<div class="crow"><span class="grp">女性 60+</span><div class="track"><div class="normal" style="left:30%;right:35%"></div><div class="pt" style="left:55%"></div></div></div>' +
+            '<div class="crow"><span class="grp">男性 18-39</span><div class="track"><div class="normal" style="left:60%;right:5%"></div><div class="pt" style="left:' +
+            marker +
+            '"></div></div></div>' +
+            '<div class="crow"><span class="grp">男性 40-59</span><div class="track"><div class="normal" style="left:50%;right:10%"></div><div class="pt" style="left:' +
+            marker +
+            '"></div></div></div>' +
+            '<div class="crow"><span class="grp">男性 60+</span><div class="track"><div class="normal" style="left:35%;right:25%"></div><div class="pt" style="left:' +
+            marker +
+            '"></div></div></div>' +
+            '<div class="crow"><span class="grp">女性 60+</span><div class="track"><div class="normal" style="left:30%;right:35%"></div><div class="pt" style="left:' +
+            marker +
+            '"></div></div></div>' +
             "</div>"
           );
         }
@@ -3663,7 +4189,7 @@
               "</div>"
             );
           }
-          if (state === "partial-input") {
+          if (state === "partial-input" || state === "input-toolbar-open") {
             return (
               '<div class="result">' +
               '<div class="head"><div class="ttl">' +
@@ -3676,17 +4202,19 @@
               '<span class="unit">' +
               L.unit[calc] +
               "</span></div>" +
-              '<div style="font:500 11px var(--jp);color:var(--c6-muted)">' +
+              '<div class="hint">' +
               L.partialHint +
               "</div>" +
               "</div>"
             );
           }
-          var val = calc === "bmi" ? "22.5" : calc === "egfr" ? "78.4" : "92.1";
-          var withClass = state === "result-with-classification";
+          var val = calc === "bmi" ? "24.4" : calc === "egfr" ? "63.1" : "81.3";
+          var withClass = calc !== "crcl";
           var chart = calc === "bmi" ? chartBmi() : calc === "egfr" ? chartEgfr() : chartCrcl();
           return (
-            '<div class="result">' +
+            '<div class="result ' +
+            (withClass ? "has-badges" : "no-badges") +
+            '">' +
             '<div class="head"><div class="ttl">' +
             L.result +
             "</div>" +
@@ -3697,7 +4225,7 @@
             '<span class="unit">' +
             L.unit[calc] +
             "</span></div>" +
-            (withClass && calc !== "crcl" ? '<div class="badge-row">' + classifyBadge(calc, true) + "</div>" : "") +
+            (withClass ? '<div class="badge-row">' + classifyBadge(calc, true) + "</div>" : "") +
             chart +
             "</div>"
           );
@@ -3707,7 +4235,7 @@
         function histRows(n) {
           n = n || 6;
           var sample = [
-            ["2026/05/10", "BMI 22.5 (普通体重)", "H170/W65"],
+            ["2026/05/20", "BMI 24.4 (普通体重)", "H167/W68"],
             ["2026/05/09", "BMI 24.3 (普通体重)", "H172/W72"],
             ["2026/05/07", "BMI 26.1 (過体重)", "H168/W74"],
             ["2026/05/05", "BMI 21.8 (普通体重)", "H175/W67"],
@@ -3726,7 +4254,9 @@
                 r[1] +
                 "</span> · " +
                 r[2] +
-                '</div><span class="ico">refresh</span></div>'
+                "</div>" +
+                ico("refresh") +
+                "</div>"
               );
             })
             .join("");
@@ -3737,7 +4267,9 @@
               '<div class="history">' +
               '<div class="header"><span>' +
               L.actions.history +
-              ' (12)</span><span class="ico">expand_more</span></div>' +
+              " (12)</span>" +
+              ico("expand_more") +
+              "</div>" +
               "</div>"
             );
           }
@@ -3746,7 +4278,9 @@
               '<div class="history">' +
               '<div class="header"><span>' +
               L.actions.history +
-              ' (50)</span><span class="ico">expand_less</span></div>' +
+              " (50)</span>" +
+              ico("expand_less") +
+              "</div>" +
               '<div class="list" style="max-height:220px;overflow:hidden;position:relative">' +
               histRows(7) +
               '<div class="scroll-hairline"></div></div></div>'
@@ -3757,9 +4291,25 @@
               '<div class="history">' +
               '<div class="header"><span>' +
               L.actions.history +
-              ' (0)</span><span class="ico">expand_less</span></div>' +
-              '<div class="list empty"><span class="ico">history_toggle_off</span>' +
+              " (0)</span>" +
+              ico("history_toggle_off") +
+              "</div>" +
+              '<div class="list empty">' +
+              ico("history_toggle_off") +
               L.histEmpty +
+              "</div></div>"
+            );
+          }
+          if (state === "history-single") {
+            return (
+              '<div class="history">' +
+              '<div class="header"><span>' +
+              L.actions.history +
+              " (1)</span>" +
+              ico("expand_less") +
+              "</div>" +
+              '<div class="list">' +
+              histRows(1) +
               "</div></div>"
             );
           }
@@ -3768,10 +4318,15 @@
               '<div class="history">' +
               '<div class="header"><span>' +
               L.actions.history +
-              ' (50)</span><span class="ico">expand_less</span></div>' +
+              " (50)</span>" +
+              ico("expand_less") +
+              "</div>" +
               '<div class="list" style="max-height:220px;overflow:hidden;position:relative">' +
-              '<div class="swipe-row"><div class="row"><div><span class="when">2026/05/10</span><span class="res">BMI 22.5 (普通体重)</span> · H170/W65</div><span class="ico">refresh</span></div>' +
-              '<div class="delete"><span class="ico">delete</span>' +
+              '<div class="swipe-row"><div class="row"><div><span class="when">2026/05/20</span><span class="res">BMI 24.4 (普通体重)</span> · H167/W68</div>' +
+              ico("refresh") +
+              "</div>" +
+              '<div class="delete">' +
+              ico("delete") +
               L.actions.del +
               "</div></div>" +
               histRows(5) +
@@ -3795,13 +4350,15 @@
             state === "swipe-to-delete"
           ) {
             hist = historyBlock(state);
+          } else if (state === "input-toolbar-open") {
+            hist = historyBlock("history-empty");
           } else {
             hist = historyBlock("history-collapsed");
           }
           return inp + res + hist + '<div style="height:60px"></div>';
         }
 
-        // Tablet 2-pane / 3-pane
+        // Tablet two-column layouts: portrait left column 280px, landscape left column 440px.
         function toolList(calc) {
           var items = [
             { id: "bmi", name: "BMI", formula: "w / h²", ic: "monitor_weight" },
@@ -3816,8 +4373,8 @@
                   '<div class="ti' +
                   (t.id === calc ? " active" : "") +
                   '">' +
-                  '<span class="ico">' +
-                  t.ic +
+                  '<span class="tool-svg" aria-hidden="true">' +
+                  ICONS[t.ic] +
                   "</span>" +
                   t.name +
                   '<span class="formula">' +
@@ -3835,19 +4392,14 @@
           var midRight =
             '<div class="pane scroll">' +
             resultCard(calc, state) +
-            historyBlock(state.indexOf("history-") === 0 || state === "swipe-to-delete" ? state : "history-expanded") +
+            historyBlock(
+              state.indexOf("history-") === 0 || state === "swipe-to-delete"
+                ? state
+                : landscape
+                  ? "history-single"
+                  : "history-expanded",
+            ) +
             "</div>";
-          if (landscape) {
-            var midPane = '<div class="pane">' + inputs(calc, state) + "</div>";
-            var rightPane =
-              '<div class="pane scroll">' +
-              resultCard(calc, state) +
-              historyBlock(
-                state.indexOf("history-") === 0 || state === "swipe-to-delete" ? state : "history-expanded",
-              ) +
-              "</div>";
-            return '<div class="threepane">' + toolList(calc) + midPane + rightPane + "</div>";
-          }
           return '<div class="twopane">' + leftPane + midRight + "</div>";
         }
 
@@ -3863,33 +4415,31 @@
             device === "iPad"
               ? opts.splitview
                 ? "tablet splitview"
-                : "tablet"
+                : opts.landscape
+                  ? "tablet landscape"
+                  : "tablet"
               : opts.landscape
                 ? "iphone-landscape"
                 : "";
           var clsList = ["frame", "mock-frame", dark ? "dark" : "", deviceCls, opts.bigText ? "large-text" : ""]
             .filter(Boolean)
             .join(" ");
+          if (opts.landscape && !opts.splitview) {
+            clsList += " has-rail";
+          }
 
           var bodyCls = "body";
           var inner = "";
 
           if (opts.splitview) {
-            // 50/50 Split View on a 1194pt-wide iPad: neighbor app placeholder + Compact-width Calc Tools.
-            // The right pane MUST gracefully fall back to the Compact (single-pane) layout —
-            // its width (≈ 480 pt content) is below the regular-width breakpoint, so the
-            // 2-pane tablet layout is intentionally NOT used here.
+            // Split View width class: render the Calc Tools screen at 480pt width.
+            // The implementation contract is the compact fallback itself; no neighbor app UI is part of CalcView.
             var compactInner = bodyInner(calc, state, opts);
-            var neighborLabel = opts.neighborLabel || "Other app — split view neighbor";
             return (
               '<div class="' +
               clsList +
               '">' +
               '<div class="device">' +
-              '<div class="sv-neighbor"><span class="lbl">' +
-              neighborLabel +
-              "</span></div>" +
-              '<div class="sv-app">' +
               statusBar() +
               appbar({ title: L.screenTitle }) +
               '<div class="' +
@@ -3900,7 +4450,6 @@
               seg(calc) +
               ribbon() +
               bottomNav() +
-              "</div>" +
               "</div></div>"
             );
           }
@@ -3912,6 +4461,7 @@
             inner =
               '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:100%">' +
               "<div>" +
+              seg(calc) +
               inputs(calc, state) +
               "</div>" +
               "<div>" +
@@ -3928,15 +4478,11 @@
           if (state === "history-restoring" && opts.beforeAfter === "after") {
             overlays = '<div class="restore-overlay"><div class="spinner"></div>' + L.restoring + "</div>";
           }
-          if (state === "keyboard-open") {
+          if (state === "input-toolbar-open" && device === "iPhone" && !opts.landscape) {
             overlays +=
-              '<div class="keyboard">' +
-              ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-                .map(function (n) {
-                  return '<div class="key">' + n + "</div>";
-                })
-                .join("") +
-              '<div class="key dim">.</div><div class="key">0</div><div class="key action"><span class="ico">done</span></div>' +
+              '<div class="input-toolbar" data-source="_CalcInputToolbar">' +
+              '<button class="tool-action">次へ</button>' +
+              '<button class="tool-action">完了</button>' +
               "</div>";
           }
           if (state === "tool-switching") {
@@ -3945,13 +4491,13 @@
 
           // For iPhone, add segmented control (bottom thumb-zone)
           var segHtml = device === "iPhone" && !opts.landscape ? seg(calc) : "";
-          if (opts.landscape && device === "iPhone") segHtml = seg(calc);
 
           return (
             '<div class="' +
             clsList +
             '">' +
             '<div class="device">' +
+            (opts.landscape ? navRail() : "") +
             statusBar() +
             appbar({ title: L.screenTitle }) +
             '<div class="' +
@@ -4001,7 +4547,6 @@
               landscape: opts.landscape,
               bigText: opts.bigText,
               splitview: opts.splitview,
-              neighborLabel: opts.neighborLabel,
             }) +
             "</div>"
           );
@@ -4032,7 +4577,10 @@
           },
           { state: "history-empty", label: "履歴 0 件のエンプティステート。" },
           { state: "swipe-to-delete", label: "履歴行を左スワイプして削除アクションを露出。" },
-          { state: "keyboard-open", label: "数値キーボードを表示。レイアウト破綻なし。" },
+          {
+            state: "input-toolbar-open",
+            label: "iOS phone の _CalcInputToolbar のみ表示。独自キーボードは描画しない。",
+          },
           {
             state: "disclaimer-ribbon-visible",
             label: "すべての画面で Disclaimer ribbon が常時表示されることを示すケース。",
@@ -4097,7 +4645,7 @@
         // -- Calc-agnostic single (7 states × 4 d/m = 28, BMI representative) --
         html +=
           '<div class="mock-block"><h3 class="mock-block-title">5.2 Calc-agnostic states (BMI representative) <span class="pill">7×4 = 28 frames</span></h3>' +
-          '<p class="mock-block-sub">これらは calcType に依存しない UI 状態。代表として BMI のみ描画 (履歴行・キーボード・ribbon・large-text)。</p>';
+          '<p class="mock-block-sub">これらは calcType に依存しない UI 状態。代表として BMI のみ描画 (履歴行・iOS phone 入力補助ツールバー・ribbon・large-text)。</p>';
 
         calcAgnosticSingle.forEach(function (s) {
           html +=
@@ -4205,7 +4753,7 @@
         // -- landscape-iphone × 2 --
         html +=
           '<div class="mock-block"><h3 class="mock-block-title">5.4 landscape-iphone <span class="pill">2 frames · iPad N/A</span></h3>' +
-          '<p class="mock-block-sub">iPhone を横向きに回転すると tablet 風の 2-pane に変化。<strong>このステートは iPad 上では存在しない</strong> (iPad は <strong>portrait で 2-pane (<code>.twopane</code>)、landscape で 3-pane (<code>.threepane</code>)、Split View 50/50 で右ペインのみ Compact 1-pane</strong> という独立したレイアウト群を持ち、「回転 = 別レイアウト」という意味の <code>landscape-iphone</code> 状態は iPad の概念には存在しない)。よって iPhone × Light/Dark の 2 frame のみ描画する。</p>';
+          '<p class="mock-block-sub">iPhone を横向きに回転すると compact rail + 2-pane mini に変化。<strong>このステートは iPad 上では存在しない</strong> (iPad は <strong>portrait で left 280px / right 1fr、landscape で left 440px / right 1fr、Split View 50/50 で右ペインのみ Compact 1-pane</strong> という独立したレイアウト群を持ち、「回転 = 別レイアウト」という意味の <code>landscape-iphone</code> 状態は iPad の概念には存在しない)。よって iPhone × Light/Dark の 2 frame のみ描画する。</p>';
         html +=
           '<div class="mock-row landscape"><div class="row-label"><span class="state-name">landscape-iphone</span><span>iPhone landscape — N/A on iPad</span></div>';
         ["Light", "Dark"].forEach(function (mode) {
@@ -4214,18 +4762,34 @@
         });
         html += "</div></div>";
 
-        // -- iPad Split View × 2 --
-        // Split View at 1194 pt iPad width, 50/50: left half is a neighbor-app placeholder, right half is
-        // the Calc Tools Screen rendered in COMPACT width (≈ 480 pt content) using the existing single-pane
-        // layout (segmented control + form + result + history). The right pane MUST gracefully fall back to
-        // the Compact layout, NOT the 2-pane tablet layout, because its width is below the regular-width
-        // breakpoint.
+        // -- iPad landscape × 2 --
+        html +=
+          '<div class="mock-block"><h3 class="mock-block-title">5.4b iPad landscape <span class="pill">2 frames · rail + 440px left pane</span></h3>' +
+          '<p class="mock-block-sub">iPad landscape は <code>width &gt; height</code> のため AppShell の navigation rail を使い、Calc 本体は <code>_CalcIPadLandscapeLayout</code> に従って left 440px / right 1fr の 2-column で描画する。実機表示は <code>devicectl device info displays</code> の <code>1210x834pt@2x</code> を反映する。</p>';
+        html +=
+          '<div class="mock-row landscape" style="grid-template-columns:repeat(auto-fit,minmax(1210px,max-content))"><div class="row-label"><span class="state-name">ipad-landscape</span><span>iPad landscape — 1210×834pt real-device display + navigation rail + 440px left pane</span></div>';
+        ["Light", "Dark"].forEach(function (mode) {
+          html += wrap({
+            device: "iPad",
+            mode: mode,
+            state: "valid-input",
+            calc: "bmi",
+            landscape: true,
+            suffix: "landscape",
+          });
+          counts.landscape++;
+        });
+        html += "</div></div>";
+
+        // -- iPad Split View width class × 2 --
+        // Flutter tests set the CalcView surface to 480 pt wide and verify compact fallback.
+        // The neighboring app is outside CalcView/AppShell and is intentionally not rendered here.
         var splitviewCount = 0;
         html +=
-          '<div class="mock-block"><h3 class="mock-block-title">5.5 iPad Split View scenario <span class="pill">2 frames · 50/50 · 1194 pt</span></h3>' +
-          '<p class="mock-block-sub">iPad Split View 50/50 (1194 pt 全幅)。左半分はネイバーアプリのプレースホルダ (視覚的に de-emphasize)、右半分は Calc Tools 画面を <strong>Compact 幅 (≈ 480 pt) シングルペイン</strong> で描画する。右ペインは regular-width ブレークポイント未満なので <strong>2-pane タブレットレイアウトではなく、必ず Compact レイアウトにフォールバック</strong>する (segmented control が下部、フォーム + 結果 + 履歴が縦積み)。</p>';
+          '<div class="mock-block"><h3 class="mock-block-title">5.5 iPad Split View width class <span class="pill">2 frames · compact fallback</span></h3>' +
+          '<p class="mock-block-sub">Split View 相当の compact 幅で Calc Tools 画面そのものを描画する。実装テストは <code>calc-layout-compact</code> と <code>calc-tool-selector-bottom</code> を確認し、<code>calc-tool-list</code> が存在しないことを確認する。</p>';
         html +=
-          '<div class="mock-row" style="grid-template-columns:repeat(auto-fit,minmax(1240px,max-content))"><div class="row-label"><span class="state-name">ipad-split-view-50-50</span><span>iPad 1194pt × Split View · Compact-width fallback</span></div>';
+          '<div class="mock-row splitview"><div class="row-label"><span class="state-name">ipad-split-view-width</span><span>Compact-width fallback in iPad chrome</span></div>';
         ["Light", "Dark"].forEach(function (mode) {
           html += wrap({
             device: "iPad",
@@ -4233,7 +4797,6 @@
             state: "valid-input",
             calc: "bmi",
             splitview: true,
-            neighborLabel: "Other app — split view neighbor",
           });
           splitviewCount++;
         });
@@ -4294,12 +4857,20 @@
           // History row (default / restoring / swipe / empty)
           '<div class="atom-card"><h4>History row</h4>' +
           '<div class="row"><span class="label">default</span><div class="demo"><div class="history"><div class="list">' +
-          '<div class="row" style="padding:8px 12px;font:500 12px var(--jp);display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center"><div><span class="when" style="font:600 11px var(--mono);color:var(--c6-muted);margin-right:6px">2026/05/10</span><span class="res" style="font-weight:700">BMI 22.5 (普通体重)</span> · H170/W65</div><span class="ico" style="color:var(--c6-muted)">refresh</span></div>' +
+          '<div class="row" style="padding:8px 12px;font:500 12px var(--jp);display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center"><div><span class="when" style="font:600 11px var(--mono);color:var(--c6-muted);margin-right:6px">2026/05/10</span><span class="res" style="font-weight:700">BMI 22.5 (普通体重)</span> · H170/W65</div>' +
+          ico("refresh") +
+          "</div>" +
           "</div></div></div></div>" +
           '<div class="row"><span class="label">swipe</span><div class="demo"><div class="history"><div class="list" style="position:relative;height:38px;overflow:hidden">' +
-          '<div class="swipe-row"><div class="row"><div><span class="when">2026/05/10</span><span class="res">BMI 22.5 (普通体重)</span> · H170/W65</div><span class="ico">refresh</span></div><div class="delete"><span class="ico">delete</span>削除</div></div>' +
+          '<div class="swipe-row"><div class="row"><div><span class="when">2026/05/10</span><span class="res">BMI 22.5 (普通体重)</span> · H170/W65</div>' +
+          ico("refresh") +
+          '</div><div class="delete">' +
+          ico("delete") +
+          "削除</div></div>" +
           "</div></div></div></div>" +
-          '<div class="row"><span class="label">empty</span><div class="demo"><div class="history"><div class="list empty"><span class="ico">history_toggle_off</span>履歴はありません</div></div></div></div>' +
+          '<div class="row"><span class="label">empty</span><div class="demo"><div class="history"><div class="list empty">' +
+          ico("history_toggle_off") +
+          "履歴はありません</div></div></div></div>" +
           "</div>" +
           // Charts
           '<div class="atom-card"><h4>Chart — BMI / eGFR / CrCl</h4>' +
@@ -4355,14 +4926,14 @@
             "A3",
             "S",
             "PASS",
-            "External resources are limited to <code>fonts.googleapis.com</code> and <code>fonts.gstatic.com</code> (preconnect + 2 stylesheet links). No local file URLs, no local absolute paths, no localhost URLs in the source.",
-            "",
+            "No external resources are used. The page has no CDN, no Google Fonts, no Material Symbols web font, no local file URLs, no local absolute paths, and no localhost URLs.",
+            "Guarded by <code>scripts/html-audit-rules/calc-tools-spec.json</code> forbiddenText for external font/CDN tokens.",
           ],
           [
             "A4",
             "S",
             "PASS",
-            'All CSS lives in one inline <code>&lt;style&gt;</code> block in <code>&lt;head&gt;</code>; grep <code>&lt;link rel="stylesheet"</code> → only the Google Fonts links; no project-relative stylesheet.',
+            'All CSS lives in one inline <code>&lt;style&gt;</code> block in <code>&lt;head&gt;</code>; grep <code>&lt;link rel="stylesheet"</code> → 0 hits; no project-relative stylesheet.',
             "",
           ],
           [
@@ -4417,7 +4988,7 @@
             "PASS",
             "landscape-iphone frames rendered: " +
               landscapeCount +
-              " (expected 2). N/A note shown for iPad in the §5.4 sub-block.",
+              " (expected 4: iPhone landscape Light/Dark + iPad landscape Light/Dark). iPhone landscape uses compact rail + left-pane segmented control; iPad landscape uses 72px icon-only rail + 440px left pane.",
             "",
           ],
           [
@@ -4426,7 +4997,7 @@
             "PASS",
             'Every <code>.mock-wrap</code> carries a <code>data-frame-label</code> attribute matching <code>{device} × {mode} × {state} ({calcType})</code> (or with a <code>-before</code>/<code>-after</code> suffix on the state, or a <code>-splitview</code> suffix on the state for §5.5 Split View frames). Grep count of <code>data-frame-label="</code> in the post-render DOM = ' +
               frameLabelCount +
-              ' (expected ≥ 108, i.e. one per frame). Sample literal present in source: <code>data-frame-label="iPhone × Light × empty (BMI)"</code>. <strong><code>device</code> values in <code>data-frame-label</code> are restricted to exactly <code>{iPhone, iPad}</code> — grep <code>data-frame-label="iPad-SplitView</code> → 0 hits (no <code>iPad-SplitView</code> literal remains); Split View nature is encoded in the <code>state</code> as <code>valid-input-splitview</code>.</strong>',
+              ' (expected ≥ 110, i.e. one per frame). Sample literal present in source: <code>data-frame-label="iPhone × Light × empty (BMI)"</code>. <strong><code>device</code> values in <code>data-frame-label</code> are restricted to exactly <code>{iPhone, iPad}</code> — grep <code>data-frame-label="iPad-SplitView</code> → 0 hits (no <code>iPad-SplitView</code> literal remains); Split View nature is encoded in the <code>state</code> as <code>valid-input-splitview</code>, and iPad landscape is encoded as <code>valid-input-landscape</code>.</strong>',
             "",
           ],
           [
@@ -4525,7 +5096,7 @@
             "F2",
             "V",
             "PASS",
-            "iPad portrait uses 2-pane (<code>.twopane</code>) tool-list + form / result+chart+history layout. iPad landscape uses 3-pane. iPhone landscape uses 2-pane mini. iPad Split View (1194 pt, 50/50) right pane gracefully falls back to Compact (<code>.frame.tablet.splitview</code> uses <code>.seg{display:flex}</code> not <code>.twopane</code>). Cross-section consistency confirmed: §5.4 N/A note now describes the iPad layout family as <em>portrait 2-pane / landscape 3-pane / Split View 50/50 → right pane Compact 1-pane</em>, matching the §5.5 Compact-fallback claim.",
+            "iPad portrait uses a 2-column layout with left 280px / right 1fr. iPad landscape remains 2-column, but widens the left column to 440px and stacks tool list above form, matching <code>_CalcIPadLandscapeLayout</code>; the frame uses the observed real-device <code>1210x834pt@2x</code> landscape display. iPhone landscape uses compact rail + 2-pane mini. iPad Split View right pane gracefully falls back to Compact (<code>.frame.tablet.splitview</code> uses <code>.seg{display:flex}</code> not <code>.twopane</code>).",
             "",
           ],
           [
