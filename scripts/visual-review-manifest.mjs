@@ -55,6 +55,7 @@ export async function captureVisualManifest({ project, pageName, maxFrames = nul
     const frames = await page.$$eval("[data-frame-label]", (nodes) =>
       nodes.map((node, index) => ({
         index,
+        tagName: node.tagName.toLowerCase(),
         label: node.getAttribute("data-frame-label") || "",
         state: node.getAttribute("data-state") || "",
         tab: node.getAttribute("data-tab") || "",
@@ -75,7 +76,11 @@ export async function captureVisualManifest({ project, pageName, maxFrames = nul
       const absPath = path.join(REPO_ROOT, relativePath);
       if (outputScreenshots) {
         const locator = page.locator("[data-frame-label]").nth(frame.index);
-        await locator.screenshot({ path: absPath, animations: "disabled" });
+        if (frame.tagName === "body" || frame.tagName === "html") {
+          await page.screenshot({ path: absPath, fullPage: true, animations: "disabled" });
+        } else {
+          await locator.screenshot({ path: absPath, animations: "disabled" });
+        }
       }
       captures.push({ ...frame, screenshot: relativePath });
     }

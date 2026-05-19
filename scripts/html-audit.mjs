@@ -75,9 +75,17 @@ function normalizeFileForCompare(file) {
 function matchingRules(file, rules) {
   const normalized = normalizeFileForCompare(file);
   return rules.filter((rule) => {
-    if (!rule.file) return false;
-    const ruleFile = normalizeFileForCompare(rule.file);
-    return ruleFile === normalized;
+    if (rule.file) {
+      const ruleFile = normalizeFileForCompare(rule.file);
+      return ruleFile === normalized;
+    }
+    if (Array.isArray(rule.files)) {
+      return rule.files.some((ruleFile) => normalizeFileForCompare(ruleFile) === normalized);
+    }
+    if (rule.filePattern) {
+      return new RegExp(rule.filePattern).test(normalized);
+    }
+    return false;
   });
 }
 
