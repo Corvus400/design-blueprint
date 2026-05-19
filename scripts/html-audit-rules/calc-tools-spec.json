@@ -149,6 +149,11 @@
     "id=\"codex-implementation-handoff\"",
     "id=\"codex-implementation-evidence-ledger\"",
     "This design file is an implementation input.",
+    "source anatomy table → HTML contract → audit rule → rendered all-frame review → commit",
+    "VRT and visual manifests verify this HTML artifact; they do not prove implementation parity",
+    "implementation source evidence + rendered frame evidence",
+    "source evidence, rendered evidence, and an audit",
+    "invariant before Codex implementation may proceed",
     "data-evidence=\"shell-tabs-header-ribbon\"",
     "data-evidence=\"material-icons\"",
     "data-evidence=\"calc-responsive-layout\"",
@@ -211,7 +216,7 @@
       "message": "Calc Tools must declare that this HTML is a Codex implementation input with no visual approximations."
     },
     {
-      "selector": "#codex-implementation-handoff[data-purpose=\"implementation-source\"][data-ssot-evidence-required=\"true\"][data-approximation-policy=\"forbidden\"][data-all-frame-visual-review=\"required\"]",
+      "selector": "#codex-implementation-handoff[data-purpose=\"implementation-source\"][data-ssot-evidence-required=\"true\"][data-rendered-evidence-required=\"true\"][data-approximation-policy=\"forbidden\"][data-all-frame-visual-review=\"required\"]",
       "min": 1,
       "message": "Implementation handoff gate must be present before the spec is used as an implementation source."
     },

@@ -9,6 +9,7 @@ const tempDir = await mkdtemp(path.join(os.tmpdir(), "html-audit-"));
 try {
   const rulesDir = path.join(tempDir, "rules");
   const goodHtml = path.join(tempDir, "good.html");
+  const groupedHtml = path.join(tempDir, "grouped.html");
   const badHtml = path.join(tempDir, "bad.html");
 
   await mkdir(rulesDir);
@@ -29,6 +30,25 @@ try {
               </div>
             </section>
           </main>
+        </body>
+      </html>
+    `,
+  );
+  await writeFile(
+    groupedHtml,
+    `
+      <!doctype html>
+      <html>
+        <body data-frame-label="document">
+          <div
+            hidden
+            data-codex-repo-wide-implementation-readiness="source-plus-rendered-evidence"
+            data-implementation-parity-scope="repo-wide-html-design-artifact"
+          >
+            Repo-wide implementation readiness gate.
+            implementation source evidence + rendered frame evidence.
+            Do not use VRT or visual manifest as implementation parity evidence by itself.
+          </div>
         </body>
       </html>
     `,
@@ -85,6 +105,29 @@ try {
     ),
   );
   await writeFile(
+    path.join(rulesDir, "grouped.json"),
+    JSON.stringify(
+      {
+        filePattern: "\\.html$",
+        requiredSelectors: [
+          {
+            selector:
+              'div[data-codex-repo-wide-implementation-readiness="source-plus-rendered-evidence"][data-implementation-parity-scope="repo-wide-html-design-artifact"][hidden]',
+            min: 1,
+          },
+        ],
+        requiredText: [
+          "Repo-wide implementation readiness gate.",
+          "implementation source evidence + rendered frame evidence",
+          "or visual manifest as implementation parity evidence by itself.",
+          "data-frame-label",
+        ],
+      },
+      null,
+      2,
+    ),
+  );
+  await writeFile(
     path.join(rulesDir, "bad.json"),
     JSON.stringify(
       {
@@ -115,11 +158,15 @@ try {
   );
 
   const good = await auditFiles({ files: [goodHtml], rulesDir });
-  assert.equal(good.audited, 1);
-  assert.deepEqual(good.failures, []);
+  assert.equal(good.audited, 2);
+  assert.ok(good.failures.some((failure) => failure.message.includes("Repo-wide implementation readiness gate")));
+
+  const grouped = await auditFiles({ files: [groupedHtml], rulesDir });
+  assert.equal(grouped.audited, 1);
+  assert.deepEqual(grouped.failures, []);
 
   const bad = await auditFiles({ files: [badHtml], rulesDir });
-  assert.equal(bad.audited, 1);
+  assert.equal(bad.audited, 2);
   assert.ok(bad.failures.some((failure) => failure.check === "forbiddenSelectors"));
   assert.ok(bad.failures.some((failure) => failure.check === "requiredText"));
   assert.ok(bad.failures.some((failure) => failure.check === "forbiddenDescendants"));

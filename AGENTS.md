@@ -6,7 +6,7 @@ Codex acts on files via `apply_patch`. The same invariants and review loop as `C
 
 - The implementation repo for each design is named identically to the directory under this repo root.
 - Always read the changed page HTML registered in `<project>/pages.json` before patching it.
-- Before changing protected `main`, create a feature branch and open a PR. The default-branch ruleset requires PR review flow and `ci-gate`; PR titles and bodies must be Japanese.
+- Branch strategy is part of this repository's contract: before changing protected `main`, update from the latest `origin/main`, create a feature branch, commit there, push that branch, and open a Japanese PR. Do not commit or push design changes directly to `main` in this public/ruleset-protected repository.
 - After patching, stage the changed HTML and commit. Pre-commit runs lint, matching HTML audit rules, and VRT on staged projects only.
 - For large or fragile HTML specs, add or update `scripts/html-audit-rules/*.json` instead of relying only on manual search. Use DOM-based audit rules for stale selectors/text, parent-child placement, TOC/section alignment, and implementation-backed invariants.
 
@@ -24,12 +24,15 @@ Codex acts on files via `apply_patch`. The same invariants and review loop as `C
 - Do not use visual approximations for icons, charts, device classes, navigation, headers, ribbons, keyboards, copy, or placeholder panes. If the implementation uses a framework glyph/font, source constant, widget, route, or test key, the spec must use or explicitly cite that exact source.
 - Do not repair one user-reported frame in isolation. Re-audit the surrounding component family and responsive state matrix so the same class of error cannot remain in nearby frames.
 - If a frame represents a device or mode only by width class, still preserve the device identity in the chrome and contract text. For example, iPad Split View may use compact CalcView content, but it must remain an iPad frame and must not invent a neighboring app pane unless the implementation owns that pane.
+- Implementation-backed HTML changes must follow this order: source anatomy table from implementation files/tests, HTML contract update, page-specific audit rule update, rendered all-frame visual review, then commit. VRT and visual manifests are evidence about the HTML artifact; they are not by themselves evidence that the artifact matches the implementation.
 - A spec is not implementation-ready until lint, HTML audit, visual manifest with `missing_capture_count: 0`, and visual inspection of the affected frame family all pass. Report those separately from functional tests or VRT.
 
 ## Design Conflict Recovery
 
 - If the user reports that a design is broken, unchanged, visually wrong, or needs recurrence prevention, stop adding speculative fixes. First inspect `git diff`, the affected page HTML, `pages.json`, the matching audit rule, and the VRT actual/comparison output.
 - For repo-wide recurrence-prevention requests, run `npm run session:conflict-audit -- --repo . --summary` and `npm run session:conflict-audit -- --repo . --inventory` before designing guardrails. Report scan counts, parse failures, `cwd_exact`, candidate counts, and inventory category totals. Treat `cwd_exact` sessions as authoritative and remote/project/page alias records as completeness candidates; do not emit raw transcript text.
+- When a feedback loop shows repeated user-detected visual or implementation mismatches, classify the session hits before editing and build an unchecked component-family inventory. Do not patch the named frame only; mark each family as `implementation evidence`, `rendered evidence`, and `audit invariant` before committing.
+- Repo-wide implementation-readiness guardrails must be automatic for future HTML additions, not only patched into current files or path families. The global HTML audit rule must match every audited `.html` artifact, and new HTML must carry both the repo-wide readiness marker and at least one `data-frame-label` visual-review frame before it can pass `html:audit`.
 - Separate changes into `revert mistaken change`, `keep intended change`, and `add guardrail`. Restore the previous design contract before adding new behavior when the issue was introduced by the current session.
 - Do not change a page's device classes, frame count, state matrix, or responsive mode from inference alone. Record the current contract, source evidence, intended contract, and impact before editing.
 - For visual design conflicts, DOM audit and VRT are not enough by themselves. Capture or inspect a rendered screenshot/crop of the affected frame before approving a VRT diff or claiming the layout is fixed.

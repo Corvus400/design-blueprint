@@ -52,6 +52,41 @@ const CATEGORIES = [
     label: "The user had to micromanage repeated failed fixes",
     patterns: [/マイクロマネジメント/, /何度も/, /イライラ/, /節穴/, /闇雲/, /一度冷静/],
   },
+  {
+    id: "approximation_used",
+    label: "Approximation was used where exact implementation parity was required",
+    patterns: [/近似/, /実装と同じ/, /実際のもの/, /グリフ/, /同じにしろ/, /exact/i],
+  },
+  {
+    id: "invented_ui_surface",
+    label: "A UI surface not owned by the implementation was invented",
+    patterns: [/実装に存在しない/, /架空UI/, /架空 UI/, /Other app/, /neighbor/i, /独自実装キーボード/],
+  },
+  {
+    id: "implementation_parity_gap",
+    label: "The implementation and design artifact were not compared as peers",
+    patterns: [/実装と.*違/, /実装.*確認/, /ちゃんと実装/, /両方を照らし合わせ/, /SSOT/],
+  },
+  {
+    id: "premature_visual_completion",
+    label: "Visual work was treated as complete before the acceptance evidence was satisfied",
+    patterns: [/コミット.*まだ/, /未達/, /勘で/, /適当な仕事/, /検証項目/, /完了扱い/],
+  },
+  {
+    id: "real_device_evidence_gap",
+    label: "Real-device or rendered evidence was required before commit or approval",
+    patterns: [/実機/, /実機を操作/, /実機の見た目/, /screenshot/i, /スクリーンショット/],
+  },
+  {
+    id: "invalid_verification_method",
+    label: "The verification method was insufficient for the requested implementation parity",
+    patterns: [/検証手段/, /検証方法/, /DOM.*不足/i, /VRT.*不足/i, /実機の見た目と実装/, /両方.*照らし合わせ/],
+  },
+  {
+    id: "human_oracle_loop",
+    label: "The user had to act as the repeated defect detector instead of the agent auditing the pattern",
+    patterns: [/指摘されないと/, /何度も同じ指摘/, /10回以上/, /自分で認知/, /修正のイテレーション/, /場当たり/],
+  },
 ];
 
 function parseArgs(argv) {

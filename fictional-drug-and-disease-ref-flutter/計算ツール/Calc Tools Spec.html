@@ -2108,6 +2108,14 @@
     </style>
   </head>
   <body>
+    <div
+      hidden
+      data-codex-repo-wide-implementation-readiness="source-plus-rendered-evidence"
+      data-implementation-parity-scope="repo-wide-html-design-artifact"
+    >
+      Repo-wide implementation readiness gate. implementation source evidence + rendered frame evidence. Do not use VRT
+      or visual manifest as implementation parity evidence by itself.
+    </div>
     <div class="shell">
       <!-- ===================== TOC ===================== -->
       <aside class="toc">
@@ -3666,6 +3674,7 @@
             id="codex-implementation-handoff"
             data-purpose="implementation-source"
             data-ssot-evidence-required="true"
+            data-rendered-evidence-required="true"
             data-approximation-policy="forbidden"
             data-all-frame-visual-review="required"
           >
@@ -3676,6 +3685,19 @@
               the owning Flutter file or test below, and the same invariant must be represented in
               <code>scripts/html-audit-rules/calc-tools-spec.json</code>
               before the spec can be treated as implementation-ready.
+            </p>
+            <p style="margin: 0 0 12px; font: 13px/1.6 var(--jp); color: var(--page-fg)">
+              Required order for future changes:
+              <strong>source anatomy table → HTML contract → audit rule → rendered all-frame review → commit</strong>
+              . VRT and visual manifests verify this HTML artifact; they do not prove implementation parity unless the
+              implementation source and rendered frame evidence are both cited here.
+            </p>
+            <p style="margin: 0 0 12px; font: 13px/1.6 var(--jp); color: var(--page-fg)">
+              Component families are not implementation-ready until both evidence columns are filled:
+              <strong>implementation source evidence + rendered frame evidence</strong>
+              . Header, navigation, disclaimer ribbon, charts, Material icon glyphs, input toolbar, empty states, and
+              responsive rail / Split View behavior must each have source evidence, rendered evidence, and an audit
+              invariant before Codex implementation may proceed.
             </p>
             <table class="vr-table" id="codex-implementation-evidence-ledger">
               <thead>

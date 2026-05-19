@@ -1,0 +1,17 @@
+{
+  "filePattern": "\\.html$",
+  "description": "Repo-wide implementation-readiness guard for every audited HTML design artifact, including future project/page additions.",
+  "requiredText": [
+    "Repo-wide implementation readiness gate.",
+    "implementation source evidence + rendered frame evidence",
+    "or visual manifest as implementation parity evidence by itself.",
+    "data-frame-label"
+  ],
+  "requiredSelectors": [
+    {
+      "selector": "div[data-codex-repo-wide-implementation-readiness=\"source-plus-rendered-evidence\"][data-implementation-parity-scope=\"repo-wide-html-design-artifact\"][hidden]",
+      "min": 1,
+      "message": "Every audited HTML design artifact must include the repo-wide readiness gate."
+    }
+  ]
+}
