@@ -149,6 +149,8 @@
     "id=\"codex-implementation-handoff\"",
     "id=\"codex-implementation-evidence-ledger\"",
     "This design file is an implementation input.",
+    "source anatomy table → HTML contract → audit rule → rendered all-frame review → commit",
+    "VRT and visual manifests verify this HTML artifact; they do not prove implementation parity",
     "data-evidence=\"shell-tabs-header-ribbon\"",
     "data-evidence=\"material-icons\"",
     "data-evidence=\"calc-responsive-layout\"",

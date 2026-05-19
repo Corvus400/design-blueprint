@@ -53,7 +53,16 @@ try {
         payload: {
           type: "message",
           role: "user",
-          content: [{ text: "PR の ruleset とブランチ戦略を確認してください" }],
+          content: [
+            {
+              text: [
+                "PR の ruleset とブランチ戦略を確認してください",
+                "実装と同じにしろと言っているのに近似で済ませないでください",
+                "実装に存在しない Other app neighbor や独自実装キーボードを残さないでください",
+                "実機の見た目と実装両方を照らし合わせ、検証項目が未達ならコミットしないでください",
+              ].join("。"),
+            },
+          ],
         },
       },
     ]),
@@ -129,8 +138,18 @@ try {
   assert.equal(summary.inventory_memory_summary_count, 3);
   assert.equal(summary.raw_categories.goal_branch_workflow, 1);
   assert.equal(summary.raw_categories.all_ui_visual_coverage, 0);
+  assert.equal(summary.raw_categories.approximation_used, 1);
+  assert.equal(summary.raw_categories.invented_ui_surface, 1);
+  assert.equal(summary.raw_categories.implementation_parity_gap, 1);
+  assert.equal(summary.raw_categories.premature_visual_completion, 1);
+  assert.equal(summary.raw_categories.real_device_evidence_gap, 1);
   assert.equal(summary.inventory_categories.raw_sessions.goal_branch_workflow, 1);
   assert.equal(summary.inventory_categories.raw_sessions.all_ui_visual_coverage, 1);
+  assert.equal(summary.inventory_categories.raw_sessions.approximation_used, 1);
+  assert.equal(summary.inventory_categories.raw_sessions.invented_ui_surface, 1);
+  assert.equal(summary.inventory_categories.raw_sessions.implementation_parity_gap, 1);
+  assert.equal(summary.inventory_categories.raw_sessions.premature_visual_completion, 1);
+  assert.equal(summary.inventory_categories.raw_sessions.real_device_evidence_gap, 1);
   assert.equal(summary.inventory_categories.memory_summaries.all_ui_visual_coverage, 0);
   assert.ok(summary.coverage.aliases.includes("example-owner/example-blueprint"));
   assert.ok(summary.coverage.aliases.includes("example-html-spec"));

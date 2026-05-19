@@ -3677,6 +3677,12 @@
               <code>scripts/html-audit-rules/calc-tools-spec.json</code>
               before the spec can be treated as implementation-ready.
             </p>
+            <p style="margin: 0 0 12px; font: 13px/1.6 var(--jp); color: var(--page-fg)">
+              Required order for future changes:
+              <strong>source anatomy table → HTML contract → audit rule → rendered all-frame review → commit</strong>
+              . VRT and visual manifests verify this HTML artifact; they do not prove implementation parity unless the
+              implementation source and rendered frame evidence are both cited here.
+            </p>
             <table class="vr-table" id="codex-implementation-evidence-ledger">
               <thead>
                 <tr>
