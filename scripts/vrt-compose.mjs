@@ -4,6 +4,7 @@ import sharp from "sharp";
 import { comparisonPath } from "./vrt-config.mjs";
 
 const LABEL_HEIGHT = 36;
+const MAX_COMPARISON_PIXELS = 220_000_000;
 
 function escapeXml(value) {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
@@ -21,7 +22,7 @@ function labelSvg(text, width) {
 }
 
 async function readMeta(file) {
-  const img = sharp(file);
+  const img = sharp(file, { limitInputPixels: false });
   const meta = await img.metadata();
   return { sharp: img, width: meta.width, height: meta.height };
 }
@@ -40,8 +41,8 @@ async function paneWithLabel(file, label, targetWidth, targetHeight) {
     },
   })
     .composite([
-      { input: labelSvg(label, targetWidth), top: 0, left: 0 },
-      { input: body, top: LABEL_HEIGHT, left: 0 },
+      { input: labelSvg(label, targetWidth), top: 0, left: 0, limitInputPixels: false },
+      { input: body, top: LABEL_HEIGHT, left: 0, limitInputPixels: false },
     ])
     .png()
     .toBuffer();
@@ -49,25 +50,30 @@ async function paneWithLabel(file, label, targetWidth, targetHeight) {
 
 export async function composeOne({ project, page, expectedPath, diffPathArg, actualPath }) {
   const { width, height } = await readMeta(expectedPath);
+  const totalComparisonPixels = width * 3 * (height + LABEL_HEIGHT);
+  const comparisonScale =
+    totalComparisonPixels > MAX_COMPARISON_PIXELS ? Math.sqrt(MAX_COMPARISON_PIXELS / totalComparisonPixels) : 1;
+  const paneWidth = Math.max(1, Math.floor(width * comparisonScale));
+  const paneHeight = Math.max(1, Math.floor(height * comparisonScale));
   const [expectedPane, diffPane, actualPane] = await Promise.all([
-    paneWithLabel(expectedPath, "Expected", width, height),
-    paneWithLabel(diffPathArg, "Diff", width, height),
-    paneWithLabel(actualPath, "Actual", width, height),
+    paneWithLabel(expectedPath, "Expected", paneWidth, paneHeight),
+    paneWithLabel(diffPathArg, "Diff", paneWidth, paneHeight),
+    paneWithLabel(actualPath, "Actual", paneWidth, paneHeight),
   ]);
   const outPath = comparisonPath(project, page);
   await mkdir(path.dirname(outPath), { recursive: true });
   await sharp({
     create: {
-      width: width * 3,
-      height: height + LABEL_HEIGHT,
+      width: paneWidth * 3,
+      height: paneHeight + LABEL_HEIGHT,
       channels: 4,
       background: "#111111",
     },
   })
     .composite([
-      { input: expectedPane, top: 0, left: 0 },
-      { input: diffPane, top: 0, left: width },
-      { input: actualPane, top: 0, left: width * 2 },
+      { input: expectedPane, top: 0, left: 0, limitInputPixels: false },
+      { input: diffPane, top: 0, left: paneWidth, limitInputPixels: false },
+      { input: actualPane, top: 0, left: paneWidth * 2, limitInputPixels: false },
     ])
     .png()
     .toFile(outPath);
