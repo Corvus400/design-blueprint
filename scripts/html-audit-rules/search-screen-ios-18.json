@@ -1,0 +1,108 @@
+{
+  "file": "fictional-drug-and-disease-ref-ios/検索画面/Search Screen Spec - iOS 18.html",
+  "description": "iOS 18 search screen structural guardrails for implementation-ready design SSOT.",
+  "tocSections": {
+    "tocSelector": "nav.toc a[href^=\"#sec-\"]",
+    "sectionSelector": "main section.block[id^=\"sec-\"]",
+    "requiredAnchors": [
+      "sec-cover",
+      "sec-colors",
+      "sec-type",
+      "sec-spacing",
+      "sec-mocks",
+      "sec-components",
+      "sec-a11y",
+      "sec-verify"
+    ]
+  },
+  "forbiddenSelectors": [
+    {
+      "selector": ".material-symbols-outlined",
+      "message": "External Material Symbols font usage is forbidden in this HTML design repository."
+    },
+    {
+      "selector": ".fab-filter",
+      "message": "Floating action buttons are forbidden in the iOS 18 search screen contract."
+    },
+    {
+      "selector": ".frame.iphone-landscape .nav-rail",
+      "message": "iPhone landscape must keep iOS tab bar navigation, not a sidebar/nav rail."
+    },
+    {
+      "selector": ".frame.iphone-landscape .left-rail",
+      "message": "iPhone landscape must remain single-pane and must not use the former left-rail pattern."
+    },
+    {
+      "selector": ".frame.tablet .bottom-nav",
+      "message": "iPad frames must use top-aligned tab bar, not bottom UITabBar."
+    }
+  ],
+  "forbiddenText": [
+    "https://fonts.googleapis.com",
+    "https://fonts.gstatic.com",
+    "https://unpkg.com",
+    "material-symbols-outlined",
+    "data-frame-total=\"80\"",
+    ".glassEffect(.regular",
+    "data-reduce-transparency-frame-count",
+    "data-tabbar-minimize"
+  ],
+  "requiredText": [
+    "Search Screen — Design SSOT (医薬品・疾患リファレンス) — iOS 18",
+    "iOS 18 (Liquid Glass 無し)",
+    "Repo-wide implementation readiness gate.",
+    "implementation source evidence + rendered frame evidence",
+    "data-frame-label",
+    "VR-01..VR-60",
+    "Liquid Glass 無し",
+    "iPhone landscape keeps UITabBar",
+    "Floating action buttons (FAB) are a Material 3 pattern and are forbidden on iOS 18"
+  ],
+  "requiredSelectors": [
+    {
+      "selector": "div[data-codex-repo-wide-implementation-readiness=\"source-plus-rendered-evidence\"][data-implementation-parity-scope=\"repo-wide-html-design-artifact\"][hidden]",
+      "min": 1,
+      "message": "Repo-wide readiness marker must be present."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-frame-total=\"74\"]",
+      "min": 1,
+      "message": "iOS 18 search SSOT must declare the 74-frame matrix."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-phone-states=\"9\"][data-utility-device-count=\"3\"][data-utility-device-states=\"7\"]",
+      "min": 1,
+      "message": "iOS 18 search SSOT must keep 9 phone states and 7 states for the three iPad utility device classes."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-history-display-limit=\"5\"][data-page-size=\"20\"][data-skeleton-count=\"5\"]",
+      "min": 1,
+      "message": "History limit, page size, and loading skeleton count must stay explicit."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-split-view-frame-width=\"960\"][data-split-view-height=\"700\"][data-split-view-mode=\"tablet-two-pane\"][data-split-view-utility-min-width=\"300\"]",
+      "min": 1,
+      "message": "iPad Split View contract must remain explicit."
+    },
+    {
+      "selector": "#search-spec-audit-contract[data-tablet-nav-pattern=\"top-tab-bar-sidebar-adaptable\"]",
+      "min": 1,
+      "message": "iPad navigation must remain top-tab-bar/sidebar-adaptable."
+    },
+    {
+      "selector": "#search-spec-audit-contract [data-required=\"bottom-nav-iphone\"]",
+      "min": 1,
+      "message": "iPhone bottom-nav requirement must remain declared."
+    },
+    {
+      "selector": "#search-spec-audit-contract [data-required=\"top-tab-bar-ipad\"]",
+      "min": 1,
+      "message": "iPad top-tab-bar requirement must remain declared."
+    },
+    {
+      "selector": "#search-spec-audit-contract [data-required=\"utility-pane-ipad\"]",
+      "min": 1,
+      "message": "iPad utility pane requirement must remain declared."
+    }
+  ]
+}
