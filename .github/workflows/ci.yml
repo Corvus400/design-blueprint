@@ -91,6 +91,7 @@ jobs:
         with:
           name: vrt-output
           path: .vrt-output
+          include-hidden-files: true
 
   ci-gate:
     needs: [classify-ci-trust, build-and-test]
