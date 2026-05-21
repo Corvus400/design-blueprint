@@ -5,21 +5,34 @@
     <title>Search Screen — Design SSOT (医薬品・疾患リファレンス) — iOS 26 (Liquid Glass)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-      /* iOS 26 native font stacks.
+      /* iOS 26 implementation font contract:
          Latin / numerals → SF Pro (-apple-system / BlinkMacSystemFont).
          Japanese        → Hiragino Sans (W3 / W6) — iOS の標準 JP family.
-         The previous "FDDR Noto Sans JP" custom face is intentionally NOT
-         loaded: an iOS 26 spec must mirror what ships on-device, which is
-         SF Pro + Hiragino Sans (Apple Design Resources). */
+         The HTML renderer uses the repo-local Noto Sans JP face first so
+         Playwright VRT is stable across macOS and Linux runners; native iOS
+         implementation notes below still map to SF Pro + Hiragino Sans. */
+      @font-face {
+        font-family: "FDDR Stable JP";
+        font-weight: 400;
+        src: url("../../fictional-drug-and-disease-ref-flutter/Design%20System/fonts/NotoSansJP-Regular.otf")
+          format("opentype");
+      }
+      @font-face {
+        font-family: "FDDR Stable JP";
+        font-weight: 700;
+        src: url("../../fictional-drug-and-disease-ref-flutter/Design%20System/fonts/NotoSansJP-Bold.otf")
+          format("opentype");
+      }
       /* =======================================================================
          PAGE TOKENS — design system bound (no invented hex inside .frame)
          ======================================================================= */
       :root {
-        /* iOS 26 native: SF Pro for Latin glyphs, Hiragino Sans for Japanese.
+        /* iOS 26 native target: SF Pro for Latin glyphs, Hiragino Sans for Japanese.
+           HTML VRT rendering starts with FDDR Stable JP for cross-runner determinism.
            --jp is the all-purpose family for app body copy (kanji + kana + Latin).
            --mono is SF Mono / Menlo for ATC / YJ / ICD-10 code identifiers. */
         --jp:
-          -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Hiragino Sans",
+          "FDDR Stable JP", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Hiragino Sans",
           "Hiragino Kaku Gothic ProN", "Yu Gothic UI", system-ui, sans-serif;
         --mono: ui-monospace, "SF Mono", Menlo, monospace;
         --icon-font: var(--jp);
