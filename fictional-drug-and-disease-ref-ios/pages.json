@@ -1,0 +1,20 @@
+{
+  "pages": [
+    {
+      "name": "search-screen-ios-18",
+      "file": "検索画面/Search Screen Spec - iOS 18.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.15,
+      "mask": []
+    },
+    {
+      "name": "search-screen-ios-26",
+      "file": "検索画面/Search Screen Spec - iOS 26.html",
+      "viewport": { "width": 1280, "height": 800 },
+      "deviceScaleFactor": 1,
+      "threshold": 0.15,
+      "mask": []
+    }
+  ]
+}
