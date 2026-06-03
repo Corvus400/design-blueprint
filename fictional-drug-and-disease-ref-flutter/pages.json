@@ -234,7 +234,7 @@
     },
     {
       "name": "onboarding-spec",
-      "file": "オンボーディング/Onboarding Spec.html",
+      "file": "オンボーディング/Onboarding Spec.html",
       "viewport": { "width": 1280, "height": 800 },
       "deviceScaleFactor": 1,
       "threshold": 0.1,

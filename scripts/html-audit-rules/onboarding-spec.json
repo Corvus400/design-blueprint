@@ -1,5 +1,8 @@
 {
-  "file": "fictional-drug-and-disease-ref-flutter/オンボーディング/Onboarding Spec.html",
+  "files": [
+    "fictional-drug-and-disease-ref-flutter/オンボーディング/Onboarding Spec.html",
+    "fictional-drug-and-disease-ref-flutter/オンボーディング/Onboarding Spec.html"
+  ],
   "description": "Onboarding design SSOT guardrails aligned with the Flutter shell, About route, l10n, and rendered frame evidence.",
   "tocSections": {
     "tocSelector": "nav.toc a[href^=\"#sec-\"]",
