@@ -1,0 +1,91 @@
+{
+  "files": [
+    "fictional-drug-and-disease-ref-flutter/オンボーディング/Onboarding Spec.html",
+    "fictional-drug-and-disease-ref-flutter/オンボーディング/Onboarding Spec.html"
+  ],
+  "description": "Onboarding design SSOT guardrails aligned with the Flutter shell, About route, l10n, and rendered frame evidence.",
+  "tocSections": {
+    "tocSelector": "nav.toc a[href^=\"#sec-\"]",
+    "sectionSelector": "main section.block[id^=\"sec-\"]",
+    "requiredAnchors": [
+      "sec-cover",
+      "sec-tokens",
+      "sec-flow",
+      "sec-copy",
+      "sec-intro",
+      "sec-spotlight",
+      "sec-reshow",
+      "sec-responsive",
+      "sec-verify"
+    ]
+  },
+  "forbiddenText": [
+    "https://fonts.googleapis.com",
+    "https://fonts.gstatic.com",
+    "https://unpkg.com",
+    "material-symbols-outlined"
+  ],
+  "requiredText": [
+    "Repo-wide implementation readiness gate.",
+    "implementation source evidence + rendered frame evidence",
+    "or visual manifest as implementation parity evidence by itself.",
+    "data-frame-label",
+    "introFrames.length === 12",
+    "Intro matrix 3 pages",
+    "Spotlight focus targets",
+    "About = flat ListView",
+    "About frames=",
+    "lib/ui/about/about_view.dart",
+    "mirrors app_shell.dart",
+    "Ground truth from Flutter: about_view.dart",
+    "disclaimerRibbonText",
+    "ValueKey('search-field')",
+    "VR-ALL",
+    "VR-AUDIT-A",
+    "VR-AUDIT-B",
+    "__INITIAL_TBODY_HTML === \"\"",
+    "__INITIAL_BANNER_TEXT === \"\""
+  ],
+  "requiredSelectors": [
+    {
+      "selector": "div[data-codex-repo-wide-implementation-readiness=\"source-plus-rendered-evidence\"][data-implementation-parity-scope=\"repo-wide-html-design-artifact\"][hidden]",
+      "min": 1,
+      "message": "Onboarding spec must include the repo-wide implementation readiness marker."
+    },
+    {
+      "selector": "div[data-onboarding-implementation-source-evidence=\"flutter-source-parity\"][hidden]",
+      "min": 1,
+      "message": "Onboarding spec must record implementation-source parity evidence."
+    },
+    {
+      "selector": "#onboarding-spec-audit-contract[data-intro-page-count=\"3\"][data-disclaimer-on-page=\"1\"][data-themes=\"light,dark\"][data-device-classes=\"iphone,ipad\"][data-tablet-breakpoint=\"600\"][data-skip-available=\"both-phases\"][data-dot-indicator-count=\"3\"][data-spotlight-target-scope=\"shell-chrome-only\"][data-spotlight-targets=\"search-field,nav-tabs,about-icon\"][data-feature-list-count=\"5\"][data-feature-order=\"search,detail,calc,bookmark,history\"][data-nav-form-rule=\"orientation\"][data-reshow-entry=\"about\"][data-persist-key=\"onboarding_completed\"]",
+      "min": 1,
+      "message": "Onboarding audit contract must preserve flow, copy, target, feature-list, nav, and persistence invariants."
+    },
+    {
+      "selector": "#onboarding-spec-audit-contract [data-required=\"disclaimer-page1\"]",
+      "min": 1,
+      "message": "Disclaimer reuse on intro page 1 must remain part of the contract."
+    },
+    {
+      "selector": "#onboarding-spec-audit-contract [data-required=\"spotlight-shell-chrome\"]",
+      "min": 1,
+      "message": "Spotlight targets must stay limited to persistent shell chrome."
+    },
+    {
+      "selector": "#onboarding-spec-audit-contract [data-required=\"feature-list-5\"]",
+      "min": 1,
+      "message": "Intro page 2 must keep the five-feature list contract."
+    },
+    {
+      "selector": "#onboarding-spec-audit-contract [data-required=\"nav-form-by-orientation\"]",
+      "min": 1,
+      "message": "Navigation form must stay orientation-driven."
+    },
+    {
+      "selector": "#onboarding-spec-audit-contract [data-required=\"about-pushed-route-chrome\"]",
+      "min": 1,
+      "message": "About re-show entry must remain aligned with pushed-route chrome."
+    }
+  ]
+}

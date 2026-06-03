@@ -1,0 +1,3701 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>Onboarding &amp; Tutorial — Design SSOT (医薬品・疾患リファレンス)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      /* =======================================================================
+         PAGE TOKENS — design-system bound. No invented hex/px inside .frame:
+         every value painted inside a device frame resolves to a var(--*) that
+         mirrors the Flutter ThemeExtension tokens (AppPalette / AppSpacing /
+         AppTypography / AppRadii). Doc-chrome tokens (--page-*) are the SSOT
+         document shell only and never appear inside a frame.
+         ======================================================================= */
+      :root {
+        --jp:
+          "Noto Sans JP", system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo,
+          sans-serif;
+        --mono: ui-monospace, "JetBrains Mono", Menlo, monospace;
+        --icon-font: var(--jp);
+
+        /* SSOT doc chrome */
+        --page-bg: #f4f5f7;
+        --page-fg: #15181d;
+        --page-muted: #5c6370;
+        --page-rule: #d8dce3;
+        --page-card: #ffffff;
+        --page-accent: #007aff;
+        --page-warn: #b3261e;
+        --page-ok: #1f7a3a;
+
+        /* ---- LIGHT shell tokens (AppPalette) ---- */
+        --bg: #f2f2f7;
+        --surface: #ffffff;
+        --surface-2: #f7f7fa;
+        --surface-3: #efeff4;
+        --surface-4: #e5e5ea;
+        --ink: #1a1c1e;
+        --ink-2: #3f4347;
+        --muted: #6c7177;
+        --muted-2: #8e9298;
+        --hairline: rgba(60, 60, 67, 0.13);
+        --hairline-2: rgba(60, 60, 67, 0.08);
+        --primary: #007aff;
+        --on-primary: #ffffff;
+        --primary-soft: rgba(0, 122, 255, 0.1);
+        --primary-ring: rgba(0, 122, 255, 0.35);
+        --primary-cont: #d8e4ff;
+        --on-primary-cont: #001a41;
+        --danger: #d62a2a;
+        --search-field-bg: #ebebef;
+        /* AppPalette.light.scrim = Color(0x52000000), alpha 82/255 = 0.322 */
+        --scrim: rgba(0, 0, 0, 0.32);
+
+        /* AppSpacing */
+        --s-1: 4px;
+        --s-2: 8px;
+        --s-3: 12px;
+        --s-4: 16px;
+        --s-5: 20px;
+        --s-6: 24px;
+        --s-7: 28px;
+        --s-8: 32px;
+        --s-10: 40px;
+
+        /* AppRadii */
+        --r-chip: 5px;
+        --r-badge: 4px;
+        --r-tile: 8px;
+        --r-card: 10px;
+        --r-sheet-card: 12px;
+        --r-pill: 22px;
+        --r-sheet-top: 20px;
+        --r-fab: 18px;
+
+        /* Disclaimer ribbon */
+        --rib-bg-light: #1a1c1e;
+        --rib-bg-dark: #0d0e13;
+        --rib-fg: #ffffff;
+        --rib-accent: #ffb4ab;
+
+        --ease-std: cubic-bezier(0.2, 0, 0, 1);
+        --ease-emph: cubic-bezier(0.32, 0.72, 0, 1);
+        --dur-fast: 120ms;
+        --dur-base: 200ms;
+        --dur-slow: 320ms;
+      }
+
+      /* ---- DARK shell (AppPalette dark) ---- */
+      .frame.dark {
+        --bg: #101317;
+        --surface: #181b20;
+        --surface-2: #1f2329;
+        --surface-3: #272b32;
+        --surface-4: #31353d;
+        --ink: #e5e7ec;
+        --ink-2: #c2c6cd;
+        --muted: #9ca1aa;
+        --muted-2: #7a7f88;
+        --hairline: rgba(255, 255, 255, 0.1);
+        --hairline-2: rgba(255, 255, 255, 0.06);
+        --primary: #9ecaff;
+        --on-primary: #003258;
+        --primary-soft: rgba(158, 202, 255, 0.14);
+        --primary-ring: rgba(158, 202, 255, 0.45);
+        --primary-cont: #003494;
+        --on-primary-cont: #d8e4ff;
+        --danger: #ffb4ab;
+        --search-field-bg: #272b32;
+        /* AppPalette.dark.scrim = Color(0x8C000000), alpha 140/255 = 0.549 */
+        --scrim: rgba(0, 0, 0, 0.55);
+      }
+
+      /* =======================================================================
+         PAGE LAYOUT
+         ======================================================================= */
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--jp);
+        background: var(--page-bg);
+        color: var(--page-fg);
+        font-size: 14px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      .shell {
+        display: grid;
+        grid-template-columns: 248px minmax(0, 1fr);
+        max-width: 2200px;
+        margin: 0 auto;
+      }
+      .toc {
+        position: sticky;
+        top: 0;
+        align-self: start;
+        height: 100vh;
+        overflow: auto;
+        padding: 28px 18px 28px 24px;
+        border-right: 1px solid var(--page-rule);
+        background: #ffffff;
+      }
+      .toc h1 {
+        font-size: 13px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--page-muted);
+        margin: 0 0 4px;
+        font-weight: 700;
+      }
+      .toc .brand {
+        font: 700 15px var(--jp);
+        color: var(--page-fg);
+        margin: 0 0 14px;
+      }
+      .toc ol {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        counter-reset: toc;
+      }
+      .toc ol li {
+        counter-increment: toc;
+      }
+      .toc ol li a {
+        display: block;
+        padding: 6px 8px;
+        border-radius: 6px;
+        color: var(--page-fg);
+        text-decoration: none;
+        font-size: 13px;
+      }
+      .toc ol li a::before {
+        content: counter(toc, decimal-leading-zero) ".  ";
+        color: var(--page-muted);
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+      .toc ol li a:hover {
+        background: #eef1f5;
+      }
+      .toc .meta {
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px dashed var(--page-rule);
+        font-size: 11px;
+        color: var(--page-muted);
+        line-height: 1.6;
+      }
+      .toc .meta code {
+        font: 11px var(--mono);
+        background: #eef1f5;
+        padding: 1px 5px;
+        border-radius: 3px;
+      }
+
+      main {
+        padding: 36px 40px 96px;
+        min-width: 0;
+      }
+      section.block {
+        margin: 0 0 56px;
+        scroll-margin-top: 12px;
+      }
+      h2.section-title {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 0 4px;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+      h2.section-title .tag {
+        font: 600 11px/1.2 var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #fff;
+        background: var(--page-fg);
+        padding: 3px 6px;
+        border-radius: 4px;
+      }
+      .section-sub {
+        color: var(--page-muted);
+        font-size: 13px;
+        margin: 0 0 22px;
+        max-width: 1000px;
+      }
+      .card {
+        background: var(--page-card);
+        border: 1px solid var(--page-rule);
+        border-radius: 12px;
+        padding: 20px;
+      }
+      h3.sub {
+        font-size: 15px;
+        font-weight: 700;
+        margin: 22px 0 10px;
+      }
+      p.note {
+        font-size: 12.5px;
+        color: var(--page-muted);
+        max-width: 1000px;
+      }
+      code.k {
+        font: 600 12px var(--mono);
+        background: #eef1f5;
+        color: #0b3a73;
+        padding: 1px 6px;
+        border-radius: 4px;
+      }
+
+      /* COVER */
+      .cover {
+        background: linear-gradient(135deg, #0a1a2f 0%, #0e2545 60%, #143062 100%);
+        color: #fff;
+        border-radius: 16px;
+        padding: 32px 36px;
+      }
+      .cover .eyebrow {
+        font: 600 11px/1 var(--mono);
+        letter-spacing: 0.16em;
+        color: #9db2d9;
+        text-transform: uppercase;
+      }
+      .cover h1 {
+        font-size: 30px;
+        font-weight: 700;
+        margin: 10px 0 6px;
+      }
+      .cover .lede {
+        color: #cbd5e1;
+        max-width: 900px;
+        font-size: 14.5px;
+        margin: 0 0 18px;
+      }
+      .cover .ssot {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin: 18px 0;
+        font: 600 13px var(--jp);
+      }
+      .cover .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-top: 18px;
+      }
+      .cover .grid .lbl {
+        font: 600 10px/1 var(--mono);
+        color: #94a3b8;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .cover .grid .val {
+        font-size: 14px;
+        color: #fff;
+        font-weight: 500;
+      }
+
+      /* token mini-grids */
+      .tok-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+      }
+      .tok {
+        background: var(--page-card);
+        border: 1px solid var(--page-rule);
+        border-radius: 10px;
+        padding: 12px;
+      }
+      .tok .sw {
+        height: 40px;
+        border-radius: 6px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        margin-bottom: 8px;
+      }
+      .tok .nm {
+        font: 600 11px var(--mono);
+        color: var(--page-fg);
+      }
+      .tok .vl {
+        font: 500 10.5px var(--mono);
+        color: var(--page-muted);
+        margin-top: 2px;
+      }
+      .type-row {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--page-rule);
+      }
+      .type-row:last-child {
+        border-bottom: 0;
+      }
+      .type-row .meta {
+        width: 220px;
+        flex: 0 0 220px;
+        font: 600 11px var(--mono);
+        color: var(--page-muted);
+      }
+      .type-row .meta b {
+        display: block;
+        color: var(--page-fg);
+        font-size: 12px;
+      }
+
+      /* FLOW diagram */
+      .flow {
+        display: grid;
+        gap: 14px;
+        background: var(--page-card);
+        border: 1px solid var(--page-rule);
+        border-radius: 12px;
+        padding: 22px;
+      }
+      .flow-lane {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 16px;
+        align-items: center;
+      }
+      .flow-lane + .flow-lane {
+        border-top: 1px dashed var(--page-rule);
+        padding-top: 14px;
+      }
+      .flow-lane .lane-key {
+        font: 700 12px var(--jp);
+        color: var(--page-fg);
+      }
+      .flow-lane .lane-key .gate {
+        display: inline-block;
+        margin-top: 4px;
+        font: 600 10px var(--mono);
+        color: var(--page-muted);
+        background: #eef1f5;
+        border-radius: 4px;
+        padding: 2px 6px;
+      }
+      .flow-steps {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+      }
+      .flow-step {
+        background: #eef4ff;
+        border: 1px solid #c3d9ff;
+        color: #0b3a73;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font: 600 12px var(--jp);
+      }
+      .flow-step.terminal {
+        background: #e7f6ec;
+        border-color: #aedcbd;
+        color: #14512c;
+      }
+      .flow-step.skip {
+        background: #fdeeee;
+        border-color: #f3c6c6;
+        color: #8a2a22;
+      }
+      .flow-arrow {
+        color: var(--page-muted);
+        font: 600 14px var(--mono);
+      }
+
+      /* COPY SSOT table */
+      .copy-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12.5px;
+      }
+      .copy-table th,
+      .copy-table td {
+        text-align: left;
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--page-rule);
+        vertical-align: top;
+      }
+      .copy-table th {
+        font: 600 11px var(--mono);
+        color: var(--page-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .copy-table td.key {
+        font: 600 11.5px var(--mono);
+        color: #0b3a73;
+        white-space: nowrap;
+      }
+      .copy-table td.val {
+        color: var(--page-fg);
+      }
+      .copy-table .reuse {
+        color: var(--page-warn);
+        font: 600 10.5px var(--mono);
+      }
+      .copy-table tr.group td {
+        background: #f0f3f7;
+        font: 700 11px var(--mono);
+        color: var(--page-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      /* =======================================================================
+         DEVICE FRAMES  (chrome mirrors the Search Screen Spec frame system)
+         ======================================================================= */
+      .mock-block {
+        margin-bottom: 44px;
+      }
+      .mock-block-title {
+        font-size: 17px;
+        font-weight: 700;
+        margin: 0 0 4px;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+      .mock-block-title .pill {
+        font: 600 10px var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        background: var(--page-fg);
+        color: #fff;
+        padding: 3px 6px;
+        border-radius: 4px;
+      }
+      .mock-block-sub {
+        font-size: 12.5px;
+        color: var(--page-muted);
+        margin: 0 0 16px;
+        max-width: 1000px;
+      }
+
+      .mock-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, max-content));
+        gap: 24px;
+        align-items: start;
+        margin-bottom: 24px;
+        padding: 18px;
+        background: var(--page-card);
+        border: 1px solid var(--page-rule);
+        border-radius: 12px;
+        overflow-x: auto;
+      }
+      .mock-row.tablet {
+        grid-template-columns: repeat(auto-fit, minmax(740px, max-content));
+      }
+      .mock-row.landscape {
+        grid-template-columns: repeat(auto-fit, minmax(980px, max-content));
+      }
+      .mock-row > .row-label {
+        grid-column: 1/-1;
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        font: 600 12px var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--page-muted);
+        border-bottom: 1px solid var(--page-rule);
+        padding-bottom: 10px;
+        margin-bottom: 4px;
+      }
+      .mock-row > .row-label .state-name {
+        color: var(--page-fg);
+        font-size: 13px;
+      }
+      .mock-row > .row-label .desc {
+        color: var(--page-muted);
+        font: 400 12px var(--jp);
+        text-transform: none;
+        letter-spacing: 0;
+      }
+
+      .mock-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .mock-wrap > h4 {
+        margin: 0;
+        font: 600 11px/1.4 var(--mono);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--page-muted);
+      }
+      .mock-wrap > h4 .pill {
+        margin-left: 6px;
+        padding: 1px 5px;
+        border-radius: 3px;
+        font-size: 9.5px;
+        letter-spacing: 0.04em;
+        color: var(--page-fg);
+        background: #efeff4;
+        border: 1px solid var(--page-rule);
+      }
+      .mock-wrap > h4 .pill.dark {
+        background: #0f172a;
+        color: #f1f5f9;
+        border-color: #0f172a;
+      }
+
+      .frame {
+        font-family: var(--jp);
+        position: relative;
+        background: linear-gradient(180deg, #0f172a, #0b1220);
+        padding: 8px;
+        border-radius: 26px;
+        color: var(--ink);
+        width: 380px;
+      }
+      .frame.dark {
+        background: linear-gradient(180deg, #1e293b, #0f172a);
+      }
+      .frame .device {
+        background: var(--bg);
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 760px;
+      }
+      .frame.tablet {
+        width: 720px;
+        border-radius: 22px;
+        padding: 10px;
+      }
+      .frame.tablet .device {
+        height: 940px;
+        border-radius: 16px;
+      }
+      .frame.tablet.landscape {
+        width: 980px;
+      }
+      .frame.tablet.landscape .device {
+        height: 700px;
+      }
+      /* phone in landscape — nav form resolves to NavigationRail by orientation, not device */
+      .frame.landscape:not(.tablet) {
+        width: 760px;
+      }
+      .frame.landscape:not(.tablet) .device {
+        height: 400px;
+      }
+
+      /* Status bar (OS only) */
+      .frame .status-bar {
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 18px;
+        font: 600 12px var(--jp);
+        color: var(--ink);
+        background: var(--bg);
+        flex: 0 0 auto;
+      }
+      .frame .status-bar .os-time {
+        font-feature-settings: "tnum";
+      }
+      .frame .status-bar .os-indicators {
+        display: inline-flex;
+        gap: 4px;
+        align-items: center;
+        font-size: 12px;
+      }
+      .frame .status-bar .os-ico {
+        font-family: var(--icon-font);
+        font-size: 13px;
+      }
+      .ico svg,
+      .os-ico svg,
+      .caret svg {
+        width: 1em;
+        height: 1em;
+        display: block;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .frame.tablet .status-bar {
+        height: 32px;
+        padding: 0 24px;
+      }
+
+      /* App bar — title + always-visible "about" icon (shell chrome) */
+      .frame .appbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 12px 6px;
+        background: var(--bg);
+        flex: 0 0 auto;
+      }
+      .frame .appbar .title {
+        font: 700 22px var(--jp);
+        color: var(--ink);
+      }
+      .frame.tablet .appbar {
+        padding: 6px 24px 8px;
+      }
+      .frame.tablet .appbar .title {
+        font-size: 26px;
+      }
+      .frame .about-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: var(--ink-2);
+        background: transparent;
+        flex: 0 0 auto;
+      }
+      .frame .about-icon .ico {
+        font-family: var(--icon-font);
+        font-size: 24px;
+      }
+      /* About app bar = pushed top-level route: CENTERED title + LEADING back button.
+         (Search shell app bar keeps justify-content:space-between, i.e. LEFT title, no back.) */
+      .frame .appbar.centered {
+        position: relative;
+        justify-content: center;
+      }
+      .frame .appbar.centered .title {
+        text-align: center;
+      }
+      .frame .nav-back {
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: var(--ink-2);
+        background: transparent;
+      }
+      .frame.tablet .appbar.centered .nav-back {
+        left: 16px;
+      }
+      .frame .nav-back .ico {
+        font-family: var(--icon-font);
+        font-size: 24px;
+      }
+
+      /* Toolbar (seg tabs + search field) */
+      .frame .toolbar {
+        padding: 6px 12px 8px;
+        background: var(--bg);
+        display: grid;
+        gap: 8px;
+        flex: 0 0 auto;
+        border-bottom: 1px solid var(--hairline);
+      }
+      .frame.tablet .toolbar {
+        padding: 8px 24px 10px;
+        gap: 10px;
+      }
+      .seg-tabs {
+        display: flex;
+        background: var(--surface-3);
+        border-radius: var(--r-pill);
+        padding: 3px;
+        height: 38px;
+        gap: 2px;
+      }
+      .seg-tabs .opt {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font: 700 13px var(--jp);
+        color: var(--ink-2);
+        border-radius: calc(var(--r-pill) - 3px);
+      }
+      .seg-tabs .opt.on {
+        background: var(--surface);
+        color: var(--ink);
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+      }
+      .search-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .search-field {
+        flex: 1;
+        height: 42px;
+        border-radius: var(--r-tile);
+        background: var(--search-field-bg);
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        gap: 8px;
+        color: var(--ink);
+        font: 500 14px var(--jp);
+        border: 1px solid transparent;
+      }
+      .search-field .ico {
+        font-family: var(--icon-font);
+        font-size: 18px;
+        color: var(--muted);
+      }
+      .search-field .ph {
+        color: var(--muted-2);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .search-btn {
+        height: 42px;
+        padding: 0 18px;
+        border-radius: var(--r-tile);
+        background: var(--primary-cont);
+        color: var(--on-primary-cont);
+        font: 700 14px var(--jp);
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+      }
+
+      /* Body + result placeholders */
+      .frame .body {
+        flex: 1 1 auto;
+        overflow: hidden;
+        position: relative;
+        background: var(--bg);
+      }
+      .frame .body .scroll {
+        position: absolute;
+        inset: 0;
+        bottom: 90px;
+        overflow: hidden;
+        padding: 10px 12px;
+      }
+      .frame.tablet .body .scroll {
+        padding: 12px 24px;
+      }
+      .result-card {
+        background: var(--surface);
+        border-radius: var(--r-card);
+        padding: 12px;
+        margin-top: 8px;
+        display: flex;
+        gap: 12px;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        border: 0.5px solid var(--hairline);
+      }
+      .result-card:first-child {
+        margin-top: 0;
+      }
+      .result-card .card-image {
+        width: 52px;
+        height: 78px;
+        border-radius: var(--r-tile);
+        background: var(--surface-3);
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        flex: 0 0 52px;
+        border: 0.5px solid var(--hairline-2);
+      }
+      .result-card .card-image .ico {
+        font-family: var(--icon-font);
+        font-size: 22px;
+      }
+      .result-card .meta-wrap {
+        flex: 1;
+        min-width: 0;
+      }
+      .result-card .chips {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 4px;
+        flex-wrap: wrap;
+      }
+      .chip-s {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 6px;
+        border-radius: var(--r-chip);
+        font: 700 10.5px var(--jp);
+        line-height: 1.2;
+      }
+      .chip-rx {
+        background: rgba(0, 122, 255, 0.1);
+        color: var(--primary);
+      }
+      .chip-otc {
+        background: var(--surface-3);
+        color: var(--ink-2);
+      }
+      .result-card .brand {
+        font: 700 14px/1.3 var(--jp);
+        color: var(--ink);
+      }
+      .result-card .generic {
+        font: 400 12px/1.4 var(--jp);
+        color: var(--ink-2);
+        margin-top: 2px;
+      }
+      .result-card .meta-line {
+        font: 500 11px/1.4 var(--mono);
+        color: var(--muted);
+        margin-top: 5px;
+      }
+
+      /* Bottom nav (portrait) */
+      .frame .bottom-nav {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        background: var(--surface);
+        border-top: 0.5px solid var(--hairline);
+        z-index: 6;
+      }
+      .frame .bottom-nav .nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        color: var(--muted);
+        font: 600 10px var(--jp);
+      }
+      .frame .bottom-nav .nav-item .ico {
+        font-family: var(--icon-font);
+        font-size: 22px;
+        font-variation-settings: "FILL" 0;
+      }
+      .frame .bottom-nav .nav-item .ico-wrap {
+        width: 64px;
+        height: 32px;
+        border-radius: var(--r-pill);
+        display: grid;
+        place-items: center;
+      }
+      .frame .bottom-nav .nav-item.active {
+        color: var(--primary);
+      }
+      .frame .bottom-nav .nav-item.active .ico-wrap {
+        background: var(--primary-soft);
+      }
+
+      /* Nav rail (landscape) — leftmost edge */
+      .frame.landscape .device {
+        flex-direction: row;
+      }
+      .frame.landscape .status-bar {
+        display: none;
+      }
+      .frame .nav-rail {
+        flex: 0 0 72px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface);
+        border-right: 0.5px solid var(--hairline);
+        padding: 12px 0;
+        z-index: 6;
+      }
+      .frame .nav-rail .nav-rail-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        color: var(--muted);
+        font: 600 9.5px var(--jp);
+        width: 100%;
+      }
+      .frame .nav-rail .nav-rail-item .ico-wrap {
+        width: 48px;
+        height: 30px;
+        border-radius: var(--r-pill);
+        display: grid;
+        place-items: center;
+      }
+      .frame .nav-rail .nav-rail-item .ico {
+        font-family: var(--icon-font);
+        font-size: 23px;
+      }
+      .frame .nav-rail .nav-rail-item.active {
+        color: var(--primary);
+      }
+      .frame .nav-rail .nav-rail-item.active .ico-wrap {
+        background: var(--primary-soft);
+      }
+      .frame.landscape .device-main {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        position: relative;
+      }
+
+      /* Disclaimer ribbon (shell-level, always-on) */
+      .frame .ribbon {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 64px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: var(--rib-bg-light);
+        color: var(--rib-fg);
+        font: 700 11px/1 var(--jp);
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+        user-select: none;
+        pointer-events: none;
+        z-index: 7;
+      }
+      .frame.dark .ribbon {
+        background: var(--rib-bg-dark);
+      }
+      .frame.landscape .ribbon {
+        bottom: 0;
+      }
+      .frame .ribbon .accent {
+        color: var(--rib-accent);
+      }
+
+      /* =======================================================================
+         ONBOARDING — INTRO CAROUSEL overlay
+         ======================================================================= */
+      .ob-intro {
+        position: absolute;
+        inset: 0;
+        z-index: 12;
+        background: var(--bg);
+        display: flex;
+        flex-direction: column;
+        padding: var(--s-4);
+      }
+      .frame.tablet .ob-intro {
+        padding: var(--s-8) var(--s-10);
+      }
+      .ob-intro-head {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        min-height: 44px;
+        flex: 0 0 auto;
+      }
+      .ob-skip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        min-height: 44px;
+        padding: 0 10px;
+        background: transparent;
+        border: 0;
+        color: var(--muted);
+        font: 600 13px var(--jp);
+        cursor: pointer;
+      }
+      .ob-skip .ico {
+        font-family: var(--icon-font);
+        font-size: 16px;
+      }
+      .ob-intro-body {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: var(--s-4);
+        padding: 0 var(--s-2);
+      }
+      .ob-icon {
+        width: 96px;
+        height: 96px;
+        border-radius: var(--r-fab);
+        display: grid;
+        place-items: center;
+        background: var(--primary-soft);
+        color: var(--primary);
+      }
+      .ob-icon .ico {
+        font-family: var(--icon-font);
+        font-size: 46px;
+      }
+      .ob-title {
+        font: 700 22px/1.3 var(--jp);
+        color: var(--ink);
+        margin: 0;
+      }
+      .ob-text {
+        font: 400 14px/1.7 var(--jp);
+        color: var(--ink-2);
+        margin: 0;
+        max-width: 320px;
+        text-wrap: pretty;
+      }
+      .frame.tablet .ob-icon {
+        width: 120px;
+        height: 120px;
+      }
+      .frame.tablet .ob-icon .ico {
+        font-size: 58px;
+      }
+      .frame.tablet .ob-title {
+        font-size: 28px;
+      }
+      .frame.tablet .ob-text {
+        font-size: 16px;
+        max-width: 460px;
+      }
+
+      /* tablet two-column intro layout (responsive adaptation, OB-10) */
+      .ob-intro[data-layout="tablet"] .ob-intro-body {
+        flex-direction: row;
+        text-align: left;
+        gap: var(--s-10);
+        align-items: center;
+        justify-content: center;
+      }
+      .ob-intro[data-layout="tablet"] .ob-intro-body .ob-col-text {
+        max-width: 420px;
+        display: flex;
+        flex-direction: column;
+        gap: var(--s-4);
+      }
+      .ob-intro[data-layout="tablet"] .ob-text {
+        margin: 0;
+      }
+
+      .ob-disclaimer {
+        display: flex;
+        align-items: center;
+        gap: var(--s-2);
+        justify-content: center;
+        background: var(--rib-bg-light);
+        color: var(--rib-fg);
+        border-radius: var(--r-tile);
+        padding: 10px 14px;
+        font: 700 11px/1.3 var(--jp);
+        letter-spacing: 0.03em;
+        max-width: 360px;
+        text-wrap: pretty;
+      }
+      .frame.dark .ob-disclaimer {
+        background: var(--rib-bg-dark);
+      }
+      .ob-disclaimer .accent {
+        color: var(--rib-accent);
+        font-size: 16px;
+        flex: 0 0 auto;
+      }
+
+      .ob-features {
+        display: grid;
+        gap: var(--s-2);
+        width: 100%;
+        max-width: 360px;
+        text-align: left;
+      }
+      .frame.tablet .ob-features {
+        max-width: 420px;
+      }
+      .ob-feature {
+        display: flex;
+        align-items: center;
+        gap: var(--s-3);
+        background: var(--surface);
+        border: 0.5px solid var(--hairline);
+        border-radius: var(--r-card);
+        padding: 10px 12px;
+      }
+      .ob-feature .ico-wrap {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--r-tile);
+        flex: 0 0 36px;
+        display: grid;
+        place-items: center;
+        background: var(--primary-soft);
+        color: var(--primary);
+      }
+      .ob-feature .ico-wrap .ico {
+        font-family: var(--icon-font);
+        font-size: 20px;
+      }
+      .ob-feature .f-text {
+        min-width: 0;
+      }
+      .ob-feature .f-title {
+        font: 700 13px var(--jp);
+        color: var(--ink);
+      }
+      .ob-feature .f-sub {
+        font: 400 11.5px/1.4 var(--jp);
+        color: var(--muted);
+      }
+
+      .ob-intro-foot {
+        flex: 0 0 auto;
+        display: grid;
+        gap: var(--s-4);
+        padding-top: var(--s-4);
+      }
+      .ob-dots {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+      }
+      .ob-dots .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--surface-4);
+      }
+      .ob-dots .dot.on {
+        background: var(--primary);
+        width: 22px;
+        border-radius: 5px;
+      }
+      .ob-next {
+        height: 50px;
+        border: 0;
+        border-radius: var(--r-pill);
+        cursor: pointer;
+        background: var(--primary);
+        color: var(--on-primary);
+        font: 700 15px var(--jp);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .ob-next.start {
+        background: var(--primary);
+      }
+      .ob-next .ico {
+        font-family: var(--icon-font);
+        font-size: 18px;
+      }
+
+      /* =======================================================================
+         ONBOARDING — SPOTLIGHT coachmarks over live UI
+         ======================================================================= */
+      .frame.spotlight .device .scrim {
+        position: absolute;
+        inset: 0;
+        background: var(--scrim);
+        z-index: 20;
+        pointer-events: none;
+      }
+      .spot-target {
+        position: relative;
+        z-index: 30 !important;
+        border-radius: var(--r-tile);
+      }
+      .spot-target::after {
+        content: "";
+        position: absolute;
+        inset: -5px;
+        border-radius: calc(var(--r-tile) + 5px);
+        border: 3px solid var(--primary);
+        box-shadow:
+          0 0 0 2px var(--on-primary),
+          0 6px 18px rgba(0, 0, 0, 0.35);
+        pointer-events: none;
+      }
+      .spot-target.round-target::after {
+        border-radius: 50%;
+        inset: -4px;
+      }
+      .spot-target.bar-target::after {
+        border-radius: 14px;
+        inset: -3px;
+      }
+      .coach-card {
+        position: absolute;
+        z-index: 31;
+        width: 268px;
+        background: var(--surface);
+        border-radius: var(--r-sheet-card);
+        border: 0.5px solid var(--hairline);
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.28);
+        padding: 14px 16px;
+        display: grid;
+        gap: 8px;
+      }
+      .frame.tablet .coach-card {
+        width: 320px;
+      }
+      .coach-card .cc-step {
+        font: 600 10.5px var(--mono);
+        color: var(--primary);
+        letter-spacing: 0.06em;
+      }
+      .coach-card .cc-title {
+        font: 700 15px var(--jp);
+        color: var(--ink);
+      }
+      .coach-card .cc-lead {
+        font: 700 10.5px var(--mono);
+        color: var(--muted);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .coach-card .cc-body {
+        font: 400 13px/1.6 var(--jp);
+        color: var(--ink-2);
+        margin: 0;
+        text-wrap: pretty;
+      }
+      .coach-card .cc-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 2px;
+      }
+      .coach-card .cc-skip {
+        background: transparent;
+        border: 0;
+        color: var(--muted);
+        font: 600 12px var(--jp);
+        cursor: pointer;
+        min-height: 40px;
+        padding: 0 6px;
+      }
+      .coach-card .cc-next {
+        height: 40px;
+        padding: 0 16px;
+        border: 0;
+        border-radius: var(--r-pill);
+        background: var(--primary);
+        color: var(--on-primary);
+        font: 700 13px var(--jp);
+        cursor: pointer;
+      }
+      /* coach card placement per target */
+      .coach-card.at-search {
+        top: 150px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .frame.tablet .coach-card.at-search {
+        top: 180px;
+      }
+      .coach-card.at-about {
+        top: 92px;
+        right: 14px;
+      }
+      .frame.tablet .coach-card.at-about {
+        top: 110px;
+        right: 24px;
+      }
+      .coach-card.at-nav {
+        bottom: 104px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .frame.landscape .coach-card.at-search {
+        top: 90px;
+        left: 120px;
+        transform: none;
+      }
+      .frame.landscape .coach-card.at-about {
+        top: 70px;
+        right: 24px;
+      }
+      .frame.landscape .coach-card.at-nav {
+        top: 90px;
+        left: 96px;
+        bottom: auto;
+        transform: none;
+      }
+
+      /* =======================================================================
+         RESHOW — About screen (flat ListView, mirrors lib/ui/about/about_view.dart)
+         A SafeArea > ListView(padding s4) of plain ListTiles. No section headers,
+         no leading icons, no legalese footer — the real screen has none of those.
+         ======================================================================= */
+      .frame .about-list {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        padding: var(--s-4);
+        display: flex;
+        flex-direction: column;
+      }
+      .about-tile {
+        display: flex;
+        align-items: center;
+        gap: var(--s-3);
+        min-height: 56px;
+        padding: 12px var(--s-2);
+      }
+      .about-tile + .about-tile {
+        border-top: 0.5px solid var(--hairline-2);
+      }
+      .about-tile.disabled {
+        opacity: 0.55;
+      }
+      .about-tile .tile-text {
+        flex: 1;
+        min-width: 0;
+      }
+      .about-tile .tile-title {
+        font: 400 14px var(--jp);
+        color: var(--ink);
+      }
+      .about-tile.disabled .tile-title {
+        color: var(--muted);
+      }
+      .about-tile .tile-sub {
+        font: 400 11.5px/1.4 var(--jp);
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      .about-tile .trail {
+        display: grid;
+        place-items: center;
+      }
+      .about-tile .trail .ico {
+        font-family: var(--icon-font);
+        font-size: 20px;
+        color: var(--muted);
+      }
+
+      /* =======================================================================
+         RESPONSIVE breakpoint live demo
+         ======================================================================= */
+      .resp-demo {
+        background: var(--page-card);
+        border: 1px solid var(--page-rule);
+        border-radius: 12px;
+        padding: 18px;
+      }
+      .resp-controls {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+      }
+      .resp-controls input[type="range"] {
+        width: 320px;
+      }
+      .resp-readout {
+        font: 600 12px var(--mono);
+        color: var(--page-fg);
+      }
+      .resp-readout b {
+        color: var(--page-accent);
+      }
+      .resp-badge {
+        display: inline-block;
+        font: 700 11px var(--mono);
+        padding: 3px 8px;
+        border-radius: 5px;
+        background: #eef4ff;
+        color: #0b3a73;
+        border: 1px solid #c3d9ff;
+      }
+      .resp-badge.tablet {
+        background: #e7f6ec;
+        color: #14512c;
+        border-color: #aedcbd;
+      }
+      .resp-stage {
+        background: linear-gradient(135deg, #e8eef6, #dde6f1);
+        border-radius: 14px;
+        padding: 16px;
+        display: flex;
+        justify-content: center;
+        overflow: auto;
+      }
+      #resp-frame {
+        flex: 0 0 auto;
+        transition: width var(--dur-base) var(--ease-std);
+      }
+      /* inner frame fills the wrapper (whose width is the dynamic px); no inline literals inside .frame */
+      #resp-frame .frame {
+        width: 100%;
+      }
+      #resp-frame .device {
+        height: 520px;
+      }
+
+      /* =======================================================================
+         VERIFICATION report
+         ======================================================================= */
+      .vr-banner {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font: 600 13px var(--jp);
+        margin-bottom: 16px;
+        background: #e7f6ec;
+        color: #14512c;
+        border: 1px solid #aedcbd;
+      }
+      .vr-banner.fail {
+        background: #fdeeee;
+        color: #8a2a22;
+        border-color: #f3c6c6;
+      }
+      .vr-banner .pill {
+        font: 700 11px var(--mono);
+        padding: 3px 8px;
+        border-radius: 5px;
+        background: #14512c;
+        color: #fff;
+        letter-spacing: 0.06em;
+      }
+      .vr-banner.fail .pill {
+        background: #8a2a22;
+      }
+      .vr-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12.5px;
+      }
+      .vr-table th,
+      .vr-table td {
+        text-align: left;
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--page-rule);
+        vertical-align: top;
+      }
+      .vr-table th {
+        font: 600 11px var(--mono);
+        color: var(--page-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .vr-table td.id {
+        font: 700 11.5px var(--mono);
+        color: var(--page-fg);
+        white-space: nowrap;
+      }
+      .vr-table td.method {
+        font: 500 11px var(--mono);
+        color: var(--page-muted);
+      }
+      .vr-table td.result {
+        font: 700 11.5px var(--mono);
+        white-space: nowrap;
+      }
+      .vr-table td.result.pass {
+        color: var(--page-ok);
+      }
+      .vr-table td.result.fail {
+        color: var(--page-warn);
+      }
+      .vr-table td.evidence {
+        color: var(--page-fg);
+      }
+      .vr-table td.evidence code {
+        font: 600 11px var(--mono);
+        background: #eef1f5;
+        padding: 1px 5px;
+        border-radius: 3px;
+      }
+      .vr-legend {
+        font-size: 11.5px;
+        color: var(--page-muted);
+        margin-top: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      hidden
+      data-codex-repo-wide-implementation-readiness="source-plus-rendered-evidence"
+      data-implementation-parity-scope="repo-wide-html-design-artifact"
+    >
+      Repo-wide implementation readiness gate. implementation source evidence + rendered frame evidence. Do not use VRT
+      or visual manifest as implementation parity evidence by itself.
+    </div>
+    <div hidden data-onboarding-implementation-source-evidence="flutter-source-parity">
+      Flutter source parity: lib/router/app_router.dart defines /about outside the StatefulShellRoute;
+      lib/ui/about/about_view.dart renders a flat ListView with the licenses ListTile shape;
+      lib/ui/shell/app_tab_header.dart provides ValueKey('app-tab-header-about-button');
+      lib/ui/search/widgets/search_top_chrome.dart provides ValueKey('search-field'); lib/ui/shell/app_shell.dart
+      switches NavigationBar and NavigationRail by orientation; lib/l10n/app_ja.arb provides disclaimerRibbonText.
+    </div>
+    <div class="shell">
+      <nav class="toc">
+        <h1>Design SSOT</h1>
+        <p class="brand">オンボーディング / チュートリアル</p>
+        <ol>
+          <li><a href="#sec-cover">Overview</a></li>
+          <li><a href="#sec-tokens">Design tokens</a></li>
+          <li><a href="#sec-flow">Flow &amp; gating</a></li>
+          <li><a href="#sec-copy">Copy SSOT (l10n)</a></li>
+          <li><a href="#sec-intro">Intro carousel</a></li>
+          <li><a href="#sec-spotlight">Spotlight tour</a></li>
+          <li><a href="#sec-reshow">Re-show entry</a></li>
+          <li><a href="#sec-responsive">Responsive breakpoint</a></li>
+          <li><a href="#sec-verify">Verification report</a></li>
+        </ol>
+        <div class="meta">
+          要件 SSOT:
+          <code>16_オンボーディング要件定義.md</code>
+          の全 OB-N 受け入れ基準を満たす。
+          <br />
+          検証は
+          <code>#sec-verify</code>
+          にて on-load の inline JS が live DOM から算出する。
+        </div>
+      </nav>
+
+      <main>
+        <!-- ===================== COVER ===================== -->
+        <section class="block" id="sec-cover">
+          <div class="cover">
+            <div class="eyebrow">医薬品・疾患リファレンス · Onboarding layer</div>
+            <h1>初回起動オンボーディング &amp; 操作チュートリアル</h1>
+            <p class="lede">
+              初見利用者にアプリ目的と主要機能の所在を短時間で伝える intro カルーセルと、実画面上の主要要素を
+              順に案内する spotlight ツアーの 2 段構成。既存 6
+              画面の構造・操作・テーマ追従は変更しない、重なる層として提示する。
+            </p>
+            <div class="ssot">
+              単一ファイル SSOT — intro 3 ページ × light/dark × iPhone/iPad、spotlight coachmark、再表示動線を 1
+              ページに集約。 文言は l10n キー (
+              <code>onboarding*</code>
+              /
+              <code>aboutTutorial*</code>
+              )、免責は既存
+              <code>disclaimerRibbonText</code>
+              を再利用。
+            </div>
+            <div class="grid">
+              <div>
+                <div class="lbl">Intro frames</div>
+                <div class="val" id="cover-intro-count">—</div>
+              </div>
+              <div>
+                <div class="lbl">Spotlight frames</div>
+                <div class="val" id="cover-spot-count">—</div>
+              </div>
+              <div>
+                <div class="lbl">Persist key</div>
+                <div class="val">onboarding_completed</div>
+              </div>
+              <div>
+                <div class="lbl">Tablet breakpoint</div>
+                <div class="val">shortestSide ≥ 600</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== TOKENS ===================== -->
+        <section class="block" id="sec-tokens">
+          <h2 class="section-title">
+            01 — Design tokens
+            <span class="tag">AppTheme</span>
+          </h2>
+          <p class="section-sub">
+            すべてのフレーム内の色・余白・角丸・タイポは下記トークン (AppPalette / AppSpacing / AppRadii /
+            AppTypography) に解決する。直値は使用しない。
+          </p>
+          <h3 class="sub">Color roles — light / dark</h3>
+          <div class="tok-grid" id="tok-colors"></div>
+          <h3 class="sub">Type ramp (NotoSansJP)</h3>
+          <div class="card" id="tok-type"></div>
+          <h3 class="sub">Spacing · Radii</h3>
+          <div class="tok-grid" id="tok-space"></div>
+        </section>
+
+        <!-- ===================== FLOW ===================== -->
+        <section class="block" id="sec-flow">
+          <h2 class="section-title">
+            02 — Flow &amp; gating
+            <span class="tag">OB-1/2/3/4/9</span>
+          </h2>
+          <p class="section-sub">
+            完了フラグ
+            <code class="k">onboarding_completed</code>
+            (bool, 既定
+            <code class="k">false</code>
+            ) による gating。Skip は両フェーズで可能、Skip / 完了で
+            <code class="k">true</code>
+            を書き込む。再表示は完了フラグを変更しない。
+          </p>
+          <div class="flow">
+            <div class="flow-lane">
+              <div class="lane-key">
+                初回起動
+                <span class="gate">flag = false</span>
+              </div>
+              <div class="flow-steps">
+                <span class="flow-step">intro カルーセル (3p)</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step">「使ってみる」</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step">spotlight ツアー</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step terminal">完了 (flag = true)</span>
+              </div>
+            </div>
+            <div class="flow-lane">
+              <div class="lane-key">
+                Skip
+                <span class="gate">両フェーズ可</span>
+              </div>
+              <div class="flow-steps">
+                <span class="flow-step skip">intro / spotlight いずれでも Skip</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step terminal">即時完了 (flag = true)</span>
+              </div>
+            </div>
+            <div class="flow-lane">
+              <div class="lane-key">
+                2 回目以降
+                <span class="gate">flag = true</span>
+              </div>
+              <div class="flow-steps">
+                <span class="flow-step terminal">オンボーディングを挟まず通常起動</span>
+              </div>
+            </div>
+            <div class="flow-lane">
+              <div class="lane-key">
+                再表示
+                <span class="gate">flag 維持</span>
+              </div>
+              <div class="flow-steps">
+                <span class="flow-step">「アプリについて」項目</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step">intro から再提示</span>
+                <span class="flow-arrow">→</span>
+                <span class="flow-step terminal">flag は true のまま</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== COPY SSOT ===================== -->
+        <section class="block" id="sec-copy">
+          <h2 class="section-title">
+            03 — Copy SSOT (l10n)
+            <span class="tag">app_ja.arb</span>
+          </h2>
+          <p class="section-sub">
+            文言の SSOT はアプリ l10n リソース。オンボーディング文言は
+            <code class="k">onboarding*</code>
+            、再表示項目は
+            <code class="k">aboutTutorial*</code>
+            キー接頭辞。免責はページ 1 で既存
+            <code class="k">disclaimerRibbonText</code>
+            を再利用
+            (新規定義しない)。本表のキー/値がレンダリングの唯一の入力であり、フレーム内に直書きの文言は存在しない。
+          </p>
+          <div class="card" style="padding: 0; overflow: hidden">
+            <table class="copy-table" id="copy-table"></table>
+          </div>
+        </section>
+
+        <!-- ===================== INTRO ===================== -->
+        <section class="block" id="sec-intro">
+          <h2 class="section-title">
+            04 — Intro carousel
+            <span class="tag">OB-1/7/8/11</span>
+          </h2>
+          <p class="section-sub">
+            左右スワイプの 3 ページ。各ページ = アイコン + タイトル + 本文 (スクリーンショットは用いない)。共通要素 =
+            右上 Skip・3 点ドットインジケータ・Next、最終ページに「使ってみる」。ページ 1 に架空データ免責。iPhone /
+            iPad で破綻なく表示。
+          </p>
+          <div class="mock-block" id="mock-intro-iphone"></div>
+          <div class="mock-block" id="mock-intro-ipad"></div>
+        </section>
+
+        <!-- ===================== SPOTLIGHT ===================== -->
+        <section class="block" id="sec-spotlight">
+          <h2 class="section-title">
+            05 — Spotlight tour
+            <span class="tag">OB-5/6/12</span>
+          </h2>
+          <p class="section-sub">
+            実 UI 上の shell 常時可視 chrome を 1 つずつハイライト (フォーカス枠)
+            し、各要素に「ここを押すとこうなる」カードを添える。対象は
+            <b>検索フィールド・主ナビゲーション・「アプリについて」アイコン</b>
+            の 3 点のみ。非アクティブタブ内の widget は対象にしない。向きで主ナビの形態が変わる — portrait = bottom
+            NavigationBar / landscape = NavigationRail。
+          </p>
+          <div class="mock-block" id="mock-spot-iphone"></div>
+          <div class="mock-block" id="mock-spot-ipad"></div>
+        </section>
+
+        <!-- ===================== RESHOW ===================== -->
+        <section class="block" id="sec-reshow">
+          <h2 class="section-title">
+            06 — Re-show entry
+            <span class="tag">OB-9</span>
+          </h2>
+          <p class="section-sub">
+            「アプリについて」画面に、既存ライセンス項目と同形の再表示項目を追加。選択で intro
+            カルーセルから再提示し、完了フラグは完了のまま維持。画面の既存機能は変更しない。
+          </p>
+          <div class="mock-block" id="mock-reshow"></div>
+        </section>
+
+        <!-- ===================== RESPONSIVE ===================== -->
+        <section class="block" id="sec-responsive">
+          <h2 class="section-title">
+            07 — Responsive breakpoint
+            <span class="tag">OB-10</span>
+          </h2>
+          <p class="section-sub">
+            端末クラスは最短辺の閾値
+            <code class="k">shortestSide ≥ 600</code>
+            で phone / tablet を判定する。スライダーで幅を変え、600 を跨ぐとレイアウトが phone ⇄ tablet に切り替わる
+            (live)。
+          </p>
+          <div class="resp-demo">
+            <div class="resp-controls">
+              <input type="range" id="resp-range" min="360" max="900" value="430" step="2" aria-label="幅" />
+              <span class="resp-readout">
+                幅
+                <b id="resp-w">430</b>
+                px · 判定
+                <span class="resp-badge" id="resp-class">phone</span>
+              </span>
+            </div>
+            <div class="resp-stage">
+              <div id="resp-frame"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================== VERIFICATION ===================== -->
+        <section class="block" id="sec-verify">
+          <h2 class="section-title">
+            08 — Verification report
+            <span class="tag">VR-01..VR-AUDIT</span>
+          </h2>
+          <p class="section-sub">
+            Computed by inline JS on load from the live DOM. Every row must read PASS before this spec ships. Verdicts
+            are JS-computed — never hard-coded into the HTML.
+          </p>
+          <div id="verify-banner"></div>
+          <div id="verify-root"></div>
+          <p class="vr-legend">
+            Method —
+            <b>C</b>
+            : computed from live DOM ·
+            <b>S</b>
+            : static-source scan ·
+            <b>F</b>
+            : functional assertion. Anti-forgery rows VR-AUDIT-A/B capture the on-disk document at the top of the IIFE
+            before any DOM mutation.
+          </p>
+
+          <!-- Audit contract — OB invariants encoded as data-* + <span data-required>.
+               verify-banner / verify-root above are EMPTY on disk; any static content
+               there is caught by VR-AUDIT-A. -->
+          <div
+            id="onboarding-spec-audit-contract"
+            hidden
+            data-intro-page-count="3"
+            data-disclaimer-on-page="1"
+            data-themes="light,dark"
+            data-device-classes="iphone,ipad"
+            data-tablet-breakpoint="600"
+            data-skip-available="both-phases"
+            data-dot-indicator-count="3"
+            data-spotlight-target-scope="shell-chrome-only"
+            data-spotlight-targets="search-field,nav-tabs,about-icon"
+            data-spotlight-last-label="完了"
+            data-feature-list-count="5"
+            data-feature-order="search,detail,calc,bookmark,history"
+            data-nav-form-rule="orientation"
+            data-reshow-entry="about"
+            data-persist-key="onboarding_completed"
+          >
+            <span data-required="disclaimer-page1"></span>
+            <span data-required="skip-button"></span>
+            <span data-required="dot-indicator-3"></span>
+            <span data-required="start-button-last-page"></span>
+            <span data-required="spotlight-shell-chrome"></span>
+            <span data-required="spotlight-done-on-last"></span>
+            <span data-required="feature-list-5"></span>
+            <span data-required="token-discipline"></span>
+            <span data-required="nav-form-by-orientation"></span>
+            <span data-required="responsive-breakpoint"></span>
+            <span data-required="about-pushed-route-chrome"></span>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      /* eslint-disable */
+      (function () {
+        // =====================================================================
+        // ANTI-FORGERY CAPTURE — runs FIRST, before any DOM mutation.
+        // =====================================================================
+        var __SOURCE_HTML = document.documentElement.outerHTML;
+        var __verifyRootEl = document.getElementById("verify-root");
+        var __verifyBannerEl = document.getElementById("verify-banner");
+        var __INITIAL_TBODY_HTML = (__verifyRootEl ? __verifyRootEl.innerHTML : "__MISSING__").trim();
+        var __INITIAL_BANNER_TEXT = (__verifyBannerEl ? __verifyBannerEl.textContent : "__MISSING__").trim();
+
+        // =====================================================================
+        // COPY SSOT — modelled l10n keys (Japanese). The ONLY source of visible
+        // onboarding copy; nothing is written inline in the markup. Disclaimer
+        // reuses the existing app_ja.arb key verbatim.
+        // =====================================================================
+        var L = {
+          // existing app strings (reused verbatim from app_ja.arb)
+          appTitle: "メディマスタ",
+          aboutTitle: "アプリについて",
+          aboutLicensesTitle: "オープンソースライセンス",
+          aboutLicensesSubtitle: "使用しているオープンソースライブラリの一覧",
+          aboutAppVersionLabel: "バージョン 1.0.0",
+          aboutAppLegalese: "© 2026 Fictional Drug & Disease Ref Contributors",
+          tabSearch: "検索",
+          tabBookmarks: "ブックマーク",
+          tabHistory: "閲覧履歴",
+          tabCalc: "計算ツール",
+          searchTabDrugs: "医薬品",
+          searchTabDiseases: "疾患",
+          searchHintDrugs: "医薬品名・YJ・ATC コード",
+          searchActionSearch: "検索",
+          disclaimerRibbonText: "FICTIONAL DATA - NOT FOR MEDICAL USE / 架空データ・医療判断には使用不可",
+          // onboarding* (new)
+          onboardingSkip: "スキップ",
+          onboardingNext: "次へ",
+          onboardingStart: "使ってみる",
+          onboardingDone: "完了",
+          onboardingIntroP1Title: "メディマスタへようこそ",
+          onboardingIntroP1Body: "架空データの医薬品・疾患リファレンス。主要機能の所在を最初に案内する。",
+          onboardingIntroP2Title: "主要機能",
+          onboardingIntroP2Body: "検索・詳細・計算ツール・ブックマーク・閲覧履歴を 1 つに集約。",
+          onboardingFeatureSearch: "検索 — 医薬品・疾患をキーワードで検索",
+          onboardingFeatureDetail: "詳細 — 規制区分・用法用量・相互作用を参照",
+          onboardingFeatureCalc: "計算ツール — 用量計算を補助",
+          onboardingFeatureBookmark: "ブックマーク — 参照項目を保存",
+          onboardingFeatureHistory: "閲覧履歴 — 直近の参照を再表示",
+          onboardingIntroP3Title: "実画面ガイド",
+          onboardingIntroP3Body: "続いて実画面上で主要な操作位置を順に案内する。",
+          onboardingSpotlightSearchTitle: "検索フィールド",
+          onboardingSpotlightSearchBody: "キーワードを入力すると、医薬品・疾患を検索する。",
+          onboardingSpotlightNavTitle: "主ナビゲーション",
+          onboardingSpotlightNavBody:
+            "ブックマーク・閲覧履歴・計算ツールはここにある。常時表示され、どの画面からでも移動できる。",
+          onboardingSpotlightAboutTitle: "アプリについて",
+          onboardingSpotlightAboutBody: "アプリ情報の確認と、このガイドの再表示はここから行う。",
+          onboardingCoachLead: "ここを押すと",
+          // aboutTutorial* (new — reshow entry)
+          aboutTutorialTitle: "オンボーディングを再表示",
+          aboutTutorialSubtitle: "アプリの使い方ガイドをもう一度見る",
+        };
+
+        // The canonical disclaimer SSOT string for cross-check (must equal L key).
+        var DISCLAIMER_SSOT = "FICTIONAL DATA - NOT FOR MEDICAL USE / 架空データ・医療判断には使用不可";
+
+        // =====================================================================
+        // ICON SET — local inline SVG (no Material Symbols network dependency).
+        // =====================================================================
+        var ICONS = {
+          search:
+            '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.35-4.35"></path></svg>',
+          bookmark:
+            '<svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>',
+          history:
+            '<svg viewBox="0 0 24 24"><path d="M12 8v5l3 3"></path><path d="M3.05 11a9 9 0 1 0 .5-4"></path><path d="M3 3v5h5"></path></svg>',
+          calculate:
+            '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 7h8M8 11h2m4 0h2M8 15h2m4 0h2M8 19h2m4-4v4"></path></svg>',
+          info: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 8h.01"></path></svg>',
+          close: '<svg viewBox="0 0 24 24"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg>',
+          chevron_right: '<svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"></path></svg>',
+          arrow_back: '<svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg>',
+          chevron_right_thin: '<svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"></path></svg>',
+          check: '<svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"></path></svg>',
+          medication:
+            '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="4" rx="1"></rect><path d="M6 7h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7Z"></path><path d="M12 11v6M9 14h6"></path></svg>',
+          medical:
+            '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"></rect><path d="M12 9v6M9 12h6"></path></svg>',
+          menu_book:
+            '<svg viewBox="0 0 24 24"><path d="M12 6v14"></path><path d="M12 6C10 4.6 6.6 4.6 4 5.1V18c2.6-.5 6-.5 8 1 2-1.5 5.4-1.5 8-1V5.1C17.4 4.6 14 4.6 12 6z"></path></svg>',
+          touch_app:
+            '<svg viewBox="0 0 24 24"><path d="M9 11V6a2 2 0 0 1 4 0v5"></path><path d="M13 10V9a2 2 0 0 1 4 0v3"></path><path d="M17 12a2 2 0 0 1 4 0v3a6 6 0 0 1-6 6h-1.5a6 6 0 0 1-4.7-2.3L5 14.6a1.6 1.6 0 0 1 2.6-1.8L9 14.5"></path></svg>',
+          star: '<svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.5 6 .9-4.3 4.2 1 6L12 17.8 6.6 19.6l1-6L3.3 9.4l6-.9z"></path></svg>',
+          replay: '<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg>',
+          signal_cellular_alt:
+            '<svg viewBox="0 0 24 24"><path d="M4 20h16"></path><path d="M7 20v-4"></path><path d="M12 20v-8"></path><path d="M17 20V8"></path></svg>',
+          wifi: '<svg viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0"></path><path d="M8.5 16a5 5 0 0 1 7 0"></path><path d="M12 19h.01"></path></svg>',
+          battery_full:
+            '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="16" height="10" rx="2"></rect><path d="M21 11v2"></path></svg>',
+        };
+        function renderLocalIcons(root) {
+          (root || document).querySelectorAll(".ico, .os-ico").forEach(function (node) {
+            if (node.getAttribute("data-icon-token")) return;
+            var key = (node.textContent || "").trim();
+            if (ICONS[key]) {
+              node.setAttribute("data-icon-token", key);
+              node.innerHTML = ICONS[key];
+            }
+          });
+        }
+        function esc(s) {
+          return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // =====================================================================
+        // SHELL CHROME PRIMITIVES (mirror Search Screen Spec)
+        // =====================================================================
+        function statusBar(device) {
+          var time = device === "ipad" ? "22:19" : "22:22";
+          var date = device === "ipad" ? "  5月14日 (木)" : "";
+          return (
+            '<div class="status-bar"><span class="os-time">' +
+            time +
+            date +
+            "</span>" +
+            '<span class="os-indicators">' +
+            '<span class="os-ico">signal_cellular_alt</span>' +
+            '<span class="os-ico">wifi</span>' +
+            '<span class="os-ico">battery_full</span>' +
+            "</span></div>"
+          );
+        }
+        function appbar(opts) {
+          opts = opts || {};
+          var aboutCls = "about-icon" + (opts.aboutTarget ? " spot-target round-target" : "");
+          return (
+            '<div class="appbar"><span class="title">' +
+            esc(L.tabSearch) +
+            "</span>" +
+            '<div class="' +
+            aboutCls +
+            '" role="button" aria-label="' +
+            esc(L.aboutTitle) +
+            '"' +
+            (opts.aboutTarget ? ' data-spotlight-focus="about-icon"' : "") +
+            '><span class="ico" aria-hidden="true">info</span></div></div>'
+          );
+        }
+        function toolbar(opts) {
+          opts = opts || {};
+          var fieldCls = "search-field" + (opts.searchTarget ? " spot-target" : "");
+          return (
+            '<div class="toolbar">' +
+            '<div class="seg-tabs" role="tablist" aria-label="検索カテゴリ">' +
+            '<div class="opt on" role="tab" aria-selected="true">' +
+            esc(L.searchTabDrugs) +
+            "</div>" +
+            '<div class="opt" role="tab" aria-selected="false">' +
+            esc(L.searchTabDiseases) +
+            "</div>" +
+            "</div>" +
+            '<div class="search-row">' +
+            '<div class="' +
+            fieldCls +
+            '"' +
+            (opts.searchTarget ? ' data-spotlight-focus="search-field"' : "") +
+            ">" +
+            '<span class="ico" aria-hidden="true">search</span>' +
+            '<span class="ph">' +
+            esc(L.searchHintDrugs) +
+            "</span></div>" +
+            '<div class="search-btn">' +
+            esc(L.searchActionSearch) +
+            "</div>" +
+            "</div></div>"
+          );
+        }
+        function resultsPlaceholder() {
+          function row(brand, generic, meta, chip) {
+            return (
+              '<div class="result-card"><div class="card-image"><span class="ico" aria-hidden="true">medication</span></div>' +
+              '<div class="meta-wrap"><div class="chips"><span class="chip-s ' +
+              chip.cls +
+              '">' +
+              esc(chip.t) +
+              "</span></div>" +
+              '<div class="brand">' +
+              esc(brand) +
+              '</div><div class="generic">' +
+              esc(generic) +
+              "</div>" +
+              '<div class="meta-line">' +
+              esc(meta) +
+              "</div></div></div>"
+            );
+          }
+          return (
+            row("カルジオスタchin錠 5mg", "アムロジ仮想ピン", "ATC: C08CA01 · 改訂 2024-08-12", {
+              cls: "chip-rx",
+              t: "処方箋医薬品",
+            }) +
+            row("ガストフィクト顆粒", "架空ランソプラ仮", "ATC: A02BC03 · 改訂 2024-06-30", {
+              cls: "chip-otc",
+              t: "普通薬",
+            }) +
+            row("ニューロフィクトカプセル", "仮想プレガバ", "ATC: N03AX16 · 改訂 2024-05-18", {
+              cls: "chip-rx",
+              t: "処方箋医薬品",
+            })
+          );
+        }
+        var NAV_ITEMS = [
+          { ic: "search", lbl: L.tabSearch, active: true },
+          { ic: "bookmark", lbl: L.tabBookmarks },
+          { ic: "history", lbl: L.tabHistory },
+          { ic: "calculate", lbl: L.tabCalc },
+        ];
+        function bottomNav(opts) {
+          opts = opts || {};
+          var cls = "bottom-nav" + (opts.navTarget ? " spot-target bar-target" : "");
+          return (
+            '<div class="' +
+            cls +
+            '" role="navigation" aria-label="主要ナビゲーション"' +
+            (opts.navTarget ? ' data-spotlight-focus="nav-tabs"' : "") +
+            ">" +
+            NAV_ITEMS.map(function (it) {
+              return (
+                '<div class="nav-item' +
+                (it.active ? " active" : "") +
+                '" role="link" aria-label="' +
+                esc(it.lbl) +
+                '">' +
+                '<span class="ico-wrap"><span class="ico" aria-hidden="true">' +
+                it.ic +
+                "</span></span>" +
+                '<span class="lbl">' +
+                esc(it.lbl) +
+                "</span></div>"
+              );
+            }).join("") +
+            "</div>"
+          );
+        }
+        function navRail(opts) {
+          opts = opts || {};
+          var cls = "nav-rail" + (opts.navTarget ? " spot-target bar-target" : "");
+          return (
+            '<nav class="' +
+            cls +
+            '" role="navigation" aria-label="主要ナビゲーション"' +
+            (opts.navTarget ? ' data-spotlight-focus="nav-tabs"' : "") +
+            ">" +
+            NAV_ITEMS.map(function (it) {
+              return (
+                '<div class="nav-rail-item' +
+                (it.active ? " active" : "") +
+                '" role="link" aria-label="' +
+                esc(it.lbl) +
+                '" title="' +
+                esc(it.lbl) +
+                '">' +
+                '<span class="ico-wrap"><span class="ico" aria-hidden="true">' +
+                it.ic +
+                "</span></span>" +
+                '<span class="lbl">' +
+                esc(it.lbl) +
+                "</span></div>"
+              );
+            }).join("") +
+            "</nav>"
+          );
+        }
+        function ribbon() {
+          return (
+            '<div class="ribbon" aria-label="免責: 架空データ・医療判断には使用しないでください">' +
+            '<span class="accent">·</span> ' +
+            esc(L.disclaimerRibbonText) +
+            ' <span class="accent">·</span></div>'
+          );
+        }
+
+        // =====================================================================
+        // INTRO CAROUSEL
+        // =====================================================================
+        var PAGE_DEF = [
+          { n: 1, icon: "medical", title: L.onboardingIntroP1Title, body: L.onboardingIntroP1Body, kind: "welcome" },
+          { n: 2, icon: "menu_book", title: L.onboardingIntroP2Title, body: L.onboardingIntroP2Body, kind: "features" },
+          { n: 3, icon: "touch_app", title: L.onboardingIntroP3Title, body: L.onboardingIntroP3Body, kind: "teaser" },
+        ];
+        function dots(active) {
+          var out = '<div class="ob-dots" data-dots aria-label="' + active + ' / 3 ページ">';
+          for (var i = 1; i <= 3; i++) out += '<span class="dot' + (i === active ? " on" : "") + '"></span>';
+          return out + "</div>";
+        }
+        function featureList() {
+          var items = [
+            { ic: "search", key: "onboardingFeatureSearch", t: L.onboardingFeatureSearch },
+            { ic: "medication", key: "onboardingFeatureDetail", t: L.onboardingFeatureDetail },
+            { ic: "calculate", key: "onboardingFeatureCalc", t: L.onboardingFeatureCalc },
+            { ic: "bookmark", key: "onboardingFeatureBookmark", t: L.onboardingFeatureBookmark },
+            { ic: "history", key: "onboardingFeatureHistory", t: L.onboardingFeatureHistory },
+          ];
+          return (
+            '<div class="ob-features" data-feature-count="' +
+            items.length +
+            '">' +
+            items
+              .map(function (it) {
+                var parts = it.t.split(" — ");
+                return (
+                  '<div class="ob-feature" data-feature-key="' +
+                  it.key +
+                  '" data-feature-icon="' +
+                  it.ic +
+                  '"><div class="ico-wrap"><span class="ico" aria-hidden="true">' +
+                  it.ic +
+                  "</span></div>" +
+                  '<div class="f-text"><div class="f-title">' +
+                  esc(parts[0]) +
+                  '</div><div class="f-sub">' +
+                  esc(parts[1] || "") +
+                  "</div></div></div>"
+                );
+              })
+              .join("") +
+            "</div>"
+          );
+        }
+        function introPage(device, page) {
+          var p = PAGE_DEF[page - 1];
+          var layout = device === "ipad" ? "tablet" : "phone";
+          var isLast = p.n === 3;
+          var nextBtn =
+            '<button class="ob-next' +
+            (isLast ? " start" : "") +
+            '" data-role="' +
+            (isLast ? "start" : "next") +
+            '">' +
+            esc(isLast ? L.onboardingStart : L.onboardingNext) +
+            (isLast ? "" : ' <span class="ico" aria-hidden="true">chevron_right</span>') +
+            "</button>";
+
+          var bodyInner =
+            '<div class="ob-icon"><span class="ico" aria-hidden="true">' +
+            p.icon +
+            "</span></div>" +
+            '<h3 class="ob-title">' +
+            esc(p.title) +
+            "</h3>" +
+            '<p class="ob-text">' +
+            esc(p.body) +
+            "</p>";
+          if (p.kind === "welcome") {
+            bodyInner +=
+              '<div class="ob-disclaimer" data-disclaimer><span class="accent">·</span><span class="d-text">' +
+              esc(L.disclaimerRibbonText) +
+              "</span></div>";
+          } else if (p.kind === "features") {
+            bodyInner += featureList();
+          }
+
+          var bodyWrap;
+          if (layout === "tablet") {
+            // two-column: icon column + text column (responsive adaptation)
+            var icon = '<div class="ob-icon"><span class="ico" aria-hidden="true">' + p.icon + "</span></div>";
+            var textCol =
+              '<div class="ob-col-text"><h3 class="ob-title">' +
+              esc(p.title) +
+              "</h3>" +
+              '<p class="ob-text">' +
+              esc(p.body) +
+              "</p>";
+            if (p.kind === "welcome") {
+              textCol +=
+                '<div class="ob-disclaimer" data-disclaimer><span class="accent">·</span><span class="d-text">' +
+                esc(L.disclaimerRibbonText) +
+                "</span></div>";
+            } else if (p.kind === "features") {
+              textCol += featureList();
+            }
+            textCol += "</div>";
+            bodyWrap = '<div class="ob-intro-body">' + icon + textCol + "</div>";
+          } else {
+            bodyWrap = '<div class="ob-intro-body">' + bodyInner + "</div>";
+          }
+
+          return (
+            '<div class="ob-intro" data-phase="intro" data-intro-page="' +
+            p.n +
+            '" data-layout="' +
+            layout +
+            '">' +
+            '<div class="ob-intro-head">' +
+            '<button class="ob-skip" data-skip data-phase="intro">' +
+            esc(L.onboardingSkip) +
+            ' <span class="ico" aria-hidden="true">close</span></button>' +
+            "</div>" +
+            bodyWrap +
+            '<div class="ob-intro-foot">' +
+            dots(p.n) +
+            nextBtn +
+            "</div>" +
+            "</div>"
+          );
+        }
+
+        function introFrame(device, theme, page) {
+          var isTab = device === "ipad";
+          var cls = "frame" + (isTab ? " tablet" : "") + (theme === "dark" ? " dark" : "");
+          var label = "intro/" + device + "/" + theme + "/p" + page;
+          return (
+            '<div class="frame ' +
+            (isTab ? "tablet " : "") +
+            (theme === "dark" ? "dark" : "") +
+            '" ' +
+            'data-frame-label="' +
+            label +
+            '" data-phase="intro" data-theme="' +
+            theme +
+            '" data-device-class="' +
+            (isTab ? "tablet" : "phone") +
+            '" data-device="' +
+            device +
+            '">' +
+            '<div class="device">' +
+            statusBar(device) +
+            introPage(device, page) +
+            "</div></div>"
+          );
+        }
+
+        // =====================================================================
+        // SPOTLIGHT FRAME
+        // =====================================================================
+        var SPOT_DEF = {
+          "search-field": {
+            title: L.onboardingSpotlightSearchTitle,
+            body: L.onboardingSpotlightSearchBody,
+            at: "at-search",
+          },
+          "nav-tabs": { title: L.onboardingSpotlightNavTitle, body: L.onboardingSpotlightNavBody, at: "at-nav" },
+          "about-icon": {
+            title: L.onboardingSpotlightAboutTitle,
+            body: L.onboardingSpotlightAboutBody,
+            at: "at-about",
+          },
+        };
+        var SPOT_ORDER = ["search-field", "nav-tabs", "about-icon"];
+        function coachCard(target, isLast) {
+          var d = SPOT_DEF[target];
+          var step = SPOT_ORDER.indexOf(target) + 1;
+          var nextLabel = isLast ? L.onboardingDone : L.onboardingNext;
+          return (
+            '<div class="coach-card ' +
+            d.at +
+            '" data-coachmark-card data-for="' +
+            target +
+            '">' +
+            '<div class="cc-step">' +
+            step +
+            " / 3</div>" +
+            '<div class="cc-title">' +
+            esc(d.title) +
+            "</div>" +
+            '<div class="cc-lead">' +
+            esc(L.onboardingCoachLead) +
+            "</div>" +
+            '<p class="cc-body" data-this-happens>' +
+            esc(d.body) +
+            "</p>" +
+            '<div class="cc-foot"><button class="cc-skip" data-skip data-phase="spotlight">' +
+            esc(L.onboardingSkip) +
+            "</button>" +
+            '<button class="cc-next">' +
+            esc(nextLabel) +
+            "</button></div>" +
+            "</div>"
+          );
+        }
+        function spotlightFrame(device, theme, target, orientation) {
+          var isLast = target === SPOT_ORDER[SPOT_ORDER.length - 1];
+          var isTab = device === "ipad";
+          // Nav form follows ORIENTATION, never device (mirrors app_shell.dart:
+          // _usesNavigationRail = constraints.maxWidth > constraints.maxHeight).
+          // Default orientation by device only as a convenience; callers may override.
+          if (!orientation) orientation = isTab ? "landscape" : "portrait";
+          var landscape = orientation === "landscape";
+          var label = "spotlight/" + device + "/" + orientation + "/" + theme + "/" + target;
+          var classes =
+            "frame spotlight" +
+            (isTab ? " tablet" : "") +
+            (landscape ? " landscape" : "") +
+            (theme === "dark" ? " dark" : "");
+          var opts = {
+            searchTarget: target === "search-field",
+            navTarget: target === "nav-tabs",
+            aboutTarget: target === "about-icon",
+          };
+          var inner;
+          if (landscape) {
+            inner =
+              '<div class="device">' +
+              navRail(opts) +
+              '<div class="device-main">' +
+              appbar(opts) +
+              toolbar(opts) +
+              '<div class="body"><div class="scroll">' +
+              resultsPlaceholder() +
+              "</div></div>" +
+              ribbon() +
+              "</div>" +
+              '<div class="scrim"></div>' +
+              coachCard(target, isLast) +
+              "</div>";
+          } else {
+            inner =
+              '<div class="device">' +
+              statusBar(device) +
+              appbar(opts) +
+              toolbar(opts) +
+              '<div class="body"><div class="scroll">' +
+              resultsPlaceholder() +
+              "</div></div>" +
+              ribbon() +
+              bottomNav(opts) +
+              '<div class="scrim"></div>' +
+              coachCard(target, isLast) +
+              "</div>";
+          }
+          return (
+            '<div class="' +
+            classes +
+            '" data-frame-label="' +
+            label +
+            '" data-phase="spotlight" data-theme="' +
+            theme +
+            '" ' +
+            'data-device-class="' +
+            (isTab ? "tablet" : "phone") +
+            '" data-device="' +
+            device +
+            '" data-orientation="' +
+            (landscape ? "landscape" : "portrait") +
+            '">' +
+            inner +
+            "</div>"
+          );
+        }
+
+        // =====================================================================
+        // ABOUT SCREEN (reshow entry)
+        // =====================================================================
+        function aboutScreen(device, theme) {
+          var isTab = device === "ipad";
+          var cls = "frame" + (isTab ? " tablet" : "") + (theme === "dark" ? " dark" : "");
+          // Flat ListView of plain ListTiles — no leading icons, no section headers,
+          // no legalese footer (faithful to lib/ui/about/about_view.dart).
+          function tile(opts) {
+            var tileCls = "about-tile" + (opts.disabled ? " disabled" : "");
+            return (
+              '<div class="' +
+              tileCls +
+              '" role="listitem" ' +
+              (opts.attrs || "") +
+              ">" +
+              '<div class="tile-text"><div class="tile-title">' +
+              esc(opts.title) +
+              "</div>" +
+              (opts.sub ? '<div class="tile-sub">' + esc(opts.sub) + "</div>" : "") +
+              "</div>" +
+              (opts.trailing
+                ? '<div class="trail"><span class="ico" aria-hidden="true">chevron_right</span></div>'
+                : "") +
+              "</div>"
+            );
+          }
+          var content =
+            // Pushed top-level route AppBar: auto-inserted LEADING back button +
+            // app-wide AppBarTheme(centerTitle:true). about_view.dart overrides neither.
+            '<div class="appbar centered">' +
+            '<div class="nav-back" role="button" aria-label="\u623B\u308B"><span class="ico" aria-hidden="true">arrow_back</span></div>' +
+            '<span class="title">' +
+            esc(L.aboutTitle) +
+            "</span></div>" +
+            '<div class="body"><div class="about-list" role="list">' +
+            // (1) disabled version tile — title only, no leading, no trailing
+            tile({ title: L.aboutAppVersionLabel, disabled: true, attrs: 'data-tile="version" aria-disabled="true"' }) +
+            // (2) licenses tile — title + subtitle + trailing chevron, no leading
+            tile({
+              title: L.aboutLicensesTitle,
+              sub: L.aboutLicensesSubtitle,
+              trailing: true,
+              attrs: 'data-tile="licenses"',
+            }) +
+            // (3) re-show tile — SAME structural form as the licenses tile
+            tile({
+              title: L.aboutTutorialTitle,
+              sub: L.aboutTutorialSubtitle,
+              trailing: true,
+              attrs: 'data-tile="reshow" data-reshow-entry="about"',
+            }) +
+            "</div></div>";
+          return (
+            '<div class="' +
+            cls +
+            '" data-frame-label="about/' +
+            device +
+            "/" +
+            theme +
+            '" data-theme="' +
+            theme +
+            '" data-device-class="' +
+            (isTab ? "tablet" : "phone") +
+            '" data-device="' +
+            device +
+            '">' +
+            // No shell chrome: a route pushed on the root navigator has NO bottom-nav /
+            // nav-rail (shell-only) and NO disclaimer ribbon (shell-only). Just the Scaffold.
+            '<div class="device">' +
+            statusBar(device) +
+            content +
+            "</div></div>"
+          );
+        }
+
+        // =====================================================================
+        // BUILD MOCK ROWS
+        // =====================================================================
+        function mockBlock(containerId, titleHtml, subHtml, rows) {
+          var el = document.getElementById(containerId);
+          el.innerHTML =
+            '<div class="mock-block-title">' +
+            titleHtml +
+            "</div>" +
+            '<div class="mock-block-sub">' +
+            subHtml +
+            "</div>" +
+            rows;
+        }
+        function row(rowClass, labelName, desc, framesHtml, wraps) {
+          var inner = "";
+          if (wraps) {
+            inner = wraps
+              .map(function (w) {
+                return '<div class="mock-wrap"><h4>' + w.h + "</h4>" + w.frame + "</div>";
+              })
+              .join("");
+          } else {
+            inner = framesHtml;
+          }
+          return (
+            '<div class="mock-row ' +
+            (rowClass || "") +
+            '">' +
+            '<div class="row-label"><span class="state-name">' +
+            labelName +
+            '</span><span class="desc">' +
+            desc +
+            "</span></div>" +
+            inner +
+            "</div>"
+          );
+        }
+
+        // INTRO — iPhone: 3 pages × light/dark
+        (function () {
+          var rows = "";
+          for (var p = 1; p <= 3; p++) {
+            var pageName = p === 1 ? "ようこそ + 免責" : p === 2 ? "主要機能" : "実画面ガイド予告";
+            rows += row(
+              "",
+              "iPhone · page " + p + " / 3 — " + pageName,
+              p === 1
+                ? "免責は既存 disclaimerRibbonText を再利用。"
+                : p === 3
+                  ? "最終ページ = 「使ってみる」で spotlight へ。"
+                  : "アイコン + タイトル + 本文。",
+              "",
+              [
+                { h: 'light <span class="pill">light</span>', frame: introFrame("iphone", "light", p) },
+                { h: 'dark <span class="pill dark">dark</span>', frame: introFrame("iphone", "dark", p) },
+              ],
+            );
+          }
+          mockBlock(
+            "mock-intro-iphone",
+            'Intro — iPhone (phone layout) <span class="pill">portrait</span>',
+            "single-column。Skip 右上・3 点ドット・Next、最終ページに「使ってみる」。",
+            rows,
+          );
+        })();
+
+        // INTRO — iPad: 3 pages × light/dark (tablet two-column layout)
+        (function () {
+          var rows = "";
+          for (var p = 1; p <= 3; p++) {
+            var pageName = p === 1 ? "ようこそ + 免責" : p === 2 ? "主要機能" : "実画面ガイド予告";
+            rows += row(
+              "tablet",
+              "iPad · page " + p + " / 3 — " + pageName,
+              "tablet レイアウト = 2 カラム (アイコン + テキスト)。同一文言・同一フローを適応。",
+              "",
+              [
+                { h: 'light <span class="pill">light</span>', frame: introFrame("ipad", "light", p) },
+                { h: 'dark <span class="pill dark">dark</span>', frame: introFrame("ipad", "dark", p) },
+              ],
+            );
+          }
+          mockBlock(
+            "mock-intro-ipad",
+            'Intro — iPad (tablet layout) <span class="pill">portrait</span>',
+            "shortestSide ≥ 600 → tablet。アイコン左 / テキスト右の 2 カラムに適応 (OB-10)。",
+            rows,
+          );
+        })();
+
+        // SPOTLIGHT — iPhone portrait (bottom-nav): 3 steps light + nav step dark
+        (function () {
+          var rows = "";
+          SPOT_ORDER.forEach(function (t, i) {
+            rows += row(
+              "",
+              "iPhone · step " + (i + 1) + " / 3 — " + SPOT_DEF[t].title,
+              "フォーカス枠 + 「ここを押すとこうなる」カード。portrait = bottom NavigationBar。",
+              spotlightFrame("iphone", "light", t),
+            );
+          });
+          rows += row(
+            "",
+            "iPhone · dark — 主ナビゲーション",
+            "dark テーマでの coachmark。",
+            spotlightFrame("iphone", "dark", "nav-tabs"),
+          );
+          rows += row(
+            "landscape",
+            "iPhone landscape · 主ナビゲーション — NavigationRail",
+            "向きが landscape になれば iPhone でも NavigationRail。ナビ形態は端末クラスではなく向きで決まる。",
+            spotlightFrame("iphone", "light", "nav-tabs", "landscape"),
+          );
+          mockBlock(
+            "mock-spot-iphone",
+            'Spotlight — iPhone <span class="pill">portrait · bottom-nav</span>',
+            "shell 常時可視 chrome のみを対象。非アクティブタブ内 widget は対象外。最後の 1 枚は orientation 規則のデモ (landscape → rail)。",
+            rows,
+          );
+        })();
+
+        // SPOTLIGHT — iPad landscape (nav-rail): 3 steps light + nav step dark
+        (function () {
+          var rows = "";
+          SPOT_ORDER.forEach(function (t, i) {
+            rows += row(
+              "landscape",
+              "iPad landscape · step " + (i + 1) + " / 3 — " + SPOT_DEF[t].title,
+              "landscape = NavigationRail。主ナビ対象は実描画要素 (rail) に解決。",
+              spotlightFrame("ipad", "light", t),
+            );
+          });
+          rows += row(
+            "landscape",
+            "iPad landscape · dark — 主ナビゲーション",
+            "dark テーマでの rail coachmark。",
+            spotlightFrame("ipad", "dark", "nav-tabs"),
+          );
+          rows += row(
+            "tablet",
+            "iPad portrait · 主ナビゲーション — bottom NavigationBar",
+            "iPad でも portrait なら bottom NavigationBar。ナビ形態は端末ではなく向きで決まる。",
+            spotlightFrame("ipad", "light", "nav-tabs", "portrait"),
+          );
+          mockBlock(
+            "mock-spot-ipad",
+            'Spotlight — iPad <span class="pill">orientation-driven nav</span>',
+            "向きで主ナビ形態が変わるため、spotlight はその時点の実描画ナビ要素を対象にする。portrait → bottom-nav / landscape → nav-rail。",
+            rows,
+          );
+        })();
+
+        // RESHOW — About screen iPhone light/dark
+        (function () {
+          var rows = row(
+            "",
+            "アプリについて — 再表示項目",
+            "既存ライセンス項目と同形の ListTile を追加。選択で intro から再提示、完了フラグは維持。",
+            "",
+            [
+              { h: 'light <span class="pill">light</span>', frame: aboutScreen("iphone", "light") },
+              { h: 'dark <span class="pill dark">dark</span>', frame: aboutScreen("iphone", "dark") },
+            ],
+          );
+          mockBlock(
+            "mock-reshow",
+            'Re-show entry — About screen <span class="pill">OB-9</span>',
+            "「オンボーディングを再表示」項目 (aboutTutorial* キー)。既存ライセンス項目と同形の ListTile。",
+            rows,
+          );
+        })();
+
+        // =====================================================================
+        // RESPONSIVE LIVE DEMO — breakpoint 600 toggles phone<->tablet
+        // =====================================================================
+        var BREAKPOINT = 600;
+        function deviceClassFor(shortestSide) {
+          return shortestSide >= BREAKPOINT ? "tablet" : "phone";
+        }
+        var respFrame = document.getElementById("resp-frame");
+        var respRange = document.getElementById("resp-range");
+        var respW = document.getElementById("resp-w");
+        var respClass = document.getElementById("resp-class");
+        function renderRespDemo(width) {
+          // shortestSide of an upright phone/tablet ~ the width here (portrait)
+          var cls = deviceClassFor(width);
+          var device = cls === "tablet" ? "ipad" : "iphone";
+          var isTab = device === "ipad";
+          // Dynamic width lives on the WRAPPER (#resp-frame), not on any .frame node,
+          // so the .frame subtree stays free of inline literal px (token discipline).
+          respFrame.style.width = width + "px";
+          respFrame.innerHTML =
+            '<div class="frame' +
+            (isTab ? " tablet" : "") +
+            '">' +
+            '<div class="device">' +
+            statusBar(device) +
+            introPage(device, 1) +
+            "</div></div>";
+          renderLocalIcons(respFrame);
+          respW.textContent = width;
+          respClass.textContent = cls;
+          respClass.className = "resp-badge" + (cls === "tablet" ? " tablet" : "");
+        }
+        if (respRange) {
+          respRange.addEventListener("input", function () {
+            renderRespDemo(parseInt(respRange.value, 10));
+          });
+          renderRespDemo(parseInt(respRange.value, 10));
+        }
+
+        // =====================================================================
+        // TOKEN PREVIEWS (doc chrome)
+        // =====================================================================
+        (function () {
+          var colors = [
+            { nm: "--primary", light: "#007aff", dark: "#9ecaff" },
+            { nm: "--primary-cont", light: "#d8e4ff", dark: "#003494" },
+            { nm: "--bg", light: "#f2f2f7", dark: "#101317" },
+            { nm: "--surface", light: "#ffffff", dark: "#181b20" },
+            { nm: "--ink", light: "#1a1c1e", dark: "#e5e7ec" },
+            { nm: "--muted", light: "#6c7177", dark: "#9ca1aa" },
+            { nm: "ribbon bg", light: "#1a1c1e", dark: "#0d0e13" },
+            { nm: "ribbon accent", light: "#ffb4ab", dark: "#ffb4ab" },
+          ];
+          document.getElementById("tok-colors").innerHTML = colors
+            .map(function (c) {
+              return (
+                '<div class="tok"><div class="sw" style="background:linear-gradient(90deg,' +
+                c.light +
+                " 0 50%," +
+                c.dark +
+                ' 50% 100%)"></div>' +
+                '<div class="nm">' +
+                esc(c.nm) +
+                '</div><div class="vl">' +
+                c.light +
+                " / " +
+                c.dark +
+                "</div></div>"
+              );
+            })
+            .join("");
+
+          var types = [
+            { nm: "page heading", v: "22/700 phone · 26/700 tablet", fs: 22, fw: 700, t: "メディマスタ" },
+            { nm: "ob title", v: "22-28 / 700", fs: 22, fw: 700, t: "主要機能" },
+            { nm: "body", v: "13-14 / 400", fs: 14, fw: 400, t: "架空データの医薬品・疾患リファレンス。" },
+            { nm: "chip / label", v: "11 / 700", fs: 11, fw: 700, t: "処方箋医薬品" },
+            { nm: "mono code", v: "11 / JetBrains Mono", fs: 11, fw: 600, t: "ATC: C08CA01", mono: true },
+          ];
+          document.getElementById("tok-type").innerHTML = types
+            .map(function (t) {
+              return (
+                '<div class="type-row"><div class="meta"><b>' +
+                esc(t.nm) +
+                "</b>" +
+                esc(t.v) +
+                "</div>" +
+                '<div style="font-family:' +
+                (t.mono ? "var(--mono)" : "var(--jp)") +
+                ";font-size:" +
+                t.fs +
+                "px;font-weight:" +
+                t.fw +
+                '">' +
+                esc(t.t) +
+                "</div></div>"
+              );
+            })
+            .join("");
+
+          var space = [
+            { nm: "--s-1", v: "4px" },
+            { nm: "--s-2", v: "8px" },
+            { nm: "--s-3", v: "12px" },
+            { nm: "--s-4", v: "16px" },
+            { nm: "--s-6", v: "24px" },
+            { nm: "--s-8", v: "32px" },
+            { nm: "--r-tile", v: "8px" },
+            { nm: "--r-card", v: "10px" },
+            { nm: "--r-pill", v: "22px" },
+            { nm: "--r-fab", v: "18px" },
+          ];
+          document.getElementById("tok-space").innerHTML = space
+            .map(function (s) {
+              var px = parseInt(s.v, 10);
+              return (
+                '<div class="tok"><div class="sw" style="background:var(--primary-soft);border:1px solid var(--primary-ring);width:' +
+                Math.min(px * 2 + 8, 72) +
+                "px;height:" +
+                Math.min(px * 2 + 8, 44) +
+                "px;border-radius:" +
+                (s.nm.indexOf("--r") === 0 ? s.v : "4px") +
+                '"></div>' +
+                '<div class="nm">' +
+                esc(s.nm) +
+                '</div><div class="vl">' +
+                s.v +
+                "</div></div>"
+              );
+            })
+            .join("");
+        })();
+
+        // =====================================================================
+        // COPY SSOT TABLE
+        // =====================================================================
+        (function () {
+          var groups = [
+            {
+              label: "intro — onboarding*",
+              keys: [
+                "onboardingIntroP1Title",
+                "onboardingIntroP1Body",
+                "onboardingIntroP2Title",
+                "onboardingIntroP2Body",
+                "onboardingFeatureSearch",
+                "onboardingFeatureDetail",
+                "onboardingFeatureCalc",
+                "onboardingFeatureBookmark",
+                "onboardingFeatureHistory",
+                "onboardingIntroP3Title",
+                "onboardingIntroP3Body",
+                "onboardingSkip",
+                "onboardingNext",
+                "onboardingStart",
+              ],
+            },
+            {
+              label: "spotlight — onboarding*",
+              keys: [
+                "onboardingSpotlightSearchTitle",
+                "onboardingSpotlightSearchBody",
+                "onboardingSpotlightNavTitle",
+                "onboardingSpotlightNavBody",
+                "onboardingSpotlightAboutTitle",
+                "onboardingSpotlightAboutBody",
+                "onboardingCoachLead",
+                "onboardingDone",
+              ],
+            },
+            { label: "reshow — aboutTutorial*", keys: ["aboutTutorialTitle", "aboutTutorialSubtitle"] },
+            { label: "disclaimer — reused (do not redefine)", keys: ["disclaimerRibbonText"] },
+          ];
+          var html =
+            "<thead><tr><th style='width:280px'>l10n key</th><th>value (ja)</th><th style='width:90px'>note</th></tr></thead><tbody>";
+          groups.forEach(function (g) {
+            html += '<tr class="group"><td colspan="3">' + esc(g.label) + "</td></tr>";
+            g.keys.forEach(function (k) {
+              var note = k === "disclaimerRibbonText" ? '<span class="reuse">REUSE</span>' : "new";
+              html +=
+                '<tr><td class="key">' +
+                esc(k) +
+                '</td><td class="val">' +
+                esc(L[k]) +
+                "</td><td>" +
+                note +
+                "</td></tr>";
+            });
+          });
+          html += "</tbody>";
+          document.getElementById("copy-table").innerHTML = html;
+        })();
+
+        // render icons everywhere now that frames exist
+        renderLocalIcons(document);
+
+        // cover counts
+        document.getElementById("cover-intro-count").textContent =
+          document.querySelectorAll('[data-phase="intro"][data-frame-label]').length + " frames";
+        document.getElementById("cover-spot-count").textContent =
+          document.querySelectorAll('[data-phase="spotlight"][data-frame-label]').length + " frames";
+
+        // =====================================================================
+        // VERIFICATION — compute every row from the LIVE DOM.
+        // =====================================================================
+        var AC = document.getElementById("onboarding-spec-audit-contract");
+        function ac(name) {
+          return AC ? AC.getAttribute(name) : null;
+        }
+
+        var introFrames = Array.from(document.querySelectorAll('.frame[data-phase="intro"]'));
+        var spotFrames = Array.from(document.querySelectorAll('.frame[data-phase="spotlight"]'));
+
+        // VR-01 — intro page count == 3 (distinct pages within one device/theme)
+        var iphoneLight = introFrames.filter(function (f) {
+          return f.getAttribute("data-device") === "iphone" && f.getAttribute("data-theme") === "light";
+        });
+        var distinctPages = {};
+        iphoneLight.forEach(function (f) {
+          var p = f.querySelector("[data-intro-page]");
+          if (p) distinctPages[p.getAttribute("data-intro-page")] = true;
+        });
+        var pageCount = Object.keys(distinctPages).length;
+        var vr01 = {
+          id: "VR-01",
+          method: "C",
+          pass: pageCount === 3 && ac("data-intro-page-count") === "3",
+          evidence:
+            "Intro distinct page count (iPhone/light) = " +
+            pageCount +
+            "; audit-contract data-intro-page-count=" +
+            ac("data-intro-page-count") +
+            ". Expected 3.",
+        };
+
+        // VR-02 — fictional-data disclaimer present on page 1 (and equals reused l10n)
+        var page1Frames = introFrames.filter(function (f) {
+          var pg = f.querySelector("[data-intro-page]");
+          return pg && pg.getAttribute("data-intro-page") === "1";
+        });
+        var p1Bad = [];
+        page1Frames.forEach(function (f) {
+          var d = f.querySelector("[data-disclaimer]");
+          if (!d) {
+            p1Bad.push((f.getAttribute("data-frame-label") || "?") + ":missing");
+            return;
+          }
+          if ((d.textContent || "").indexOf(DISCLAIMER_SSOT) < 0)
+            p1Bad.push((f.getAttribute("data-frame-label") || "?") + ":text");
+        });
+        var nonP1WithDisc = introFrames.filter(function (f) {
+          var pg = f.querySelector("[data-intro-page]");
+          return pg && pg.getAttribute("data-intro-page") !== "1" && f.querySelector("[data-disclaimer]");
+        });
+        var vr02 = {
+          id: "VR-02",
+          method: "C",
+          pass:
+            page1Frames.length === 4 &&
+            p1Bad.length === 0 &&
+            nonP1WithDisc.length === 0 &&
+            ac("data-disclaimer-on-page") === "1",
+          evidence:
+            "Page-1 frames = " +
+            page1Frames.length +
+            " (each carries [data-disclaimer] == disclaimerRibbonText). Bad: " +
+            (p1Bad.length ? p1Bad.join(", ") : "none") +
+            "; disclaimer on non-page-1: " +
+            nonP1WithDisc.length +
+            ".",
+        };
+
+        // VR-03 — Skip present in BOTH phases
+        var introSkip = introFrames.filter(function (f) {
+          return f.querySelector('[data-skip][data-phase="intro"]');
+        }).length;
+        var spotSkip = spotFrames.filter(function (f) {
+          return f.querySelector('[data-skip][data-phase="spotlight"]');
+        }).length;
+        var vr03 = {
+          id: "VR-03",
+          method: "C",
+          pass:
+            introSkip === introFrames.length &&
+            introFrames.length > 0 &&
+            spotSkip === spotFrames.length &&
+            spotFrames.length > 0 &&
+            ac("data-skip-available") === "both-phases",
+          evidence:
+            "Skip in intro frames " +
+            introSkip +
+            "/" +
+            introFrames.length +
+            ", in spotlight frames " +
+            spotSkip +
+            "/" +
+            spotFrames.length +
+            ". Both phases must be fully covered.",
+        };
+
+        // VR-04 — every intro frame: EXACTLY 3 dots, EXACTLY ONE .dot.on, and the
+        // active dot's 1-indexed position === that frame's data-intro-page.
+        var dotBad = [];
+        introFrames.forEach(function (f) {
+          var lab = f.getAttribute("data-frame-label") || "?";
+          var d = f.querySelector("[data-dots]");
+          var pgEl = f.querySelector("[data-intro-page]");
+          var page = pgEl ? pgEl.getAttribute("data-intro-page") : "?";
+          if (!d) {
+            dotBad.push(lab + ":no-dots");
+            return;
+          }
+          var all = d.querySelectorAll(".dot");
+          var on = d.querySelectorAll(".dot.on");
+          if (all.length !== 3) {
+            dotBad.push(lab + ":count" + all.length);
+            return;
+          }
+          if (on.length !== 1) {
+            dotBad.push(lab + ":active" + on.length);
+            return;
+          }
+          var pos = Array.prototype.indexOf.call(all, on[0]) + 1;
+          if (String(pos) !== String(page)) dotBad.push(lab + ":pos" + pos + "\u2260p" + page);
+        });
+        var vr04 = {
+          id: "VR-04",
+          method: "C",
+          pass: introFrames.length > 0 && dotBad.length === 0 && ac("data-dot-indicator-count") === "3",
+          evidence:
+            "Every intro frame (" +
+            introFrames.length +
+            ") has 3 dots with exactly one active dot positioned at data-intro-page. Bad: " +
+            (dotBad.length ? dotBad.join(", ") : "none") +
+            "; audit count=" +
+            ac("data-dot-indicator-count") +
+            ".",
+        };
+
+        // VR-05 — "start" button present on last (page 3) frame; NOT on pages 1/2
+        var startBad = [];
+        introFrames.forEach(function (f) {
+          var pg = f.querySelector("[data-intro-page]");
+          var page = pg ? pg.getAttribute("data-intro-page") : "?";
+          var hasStart = !!f.querySelector('[data-role="start"]');
+          if (page === "3" && !hasStart) startBad.push((f.getAttribute("data-frame-label") || "?") + ":no-start");
+          if (page !== "3" && hasStart) startBad.push((f.getAttribute("data-frame-label") || "?") + ":early-start");
+        });
+        var vr05 = {
+          id: "VR-05",
+          method: "C",
+          pass: startBad.length === 0,
+          evidence:
+            'Last intro page (3) carries [data-role=start] (="' +
+            esc(L.onboardingStart) +
+            '"); pages 1-2 use [data-role=next]. Bad: ' +
+            (startBad.length ? startBad.join(", ") : "none") +
+            ".",
+        };
+
+        // Intro matrix — every (device,theme) track must render pages {1,2,3}.
+        var allFrames = Array.from(document.querySelectorAll(".frame[data-frame-label]"));
+        var introMatrix = {};
+        introFrames.forEach(function (f) {
+          var k = f.getAttribute("data-device") + "/" + f.getAttribute("data-theme");
+          var pgEl = f.querySelector("[data-intro-page]");
+          var pg = pgEl ? pgEl.getAttribute("data-intro-page") : "?";
+          (introMatrix[k] = introMatrix[k] || {})[pg] = true;
+        });
+        var INTRO_TRACKS = ["iphone/light", "iphone/dark", "ipad/light", "ipad/dark"];
+        var introMissing = [];
+        INTRO_TRACKS.forEach(function (k) {
+          var pages = introMatrix[k] || {};
+          ["1", "2", "3"].forEach(function (p) {
+            if (!pages[p]) introMissing.push(k + ":p" + p);
+          });
+        });
+        var introMatrixOk = introMissing.length === 0 && introFrames.length === 12;
+
+        // VR-06 — THEME coverage via the full 12-cell intro matrix (light AND dark
+        // each carry all 3 pages on both devices). Not an "at least one" check.
+        var lightTracks = INTRO_TRACKS.filter(function (k) {
+          return (
+            /\/light$/.test(k) &&
+            !introMissing.some(function (m) {
+              return m.indexOf(k + ":") === 0;
+            })
+          );
+        });
+        var darkTracks = INTRO_TRACKS.filter(function (k) {
+          return (
+            /\/dark$/.test(k) &&
+            !introMissing.some(function (m) {
+              return m.indexOf(k + ":") === 0;
+            })
+          );
+        });
+        var vr06 = {
+          id: "VR-06",
+          method: "C",
+          pass:
+            introMatrixOk && lightTracks.length === 2 && darkTracks.length === 2 && ac("data-themes") === "light,dark",
+          evidence:
+            "Intro matrix 3 pages \u00d7 {light,dark} \u00d7 {iphone,ipad} = 12 frames (have " +
+            introFrames.length +
+            "). Complete light tracks: " +
+            lightTracks.length +
+            "/2, dark tracks: " +
+            darkTracks.length +
+            "/2. Missing cells: " +
+            (introMissing.length ? introMissing.join(", ") : "none") +
+            ".",
+        };
+
+        // VR-07 — DEVICE coverage via the same full matrix (iphone AND ipad each
+        // carry all 3 pages on both themes).
+        var phoneTracks = INTRO_TRACKS.filter(function (k) {
+          return (
+            /^iphone\//.test(k) &&
+            !introMissing.some(function (m) {
+              return m.indexOf(k + ":") === 0;
+            })
+          );
+        });
+        var padTracks = INTRO_TRACKS.filter(function (k) {
+          return (
+            /^ipad\//.test(k) &&
+            !introMissing.some(function (m) {
+              return m.indexOf(k + ":") === 0;
+            })
+          );
+        });
+        var vr07 = {
+          id: "VR-07",
+          method: "C",
+          pass:
+            introMatrixOk &&
+            phoneTracks.length === 2 &&
+            padTracks.length === 2 &&
+            ac("data-device-classes") === "iphone,ipad",
+          evidence:
+            "Same 12-cell matrix — complete iPhone tracks: " +
+            phoneTracks.length +
+            "/2, iPad tracks: " +
+            padTracks.length +
+            "/2 (each = pages {1,2,3}). Missing cells: " +
+            (introMissing.length ? introMissing.join(", ") : "none") +
+            ".",
+        };
+
+        // VR-08 — breakpoint(600) toggles phone<->tablet layout (functional)
+        var f599 = deviceClassFor(599),
+          f600 = deviceClassFor(600),
+          f900 = deviceClassFor(900);
+        var liveDemoOk = respClass && (respClass.textContent === "phone" || respClass.textContent === "tablet");
+        var vr08 = {
+          id: "VR-08",
+          method: "F",
+          pass:
+            f599 === "phone" &&
+            f600 === "tablet" &&
+            f900 === "tablet" &&
+            ac("data-tablet-breakpoint") === "600" &&
+            liveDemoOk,
+          evidence:
+            "deviceClassFor(599)=" +
+            f599 +
+            ", (600)=" +
+            f600 +
+            ", (900)=" +
+            f900 +
+            "; BREAKPOINT=" +
+            BREAKPOINT +
+            "; live demo class=" +
+            (respClass ? respClass.textContent : "n/a") +
+            ".",
+        };
+
+        // VR-09 — spotlight focus targets are ONLY always-visible shell chrome.
+        // Positively assert each [data-spotlight-focus] is a descendant of shell
+        // chrome (.appbar / .toolbar / .bottom-nav / .nav-rail) and is NEVER inside
+        // the tab content area (.body .scroll). No vacuous data-inactive-tab branch.
+        var allowed = { "search-field": 1, "nav-tabs": 1, "about-icon": 1 };
+        var focusEls = Array.from(document.querySelectorAll("[data-spotlight-focus]"));
+        var badFocus = [];
+        var seenTargets = {};
+        focusEls.forEach(function (el) {
+          var t = el.getAttribute("data-spotlight-focus");
+          seenTargets[t] = true;
+          if (!allowed[t]) {
+            badFocus.push(t);
+            return;
+          }
+          var okEl =
+            (t === "search-field" && el.classList.contains("search-field")) ||
+            (t === "nav-tabs" && (el.classList.contains("bottom-nav") || el.classList.contains("nav-rail"))) ||
+            (t === "about-icon" && el.classList.contains("about-icon"));
+          if (!okEl) badFocus.push(t + ":wrong-el");
+          // POSITIVE: must live inside persistent shell chrome
+          if (!el.closest(".appbar, .toolbar, .bottom-nav, .nav-rail")) badFocus.push(t + ":not-shell-chrome");
+          // NEGATIVE: must never be inside the scrollable tab content
+          if (el.closest(".body .scroll")) badFocus.push(t + ":in-tab-content");
+        });
+        var coveredAll = seenTargets["search-field"] && seenTargets["nav-tabs"] && seenTargets["about-icon"];
+        var vr09 = {
+          id: "VR-09",
+          method: "C",
+          pass:
+            focusEls.length > 0 &&
+            badFocus.length === 0 &&
+            coveredAll &&
+            ac("data-spotlight-target-scope") === "shell-chrome-only" &&
+            ac("data-spotlight-targets") === "search-field,nav-tabs,about-icon",
+          evidence:
+            "Spotlight focus targets (" +
+            focusEls.length +
+            ") \u2286 {search-field, nav-tabs, about-icon}, all three covered=" +
+            !!coveredAll +
+            "; each inside shell chrome (.appbar/.toolbar/.bottom-nav/.nav-rail) and none inside .body .scroll. Bad: " +
+            (badFocus.length ? badFocus.join(", ") : "none") +
+            ".",
+        };
+
+        // VR-10 — each spotlight target has a "press-here -> this-happens" content card
+        var cardBad = [];
+        spotFrames.forEach(function (f) {
+          var card = f.querySelector("[data-coachmark-card]");
+          var lead = card ? card.querySelector(".cc-lead") : null;
+          var happens = card ? card.querySelector("[data-this-happens]") : null;
+          if (!card) {
+            cardBad.push((f.getAttribute("data-frame-label") || "?") + ":no-card");
+            return;
+          }
+          if (!lead || (lead.textContent || "").trim() !== L.onboardingCoachLead)
+            cardBad.push((f.getAttribute("data-frame-label") || "?") + ":no-lead");
+          if (!happens || (happens.textContent || "").trim().length < 4)
+            cardBad.push((f.getAttribute("data-frame-label") || "?") + ":no-effect");
+        });
+        var vr10 = {
+          id: "VR-10",
+          method: "C",
+          pass: spotFrames.length > 0 && cardBad.length === 0,
+          evidence:
+            "Every spotlight frame (" +
+            spotFrames.length +
+            ') has a coachmark card with "' +
+            esc(L.onboardingCoachLead) +
+            '" lead + non-empty effect text. Bad: ' +
+            (cardBad.length ? cardBad.join(", ") : "none") +
+            ".",
+        };
+
+        // VR-11 — reshow entry in About + persist key
+        var reshowEl = document.querySelector('[data-reshow-entry="about"]');
+        var reshowTitleOk = reshowEl && (reshowEl.textContent || "").indexOf(L.aboutTutorialTitle) >= 0;
+        var vr11 = {
+          id: "VR-11",
+          method: "C",
+          pass:
+            !!reshowEl &&
+            !!reshowTitleOk &&
+            ac("data-reshow-entry") === "about" &&
+            ac("data-persist-key") === "onboarding_completed",
+          evidence:
+            'Re-show entry present in About list ("' +
+            esc(L.aboutTutorialTitle) +
+            '"); audit data-reshow-entry=' +
+            ac("data-reshow-entry") +
+            ", data-persist-key=" +
+            ac("data-persist-key") +
+            ".",
+        };
+
+        // VR-12 — disclaimer REUSE, computed from the live DOM. The rendered page-1
+        // [data-disclaimer] text must equal the value bound from the reused
+        // disclaimerRibbonText key, AND no other onboarding* copy key may hold that
+        // same disclaimer string (i.e. it is reused, never re-defined). Reads the DOM
+        // and the copy SSOT — capable of FAILing if either invariant breaks.
+        var p1Frame = page1Frames[0];
+        var discNode = p1Frame ? p1Frame.querySelector("[data-disclaimer] .d-text") : null;
+        var discText = discNode ? (discNode.textContent || "").trim() : "__missing__";
+        var renderedReuse =
+          !!discNode && discText === L.disclaimerRibbonText && L.disclaimerRibbonText === DISCLAIMER_SSOT;
+        var redefiners = Object.keys(L).filter(function (k) {
+          return k.indexOf("onboarding") === 0 && L[k] === DISCLAIMER_SSOT;
+        });
+        var vr12 = {
+          id: "VR-12",
+          method: "C",
+          pass: renderedReuse && redefiners.length === 0,
+          evidence:
+            "Rendered page-1 [data-disclaimer] text " +
+            (discNode ? "matches reused disclaimerRibbonText=" + renderedReuse : "MISSING") +
+            "; onboarding* keys re-defining the disclaimer string: " +
+            (redefiners.length ? redefiners.join(", ") : "none") +
+            ". (Reads DOM + copy SSOT; can fail.)",
+        };
+
+        // VR-13 — required contract spans all present
+        var reqNames = [
+          "disclaimer-page1",
+          "skip-button",
+          "dot-indicator-3",
+          "start-button-last-page",
+          "spotlight-shell-chrome",
+          "spotlight-done-on-last",
+          "feature-list-5",
+          "token-discipline",
+          "nav-form-by-orientation",
+          "responsive-breakpoint",
+        ];
+        var missingReq = reqNames.filter(function (n) {
+          return !document.querySelector('#onboarding-spec-audit-contract [data-required="' + n + '"]');
+        });
+        var vr13 = {
+          id: "VR-13",
+          method: "C",
+          pass: missingReq.length === 0,
+          evidence:
+            "audit-contract declares all required invariants. Missing: " +
+            (missingReq.length ? missingReq.join(", ") : "none") +
+            ".",
+        };
+
+        // VR-14 — (OB-3) spotlight nav-button label: the FINAL target's .cc-next ==
+        // onboardingDone ("完了"); every NON-final target's .cc-next == onboardingNext ("次へ").
+        var spotNextBad = [];
+        spotFrames.forEach(function (f) {
+          var lab = f.getAttribute("data-frame-label") || "?";
+          var card = f.querySelector("[data-coachmark-card]");
+          var forT = card ? card.getAttribute("data-for") : null;
+          var nextBtn = card ? card.querySelector(".cc-next") : null;
+          var txt = nextBtn ? (nextBtn.textContent || "").trim() : "__none__";
+          var expected = forT === SPOT_ORDER[SPOT_ORDER.length - 1] ? L.onboardingDone : L.onboardingNext;
+          if (txt !== expected) spotNextBad.push(lab + ':"' + txt + '"\u2260"' + expected + '"');
+        });
+        var vr14 = {
+          id: "VR-14",
+          method: "C",
+          pass:
+            spotFrames.length > 0 &&
+            spotNextBad.length === 0 &&
+            !!document.querySelector('#onboarding-spec-audit-contract [data-required="spotlight-done-on-last"]'),
+          evidence:
+            "Final spotlight target's .cc-next = \"" +
+            esc(L.onboardingDone) +
+            '"; non-final = "' +
+            esc(L.onboardingNext) +
+            "\" (computed per coachmark card's data-for). Bad: " +
+            (spotNextBad.length ? spotNextBad.join(", ") : "none") +
+            ".",
+        };
+
+        // VR-15 — (OB-8) intro page-2 .ob-features renders EXACTLY 5 items in order
+        // [search, detail, calc, bookmark, history]; each item's rendered icon token +
+        // label bind to the 5 onboardingFeature* keys (not 4, not 6).
+        var EXPECT_FEATURES = [
+          { key: "onboardingFeatureSearch", ic: "search" },
+          { key: "onboardingFeatureDetail", ic: "medication" },
+          { key: "onboardingFeatureCalc", ic: "calculate" },
+          { key: "onboardingFeatureBookmark", ic: "bookmark" },
+          { key: "onboardingFeatureHistory", ic: "history" },
+        ];
+        var page2Frames = introFrames.filter(function (f) {
+          var pg = f.querySelector("[data-intro-page]");
+          return pg && pg.getAttribute("data-intro-page") === "2";
+        });
+        var featBad = [];
+        page2Frames.forEach(function (f) {
+          var lab = f.getAttribute("data-frame-label") || "?";
+          var list = f.querySelector(".ob-features");
+          if (!list) {
+            featBad.push(lab + ":no-list");
+            return;
+          }
+          if (list.getAttribute("data-feature-count") !== "5")
+            featBad.push(lab + ":attr=" + list.getAttribute("data-feature-count"));
+          var items = list.querySelectorAll(".ob-feature");
+          if (items.length !== 5) {
+            featBad.push(lab + ":count" + items.length);
+            return;
+          }
+          EXPECT_FEATURES.forEach(function (ef, i) {
+            var it = items[i];
+            if (it.getAttribute("data-feature-key") !== ef.key)
+              featBad.push(lab + ":order" + i + "=" + it.getAttribute("data-feature-key"));
+            var icoNode = it.querySelector(".ico");
+            if (!icoNode || icoNode.getAttribute("data-icon-token") !== ef.ic)
+              featBad.push(lab + ":icon" + i + "=" + (icoNode ? icoNode.getAttribute("data-icon-token") : "none"));
+            var head = (L[ef.key] || "").split(" \u2014 ")[0];
+            if ((it.textContent || "").indexOf(head) < 0) featBad.push(lab + ":label" + i);
+          });
+        });
+        var vr15 = {
+          id: "VR-15",
+          method: "C",
+          pass:
+            page2Frames.length === 4 &&
+            featBad.length === 0 &&
+            !!document.querySelector('#onboarding-spec-audit-contract [data-required="feature-list-5"]'),
+          evidence:
+            "Intro page-2 .ob-features = EXACTLY 5 items in order [search, detail, calc, bookmark, history]; icon token + label bound to onboardingFeature* keys. Page-2 frames=" +
+            page2Frames.length +
+            "; bad: " +
+            (featBad.length ? featBad.join(", ") : "none") +
+            ".",
+        };
+
+        // VR-16 — (token §6) STRUCTURAL token discipline: no inline literal hex / rgb( /
+        // rgba( / numeric px appears in any element's inline style attribute inside a
+        // .frame subtree — every painted value must resolve to a var(--*). NOTE: audits
+        // token discipline (structure) only; a standalone HTML cannot cross-check a CSS
+        // value (e.g. --scrim) against the Flutter source.
+        var styleEls = Array.prototype.slice.call(document.querySelectorAll(".frame[style], .frame [style]"));
+        var styleBad = [];
+        styleEls.forEach(function (el) {
+          var s = el.getAttribute("style") || "";
+          var hits = [];
+          if (/#[0-9a-fA-F]{3,8}\b/.test(s)) hits.push("hex");
+          if (/rgba?\(/i.test(s)) hits.push("rgb");
+          if (/(^|[^a-zA-Z-])\d+(\.\d+)?px\b/.test(s)) hits.push("px");
+          if (hits.length) styleBad.push((el.getAttribute("class") || el.tagName) + "{" + hits.join("+") + "}");
+        });
+        var vr16 = {
+          id: "VR-16",
+          method: "C",
+          pass:
+            styleBad.length === 0 &&
+            !!document.querySelector('#onboarding-spec-audit-contract [data-required="token-discipline"]'),
+          evidence:
+            "Inline-style scan over all .frame subtrees (" +
+            styleEls.length +
+            " styled nodes): no literal hex / rgb() / px \u2014 every painted value resolves to var(--*). Structure-only (no value cross-check vs Flutter). Violations: " +
+            (styleBad.length ? styleBad.join(", ") : "none") +
+            ".",
+        };
+
+        // VR-17 — (About §4.3) About is a FLAT list; the re-show tile shares the
+        // licenses tile's structural form (same class, title + subtitle + trailing
+        // chevron, same flat list) and the frame introduces no section-header / footer /
+        // leading-icon chrome absent from lib/ui/about/about_view.dart.
+        var aboutFrames = Array.prototype.slice.call(document.querySelectorAll('.frame[data-frame-label^="about/"]'));
+        var aboutBad = [];
+        aboutFrames.forEach(function (f) {
+          var lab = f.getAttribute("data-frame-label");
+          var list = f.querySelector(".about-list");
+          var licenses = f.querySelector('.about-tile[data-tile="licenses"]');
+          var reshow = f.querySelector('.about-tile[data-tile="reshow"]');
+          if (!list) {
+            aboutBad.push(lab + ":no-list");
+            return;
+          }
+          if (!licenses || !reshow) {
+            aboutBad.push(lab + ":missing-tile");
+            return;
+          }
+          if (licenses.className !== reshow.className)
+            aboutBad.push(lab + ':class"' + reshow.className + '"\u2260"' + licenses.className + '"');
+          ["licenses", "reshow"].forEach(function (nm) {
+            var t = nm === "licenses" ? licenses : reshow;
+            if (!t.querySelector(".tile-title")) aboutBad.push(lab + ":" + nm + ":no-title");
+            if (!t.querySelector(".tile-sub")) aboutBad.push(lab + ":" + nm + ":no-sub");
+            if (!t.querySelector(".trail")) aboutBad.push(lab + ":" + nm + ":no-trailing");
+          });
+          if (licenses.parentElement !== reshow.parentElement || reshow.parentElement !== list)
+            aboutBad.push(lab + ":not-same-flat-list");
+          if (f.querySelector(".about-section-label")) aboutBad.push(lab + ":section-header");
+          if (f.querySelector(".about-tile .lead-ico")) aboutBad.push(lab + ":leading-icon");
+          if ((reshow.textContent || "").indexOf(L.aboutTutorialTitle) < 0) aboutBad.push(lab + ":reshow-title");
+        });
+        var vr17 = {
+          id: "VR-17",
+          method: "C",
+          pass: aboutFrames.length > 0 && aboutBad.length === 0,
+          evidence:
+            "About = flat ListView; re-show tile == licenses tile structural form (same class, title+subtitle+trailing chevron, same list); no section-header / footer / leading-icon chrome. About frames=" +
+            aboutFrames.length +
+            "; bad: " +
+            (aboutBad.length ? aboutBad.join(", ") : "none") +
+            ".",
+        };
+
+        // VR-18 — (nav §4.2) nav form resolves by ORIENTATION, not device: every
+        // spotlight frame with data-orientation="portrait" renders .bottom-nav and no
+        // .nav-rail; every "landscape" renders .nav-rail and no .bottom-nav. The matrix
+        // shows both nav forms on BOTH device classes (rule is orientation-driven).
+        var navFormBad = [];
+        var navCombos = {};
+        spotFrames.forEach(function (f) {
+          var lab = f.getAttribute("data-frame-label") || "?";
+          var o = f.getAttribute("data-orientation");
+          var hasBottom = !!f.querySelector(".bottom-nav");
+          var hasRail = !!f.querySelector(".nav-rail");
+          navCombos[f.getAttribute("data-device") + "/" + o] = true;
+          if (o === "portrait") {
+            if (!hasBottom || hasRail) navFormBad.push(lab + ":portrait-needs-bottom-only");
+          } else if (o === "landscape") {
+            if (!hasRail || hasBottom) navFormBad.push(lab + ":landscape-needs-rail-only");
+          } else navFormBad.push(lab + ":no-orientation");
+        });
+        var demoBothDevices =
+          navCombos["iphone/portrait"] &&
+          navCombos["iphone/landscape"] &&
+          navCombos["ipad/portrait"] &&
+          navCombos["ipad/landscape"];
+        var vr18 = {
+          id: "VR-18",
+          method: "C",
+          pass:
+            spotFrames.length > 0 &&
+            navFormBad.length === 0 &&
+            !!demoBothDevices &&
+            !!document.querySelector('#onboarding-spec-audit-contract [data-required="nav-form-by-orientation"]'),
+          evidence:
+            "portrait \u2192 .bottom-nav only, landscape \u2192 .nav-rail only, on every spotlight frame. Both nav forms shown on both devices (orientation-, not device-driven): " +
+            !!demoBothDevices +
+            ". Bad: " +
+            (navFormBad.length ? navFormBad.join(", ") : "none") +
+            ".",
+        };
+
+        // VR-19 — (About §pushed-route chrome) The About screen is a TOP-LEVEL route
+        // pushed on the root navigator (context.push), NOT a StatefulShellRoute child.
+        // Ground truth from Flutter: about_view.dart leaves automaticallyImplyLeading at
+        // its default → a LEADING back button is auto-inserted; app-wide
+        // AppBarTheme(centerTitle:true) is not overridden → the title is CENTERED; and a
+        // pushed route carries NO shell chrome (bottom-nav / nav-rail / disclaimer ribbon
+        // all live in the shell). CONTRAST: the search/spotlight backdrop is the shell
+        // root (app_tab_header sets automaticallyImplyLeading:false + centerTitle:false),
+        // so its title is LEFT-aligned with no back button. All checks below are GEOMETRIC
+        // (getBoundingClientRect) + element-absence on the LIVE DOM — never marker-class
+        // presence (that would be a VR-12-style tautology and is forbidden here).
+        var aboutChromeBad = [];
+        var ABT_EPS = 2; // px
+        // Reference: the search shell app bar must be LEFT-aligned (title center well
+        // short of the app-bar center). Proves the two screens genuinely DIFFER.
+        var searchAppbar = document.querySelector('.frame[data-phase="spotlight"] .appbar');
+        var searchTitleLeft = false;
+        if (searchAppbar) {
+          var searchTitleEl = searchAppbar.querySelector(".title");
+          if (!searchTitleEl) {
+            aboutChromeBad.push("search:no-title");
+          } else {
+            var sAb = searchAppbar.getBoundingClientRect();
+            var sTb = searchTitleEl.getBoundingClientRect();
+            searchTitleLeft = sTb.left + sTb.width / 2 < sAb.left + sAb.width / 2 - ABT_EPS;
+            if (!searchTitleLeft) aboutChromeBad.push("search:title-not-left");
+          }
+          if (searchAppbar.querySelector(".nav-back")) aboutChromeBad.push("search:has-back-button");
+        } else {
+          aboutChromeBad.push("no-search-appbar-ref");
+        }
+        aboutFrames.forEach(function (f) {
+          var lab = f.getAttribute("data-frame-label");
+          var appbar = f.querySelector(".appbar");
+          var title = appbar ? appbar.querySelector(".title") : null;
+          var back = appbar ? appbar.querySelector(".nav-back") : null;
+          if (!appbar || !title) {
+            aboutChromeBad.push(lab + ":no-appbar/title");
+            return;
+          }
+          if (!back) {
+            aboutChromeBad.push(lab + ":no-back-button");
+            return;
+          }
+          var ab = appbar.getBoundingClientRect();
+          var tb = title.getBoundingClientRect();
+          var bb = back.getBoundingClientRect();
+          // (a) BACK BUTTON sits to the LEFT of the title (geometry, not presence)
+          if (!(bb.right <= tb.left))
+            aboutChromeBad.push(lab + ":back-not-left(" + Math.round(bb.right) + ">" + Math.round(tb.left) + ")");
+          // (b) CENTERED TITLE: title center ≈ app-bar center
+          var d = Math.abs(tb.left + tb.width / 2 - (ab.left + ab.width / 2));
+          if (d >= ABT_EPS) aboutChromeBad.push(lab + ":title-not-centered(\u0394" + Math.round(d) + ")");
+          // (c) pushed route → NO shell bottom-nav / nav-rail
+          if (f.querySelector(".bottom-nav")) aboutChromeBad.push(lab + ":has-bottom-nav");
+          if (f.querySelector(".nav-rail")) aboutChromeBad.push(lab + ":has-nav-rail");
+          // (d) pushed route → NO disclaimer ribbon
+          if (f.querySelector(".ribbon")) aboutChromeBad.push(lab + ":has-ribbon");
+        });
+        var vr19 = {
+          id: "VR-19",
+          method: "C",
+          pass:
+            aboutFrames.length > 0 &&
+            !!searchAppbar &&
+            searchTitleLeft &&
+            aboutChromeBad.length === 0 &&
+            !!document.querySelector('#onboarding-spec-audit-contract [data-required="about-pushed-route-chrome"]'),
+          evidence:
+            "About = pushed top-level route: LEADING back button left of a CENTERED title (|titleCenter\u2212appbarCenter|<" +
+            ABT_EPS +
+            "px) while the shell search title is LEFT-shifted, not centered (left=" +
+            searchTitleLeft +
+            ", so the two screens differ); pushed route has no .bottom-nav / .nav-rail / .ribbon. About frames=" +
+            aboutFrames.length +
+            "; bad: " +
+            (aboutChromeBad.length ? aboutChromeBad.join(", ") : "none") +
+            ".",
+        };
+
+        // VR-AUDIT-A — verify-root / verify-banner empty on disk (no static <tr> forgery)
+        var vrAuditA = {
+          id: "VR-AUDIT-A",
+          method: "S",
+          pass: __INITIAL_TBODY_HTML === "" && __INITIAL_BANNER_TEXT === "",
+          evidence:
+            "Captured BEFORE mutation: #verify-root inner = " +
+            (__INITIAL_TBODY_HTML === "" ? "empty" : "NON-EMPTY(" + __INITIAL_TBODY_HTML.length + ")") +
+            ", #verify-banner text = " +
+            (__INITIAL_BANNER_TEXT === "" ? "empty" : "NON-EMPTY") +
+            ". Any static verdict markup fails this row.",
+        };
+
+        // VR-AUDIT-B — no literal verdict (>" + "PASS" + "< or >" + "FAIL" + "<) outside <script> in the on-disk source
+        var srcNoScripts = __SOURCE_HTML.replace(/<script[\s\S]*?<\/script>/gi, "");
+        var verdictLeak = srcNoScripts.match(/>\s*(PASS|FAIL)\s*</g);
+        var vrAuditB = {
+          id: "VR-AUDIT-B",
+          method: "S",
+          pass: verdictLeak === null,
+          evidence:
+            "On-disk source (scripts stripped) must contain no literal verdict between tags. Matches: " +
+            (verdictLeak === null ? "none" : verdictLeak.length) +
+            ". Verdicts are JS-computed only.",
+        };
+
+        var rows_ = [
+          vr01,
+          vr02,
+          vr03,
+          vr04,
+          vr05,
+          vr06,
+          vr07,
+          vr08,
+          vr09,
+          vr10,
+          vr11,
+          vr12,
+          vr13,
+          vr14,
+          vr15,
+          vr16,
+          vr17,
+          vr18,
+          vr19,
+          vrAuditA,
+          vrAuditB,
+        ];
+        var anyFail = rows_.some(function (r) {
+          return !r.pass;
+        });
+        var failIds = rows_
+          .filter(function (r) {
+            return !r.pass;
+          })
+          .map(function (r) {
+            return r.id;
+          });
+        var vrAgg = {
+          id: "VR-ALL",
+          method: "C",
+          pass: !anyFail,
+          evidence:
+            "Aggregate of VR-01..VR-19 + VR-AUDIT-A/B. " +
+            failIds.length +
+            " FAIL row(s)" +
+            (failIds.length ? " [" + failIds.join(", ") + "]" : "") +
+            ".",
+        };
+        var sorted = [
+          vr01,
+          vr02,
+          vr03,
+          vr04,
+          vr05,
+          vr06,
+          vr07,
+          vr08,
+          vr09,
+          vr10,
+          vr11,
+          vr12,
+          vr13,
+          vr14,
+          vr15,
+          vr16,
+          vr17,
+          vr18,
+          vr19,
+          vrAuditA,
+          vrAuditB,
+          vrAgg,
+        ];
+
+        var frameCount = allFrames.length;
+        var bannerVerdict = anyFail ? "FAIL" : "ALL PASS";
+        var banner = anyFail
+          ? '<div class="vr-banner fail"><span class="pill">' +
+            bannerVerdict +
+            "</span> Verification did not pass. FAIL row(s): " +
+            failIds.join(", ") +
+            ".</div>"
+          : '<div class="vr-banner"><span class="pill">' +
+            bannerVerdict +
+            "</span> 全 " +
+            sorted.length +
+            " 行クリア。Frame count = " +
+            frameCount +
+            "。単一ファイル SSOT 配信可。</div>";
+        document.getElementById("verify-banner").innerHTML = banner;
+
+        var thead =
+          '<table class="vr-table"><thead><tr><th>ID</th><th>Method</th><th>Result</th><th>Evidence</th></tr></thead><tbody>';
+        var tbody = sorted
+          .map(function (r) {
+            return (
+              '<tr><td class="id">' +
+              r.id +
+              '</td><td class="method">' +
+              r.method +
+              "</td>" +
+              '<td class="result ' +
+              (r.pass ? "pass" : "fail") +
+              '">' +
+              (r.pass ? "PASS" : "FAIL") +
+              "</td>" +
+              '<td class="evidence">' +
+              r.evidence +
+              "</td></tr>"
+            );
+          })
+          .join("");
+        document.getElementById("verify-root").innerHTML = thead + tbody + "</tbody></table>";
+      })();
+    </script>
+  </body>
+</html>
